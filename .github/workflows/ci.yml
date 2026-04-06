@@ -1,0 +1,158 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── Lint ────────────────────────────────────────────────────────────────
+  lint:
+    name: Lint & Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+      - name: Install lint tools
+        run: pip install black==24.2.0 isort==5.13.2 flake8==7.0.0
+      - name: black
+        run: black --check src/ tests/ experiments/
+      - name: isort
+        run: isort --check-only --profile black src/ tests/ experiments/
+      - name: flake8
+        run: flake8 src/ tests/ experiments/ --max-line-length=88 --extend-ignore=E203,W503
+
+  # ── Unit tests ──────────────────────────────────────────────────────────
+  unit-tests:
+    name: Unit Tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -q libgdal-dev libhdf5-dev libnetcdf-dev
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements-dev.txt
+          pip install -e ".[dev]"
+      - name: Run unit tests with coverage
+        run: |
+          pytest tests/unit/ -v --timeout=60 \
+            --cov=src/wildfire_governance \
+            --cov-report=xml \
+            --cov-report=term-missing \
+            --cov-fail-under=75
+      - name: Upload coverage to Codecov
+        if: matrix.python-version == '3.10'
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage.xml
+          fail_ci_if_error: false
+
+  # ── Smoke test ──────────────────────────────────────────────────────────
+  smoke:
+    name: Smoke Test
+    runs-on: ubuntu-latest
+    needs: [unit-tests]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -e .
+      - name: Run smoke tests
+        run: pytest tests/smoke/ -v --timeout=60 --no-cov
+        timeout-minutes: 3
+
+  # ── Integration tests ────────────────────────────────────────────────────
+  integration:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: [smoke]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements-dev.txt
+          pip install -e ".[dev]"
+      - name: Run integration tests
+        run: pytest tests/integration/ -v --timeout=300 --no-cov
+        timeout-minutes: 10
+
+  # ── Theorem verification ─────────────────────────────────────────────────
+  theorems:
+    name: Verify Theorems 1 & 2
+    runs-on: ubuntu-latest
+    needs: [integration]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements-dev.txt
+          pip install -e ".[dev]"
+      - name: Verify Theorem 1 (Policy-Agnostic Safety) — random policy
+        run: |
+          pytest tests/integration/test_gomdp_policy_agnostic.py::test_theorem1_random_policy \
+            -v --timeout=120 --no-cov
+        timeout-minutes: 5
+      - name: Verify Theorem 2 (Adversarial Robustness Bound) — numerical
+        run: |
+          pytest tests/unit/test_breach_probability.py -v --timeout=30 --no-cov
+        timeout-minutes: 2
+      - name: Verify injection always blocked
+        run: |
+          pytest tests/integration/test_gomdp_policy_agnostic.py::test_theorem1_injection_always_blocked \
+            -v --timeout=60 --no-cov
+        timeout-minutes: 3
+
+  # ── Smoke experiment run ─────────────────────────────────────────────────
+  smoke-experiment:
+    name: Smoke Experiment (01_main_comparison)
+    runs-on: ubuntu-latest
+    needs: [theorems]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -e .
+      - name: Run smoke experiment
+        run: |
+          python experiments/01_main_comparison.py \
+            --config configs/experiments/paper_main_results.yaml \
+            --smoke
+        timeout-minutes: 5

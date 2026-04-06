@@ -1,0 +1,18 @@
+defaults:
+  - base
+
+simulation:
+  n_timesteps: 500      # Shorter for grid search over tau1/tau2
+  n_seeds: 20
+
+# tau1 and tau2 are swept inside the experiment script
+# default values used for reference
+verification:
+  thresholds:
+    tau1: 0.60
+    tau2: 0.80
+
+logging:
+  mlflow:
+    enabled: false
+    experiment_name: "sensitivity_thresholds"

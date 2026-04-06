@@ -1,0 +1,17 @@
+[flake8]
+max-line-length = 88
+extend-ignore = E203, W503, E501
+exclude =
+    .git,
+    __pycache__,
+    .venv,
+    build,
+    dist,
+    docs,
+    notebooks,
+    src/wildfire_governance/rl/checkpoints
+per-file-ignores =
+    tests/*: D100,D101,D102,D103,D104,D205,D400
+    experiments/*: D100,D101,D205
+    data/scripts/*: D100,D101
+    setup.py: D100

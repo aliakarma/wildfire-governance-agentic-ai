@@ -1,0 +1,86 @@
+# ============================================================
+# Base configuration — all paper defaults
+# Override via CLI: python script.py --config base.yaml simulation.n_uavs=40
+# ============================================================
+
+simulation:
+  grid_size: 100
+  n_timesteps: 3000             # 10s per step ≈ 8.3h simulated
+  n_seeds: 20
+  uav:
+    n_uavs: 20
+    velocity: 1.0               # grid cells per timestep
+    battery_capacity: 500       # steps before recharge
+    detection_probability: 0.85
+  fire:
+    alpha1: 0.3                 # wind coefficient in P_spread
+    alpha2: 0.5                 # fuel coefficient
+    alpha3: 0.4                 # humidity coefficient
+    n_ignition_points: 3
+    spread_model: "sigmoid_ca"  # stochastic cellular automaton
+  sensors:
+    ground_iot_density: 0.05
+    satellite_revisit: 6        # timesteps
+    satellite_latency: 2        # timesteps
+  anomaly_injection:
+    enabled: true
+    rate: 0.02                  # false anomalies per timestep
+    intensity_range: [0.3, 0.7]
+
+decision:
+  cpomdp:
+    cost_weights:
+      alpha: 0.50               # detection latency weight
+      beta: 0.35                # false alert weight
+      gamma: 0.15               # resource cost weight
+  belief:
+    filter_type: "bayesian"
+    n_particles: 500
+
+verification:
+  thresholds:
+    tau1: 0.60
+    tau2: 0.80
+    tau: 0.80
+  fusion:
+    w_h: 0.65
+    w_w: 0.35
+  bayesian_update:
+    detection_probability: 0.85
+    false_alarm_probability: 0.15
+  learning:
+    enabled: true
+    alpha_ema: 0.10
+
+blockchain:
+  n_validators: 7
+  max_byzantine: 2
+  platform: "hyperledger_fabric"
+  consensus_algorithm: "pbft_variant"
+  consensus:
+    mean_delay_steps: 1.2
+    std_delay_steps: 0.3
+    burst_multiplier: 1.35
+  crypto:
+    hash_algorithm: "sha3_256"
+    signature_algorithm: "ed25519"
+
+governance:
+  hitl:
+    mean_review_delay: 3.0
+    std_review_delay: 0.8
+    rejection_rate: 0.0
+  multi_signature:
+    required_signers: 4         # m-of-n (m=4, n=7)
+  alert:
+    dissemination_channels: ["primary", "backup"]
+
+logging:
+  level: "INFO"
+  format: "json"
+  mlflow:
+    enabled: false
+    experiment_name: "wildfire_governance"
+
+reproducibility:
+  global_seed: 42

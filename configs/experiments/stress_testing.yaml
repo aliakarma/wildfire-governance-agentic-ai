@@ -1,0 +1,18 @@
+defaults:
+  - base
+
+simulation:
+  n_timesteps: 3000
+  n_seeds: 20
+  uav:
+    n_uavs: 20
+
+# Stress parameters swept in experiment script:
+#   sensor_failure_rate: {0.0, 0.10, 0.20, 0.30, 0.40}
+#   p_drop: {0.0, 0.05, 0.10, 0.20}
+#   burst_multiplier: {1, 2, 3, 5}
+
+logging:
+  mlflow:
+    enabled: false
+    experiment_name: "stress_testing"

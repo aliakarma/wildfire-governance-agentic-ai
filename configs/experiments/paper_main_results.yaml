@@ -1,0 +1,15 @@
+# Exact configuration used for Tables II-IV and Figures 3-5 in the paper.
+# Override individual params with: python script.py simulation.n_uavs=40
+defaults:
+  - base
+
+simulation:
+  n_timesteps: 3000
+  n_seeds: 20
+  uav:
+    n_uavs: 20
+
+logging:
+  mlflow:
+    enabled: false
+    experiment_name: "paper_main_results"

@@ -1,0 +1,46 @@
+# Git
+.git
+.gitignore
+
+# Python caches
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+dist
+build
+.eggs
+
+# Test and lint caches
+.pytest_cache
+.mypy_cache
+.coverage
+coverage.xml
+htmlcov
+
+# Data (never include raw/processed datasets in Docker image)
+data/raw
+data/processed
+
+# Experiment run outputs (only paper/ is included)
+results/runs
+
+# ML artefacts (large files committed separately)
+mlruns
+wandb
+
+# Notebooks checkpoint
+.ipynb_checkpoints
+
+# Environment files with secrets
+.env
+*.pem
+*.key
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db

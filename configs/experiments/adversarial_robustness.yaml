@@ -1,0 +1,18 @@
+defaults:
+  - base
+
+simulation:
+  n_timesteps: 3000
+  n_seeds: 20
+  uav:
+    n_uavs: 20
+
+# Attack parameters are swept inside the experiment script
+# p_spoof: {0.0, 0.05, 0.10, 0.20}
+# n_byzantine: {0, 1, 2, 3}
+# p_att: 1.0 (direct injection)
+
+logging:
+  mlflow:
+    enabled: false
+    experiment_name: "adversarial_robustness"

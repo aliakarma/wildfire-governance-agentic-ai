@@ -1,0 +1,33 @@
+# Hyperledger Fabric local simulation parameters
+# Matches the paper's experimental setup (Section VI-A)
+
+platform: "hyperledger_fabric"
+network_type: "local_simulation"
+
+consensus:
+  algorithm: "pbft_variant"
+  n_validators: 7
+  max_byzantine: 2           # f < floor((k-1)/3) = 2
+  quorum_size: 5             # 2f+1 = 5 votes required
+
+  # Latency distribution (locally deployed network, consistent connectivity)
+  mean_delay_steps: 1.2
+  std_delay_steps: 0.3
+  burst_multiplier: 1.35     # Applied at 5x anomaly frequency
+
+crypto:
+  hash_algorithm: "sha3_256"
+  signature_algorithm: "ed25519"
+  key_storage: "hsm_simulation"   # In production: actual HSM
+
+smart_contract:
+  language: "go_chaincode"        # Hyperledger Fabric chaincode language
+  tau_alert: 0.80                 # Confidence threshold for alert approval
+  multi_signature:
+    required_signers: 4           # m-of-n (m=4, n=7): m >= floor(n/2)+1
+    total_validators: 7
+
+throughput:
+  max_concurrent_transactions: 50
+  nominal_tps: 100               # Transactions per second (local network)
+  burst_tps: 500                 # Peak TPS under burst conditions

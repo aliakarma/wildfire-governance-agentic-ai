@@ -1,0 +1,73 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.venv/
+venv/
+env/
+pip-wheel-metadata/
+
+# Data — never commit raw or processed datasets
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Results — only paper/ is committed; runs/ is gitignored
+results/runs/*
+!results/runs/.gitkeep
+
+# Credentials and secrets — NEVER commit
+.env
+*.pem
+*.key
+*.p12
+*.pfx
+*_key.json
+fabric-network/
+
+# ML artefacts
+mlruns/
+wandb/
+lightning_logs/
+*.ckpt
+*.pt
+!src/wildfire_governance/rl/checkpoints/ppo_gomdp_best.pt
+!src/wildfire_governance/rl/checkpoints/ppo_gomdp_final.pt
+
+# Test and lint caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Docs build
+site/
+docs/api/
+
+# Node (for any JS tooling)
+node_modules/
+
+# Logs
+*.log
+logs/

@@ -1,0 +1,12 @@
+defaults:
+  - base
+
+simulation:
+  n_timesteps: 3000
+  n_seeds: 20
+  # n_uavs is swept over [5, 10, 20, 40] inside the experiment script
+
+logging:
+  mlflow:
+    enabled: false
+    experiment_name: "scalability_uav_fleet"

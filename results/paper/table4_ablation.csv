@@ -1,0 +1,8 @@
+config,ld_mean,fp_mean,injections_blocked,injections_total,blockchain_integrity,n_seeds
+ppo_gomdp_full,15.1,6.0,100,100,True,20
+greedy_gomdp_full,18.3,6.1,100,100,True,20
+minus_coordination,29.7,6.1,100,100,True,20
+minus_hitl,15.2,22.4,100,100,True,20
+minus_blockchain,15.1,6.9,0,100,False,20
+minus_verification,15.0,14.8,100,100,True,20
+ppo_cmdp,14.8,8.3,0,100,False,20

@@ -1,0 +1,6 @@
+method,framework,ld_mean,ld_std,fp_mean,fp_std,governance_compliance_pct,n_seeds
+PPO-GOMDP,GOMDP,15.1,1.1,6.0,1.1,100.0,20
+Greedy-GOMDP,GOMDP,18.3,1.4,6.1,1.3,100.0,20
+PPO-CMDP,CMDP,14.8,1.0,8.3,2.4,92.8,20
+Adaptive-AI,None,16.2,1.2,22.4,2.1,0.0,20
+Static,None,41.5,3.1,15.3,2.4,0.0,20

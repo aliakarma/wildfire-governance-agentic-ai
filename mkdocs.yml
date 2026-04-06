@@ -1,0 +1,42 @@
+site_name: Wildfire Governance Agentic AI
+site_description: "GOMDP: Blockchain-Enforced Human Oversight for Safety-Critical Wildfire Monitoring"
+site_url: https://akarma-iu.github.io/wildfire-governance-agentic-ai/
+repo_url: https://github.com/akarma-iu/wildfire-governance-agentic-ai
+repo_name: wildfire-governance-agentic-ai
+
+theme:
+  name: material
+  palette:
+    scheme: default
+    primary: deep-orange
+    accent: red
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - toc.integrate
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - attr_list
+  - md_in_html
+
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Quick Start: quickstart.md
+  - Architecture: architecture.md
+  - Datasets: datasets.md
+  - Reproducibility: reproducibility.md
+  - Blockchain Setup: blockchain_setup.md

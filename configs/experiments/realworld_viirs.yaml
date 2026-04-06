@@ -1,0 +1,29 @@
+defaults:
+  - base
+
+simulation:
+  grid_size: 100
+  n_timesteps: 500        # Limited by real data temporal resolution
+  uav:
+    n_uavs: 20
+
+realworld:
+  regions:
+    - name: california_2020
+      viirs_path: "data/processed/viirs_grid_california_2020.npz"
+      nifc_path: "data/processed/nifc_masks_2020_CA.npz"
+      n_episodes: 10
+    - name: mediterranean_2021
+      viirs_path: "data/processed/viirs_grid_mediterranean_2021.npz"
+      nifc_path: null
+      n_episodes: 10
+    - name: australia_2019
+      viirs_path: "data/processed/viirs_grid_australia_2019.npz"
+      nifc_path: null
+      n_episodes: 10
+  iot_baseline_ld: 45.0   # Tarigan et al. [6] comparison value
+
+logging:
+  mlflow:
+    enabled: false
+    experiment_name: "realworld_viirs"
