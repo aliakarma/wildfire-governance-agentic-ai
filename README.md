@@ -7,8 +7,8 @@
 [![arXiv](https://img.shields.io/badge/arXiv-2512.XXXXX-red)](https://arxiv.org/abs/2512.XXXXX)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)](https://python.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![CI](https://github.com/akarma-iu/wildfire-governance-agentic-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/akarma-iu/wildfire-governance-agentic-ai/actions)
-[![codecov](https://codecov.io/gh/akarma-iu/wildfire-governance-agentic-ai/branch/main/graph/badge.svg)](https://codecov.io/gh/akarma-iu/wildfire-governance-agentic-ai)
+[![CI](https://github.com/aliakarma/wildfire-governance-agentic-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/aliakarma/wildfire-governance-agentic-ai/actions)
+[![codecov](https://codecov.io/gh/aliakarma/wildfire-governance-agentic-ai/branch/main/graph/badge.svg)](https://codecov.io/gh/aliakarma/wildfire-governance-agentic-ai)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX)
 
 ---
@@ -37,7 +37,7 @@ The GOMDP enforces safety at the environment boundary via a cryptographic invari
 
 ```bash
 # Bash (Linux/macOS)
-git clone https://github.com/akarma-iu/wildfire-governance-agentic-ai.git
+git clone https://github.com/aliakarma/wildfire-governance-agentic-ai.git
 cd wildfire-governance-agentic-ai
 conda env create -f environment.yml
 conda activate wildfire-gov
@@ -47,7 +47,7 @@ make test-smoke
 
 ```powershell
 # PowerShell (Windows)
-git clone https://github.com/akarma-iu/wildfire-governance-agentic-ai.git
+git clone https://github.com/aliakarma/wildfire-governance-agentic-ai.git
 Set-Location wildfire-governance-agentic-ai
 conda env create -f environment.yml
 conda activate wildfire-gov
@@ -59,7 +59,7 @@ python -m pytest tests/smoke/ -v --no-cov --timeout=60
 
 ```bash
 # Bash
-git clone https://github.com/akarma-iu/wildfire-governance-agentic-ai.git
+git clone https://github.com/aliakarma/wildfire-governance-agentic-ai.git
 cd wildfire-governance-agentic-ai
 python -m venv .venv
 source .venv/bin/activate          # Linux/macOS
@@ -70,7 +70,7 @@ make test-smoke
 
 ```powershell
 # PowerShell (Windows)
-git clone https://github.com/akarma-iu/wildfire-governance-agentic-ai.git
+git clone https://github.com/aliakarma/wildfire-governance-agentic-ai.git
 Set-Location wildfire-governance-agentic-ai
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
@@ -83,14 +83,14 @@ python -m pytest tests/smoke/ -v --no-cov --timeout=60
 
 ```bash
 # Bash
-git clone https://github.com/akarma-iu/wildfire-governance-agentic-ai.git
+git clone https://github.com/aliakarma/wildfire-governance-agentic-ai.git
 cd wildfire-governance-agentic-ai
 docker-compose up wildfire-gov
 ```
 
 ```powershell
 # PowerShell (Windows)
-git clone https://github.com/akarma-iu/wildfire-governance-agentic-ai.git
+git clone https://github.com/aliakarma/wildfire-governance-agentic-ai.git
 Set-Location wildfire-governance-agentic-ai
 docker-compose up wildfire-gov
 ```
@@ -210,7 +210,7 @@ wildfire-governance-agentic-ai/
                with Blockchain-Enforced Human Oversight for Safety-Critical Wildfire Monitoring},
   author    = {Akarma, Ali and Syed, Toqeer Ali and Jan, Salman and
                Muneer, Hammad and Jilani, Abdul Khadar},
-  journal   = {IEEE Transactions on Industrial Informatics},
+  journal   = {},
   year      = {2025},
   doi       = {10.1109/TII.2025.XXXXXXX}
 }
