@@ -1,0 +1,65 @@
+version: "3.9"
+
+services:
+  # ── Main experiment runner ─────────────────────────────────────────────
+  wildfire-gov:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: wildfire-governance:latest
+    volumes:
+      - ./results:/workspace/results
+      - ./data/processed:/workspace/data/processed
+      - ./data/raw:/workspace/data/raw
+    environment:
+      - NASA_FIRMS_KEY=${NASA_FIRMS_KEY:-}
+      - MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI:-file:///workspace/mlruns}
+    command: >
+      bash -c "bash experiments/run_all.sh --smoke"
+
+  # ── Full reproduction (use: docker-compose run reproduce) ──────────────
+  reproduce:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: wildfire-governance:latest
+    volumes:
+      - ./results:/workspace/results
+      - ./data/processed:/workspace/data/processed
+    environment:
+      - NASA_FIRMS_KEY=${NASA_FIRMS_KEY:-}
+    command: >
+      bash -c "bash experiments/run_all.sh --skip_training"
+    profiles: ["reproduce"]
+
+  # ── MLflow tracking server ─────────────────────────────────────────────
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.11.1
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlruns:/mlruns
+    command: >
+      mlflow server
+        --host 0.0.0.0
+        --port 5000
+        --backend-store-uri /mlruns
+    profiles: ["mlflow"]
+
+  # ── Jupyter notebook server ────────────────────────────────────────────
+  jupyter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8888:8888"
+    volumes:
+      - .:/workspace
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+    command: >
+      bash -c "pip install jupyter ipykernel nbconvert --quiet &&
+               jupyter lab --ip=0.0.0.0 --port=8888
+                          --no-browser --allow-root
+                          --NotebookApp.token=''"
+    profiles: ["jupyter"]

@@ -1,0 +1,11 @@
+defaults:
+  - base
+simulation:
+  n_timesteps: 3000
+  n_seeds: 20
+  uav:
+    n_uavs: 20
+logging:
+  mlflow:
+    enabled: false
+    experiment_name: "stress_testing"

@@ -1,0 +1,27 @@
+# Cross-modal fusion model configuration (Eq. 5 in paper)
+# f(H_t, W_t) = w_H * hat_H_t + w_W * hat_W_t
+
+type: "weighted_linear"
+
+# Fusion weights calibrated by grid search on validation seeds (Section VI-A)
+w_h: 0.65    # Heat anomaly index weight
+w_w: 0.35    # Weather index weight
+
+# Input normalisation
+normalisation:
+  heat_min: 0.0
+  heat_max: 1.0
+  weather_min: 0.0
+  weather_max: 1.0
+
+# Calibration settings
+calibration:
+  method: "grid_search"
+  search_step: 0.05
+  metric: "f1"
+  validation_seeds: [10, 11, 12, 13, 14]   # Held-out seeds
+
+# Bayesian update stage (Eq. 6)
+bayesian_update:
+  detection_probability: 0.85    # P(V_t | fire) — UAV thermal sensor
+  false_alarm_probability: 0.15  # P(V_t | no fire)

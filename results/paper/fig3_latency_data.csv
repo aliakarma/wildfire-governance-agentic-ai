@@ -1,0 +1,13 @@
+config,n_uavs,ld_mean,ld_std,proposition1_bound
+greedy_gomdp,5,55.0,4.2,404.0
+greedy_gomdp,10,30.5,2.8,202.0
+greedy_gomdp,20,18.3,1.4,101.0
+greedy_gomdp,40,10.0,1.1,50.5
+adaptive_ai,5,51.0,3.9,404.0
+adaptive_ai,10,27.5,2.5,202.0
+adaptive_ai,20,16.2,1.2,101.0
+adaptive_ai,40,9.8,1.0,50.5
+static,5,55.5,4.8,404.0
+static,10,48.0,4.1,202.0
+static,20,41.5,3.1,101.0
+static,40,39.5,3.0,50.5

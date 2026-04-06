@@ -1,0 +1,19 @@
+defaults:
+  - base
+simulation:
+  n_timesteps: 3000
+  uav:
+    n_uavs: 20
+ppo:
+  n_episodes: 1000
+  lr: 0.0003
+  clip_ratio: 0.2
+  entropy_coeff: 0.01
+  gamma: 0.99
+  n_epochs: 4
+  hidden_dims: [256, 128]
+  checkpoint_every: 50
+logging:
+  mlflow:
+    enabled: false
+    experiment_name: "ppo_gomdp_training"
