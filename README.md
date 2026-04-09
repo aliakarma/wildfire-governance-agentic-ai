@@ -211,8 +211,8 @@ wildfire-governance-agentic-ai/
   author    = {Akarma, Ali and Syed, Toqeer Ali and Jan, Salman and
                Muneer, Hammad and Jilani, Abdul Khadar},
   journal   = {},
-  year      = {2025},
-  doi       = {10.1109/TII.2025.XXXXXXX}
+  year      = {2026},
+  doi       = {}
 }
 ```
 
