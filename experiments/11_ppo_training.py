@@ -286,8 +286,13 @@ def main(config_path: str, smoke: bool = False, use_pretrained: bool = False) ->
                     loss=round(loss, 4),
                 )
     finally:
-        # FIX [CRITICAL]: always close the environment.
-        env.close()
+        # GOMMDPGymEnv does not implement close(); guard with hasattr so we
+        # still benefit from cleanup on any future env that does add it.
+        if hasattr(env, "close") and callable(env.close):
+            try:
+                env.close()
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("env_close_failed", reason=str(exc))
 
     # FIX [CRITICAL]: removed redundant reward_history list; use
     # history["episode_rewards"] directly (identical data, no duplication).
