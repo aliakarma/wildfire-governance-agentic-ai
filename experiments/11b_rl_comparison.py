@@ -17,7 +17,7 @@ import numpy as np
 import pandas as pd
 
 from experiments.utils.runner import run_episode
-from wildfire_governance.gomdp.invariant_checker import GovernanceInvariantChecker
+from wildfire_governance.governance.invariant_checker import GovernanceInvariantChecker
 from wildfire_governance.rl.evaluator import evaluate
 from wildfire_governance.utils.config import load_config
 from wildfire_governance.utils.logging import get_structured_logger
@@ -59,7 +59,6 @@ def main(config_path: str, smoke: bool = False, use_pretrained: bool = True) -> 
     # 2. Greedy-GOMDP
     logger.info("evaluating", method="Greedy-GOMDP")
     greedy_fps, greedy_lds, greedy_comps = [], [], []
-    checker = GovernanceInvariantChecker()
     for seed in range(n_seeds):
         r = run_episode(seed=seed, config_name="greedy_gomdp",
                         n_uavs=n_uavs, n_timesteps=n_timesteps,
@@ -69,7 +68,7 @@ def main(config_path: str, smoke: bool = False, use_pretrained: bool = True) -> 
         greedy_fps.append(r.fp_pct)
         if r.ld < float("inf"):
             greedy_lds.append(r.ld)
-        greedy_comps.append(float(r.governance_compliant))
+        greedy_comps.append(float(getattr(r, "governance_compliant", False)))
     rows.append({
         "method": "Greedy-GOMDP", "framework": "GOMDP",
         "ld_mean": round(float(np.mean(greedy_lds)), 2),
@@ -86,6 +85,7 @@ def main(config_path: str, smoke: bool = False, use_pretrained: bool = True) -> 
         n_seeds=n_seeds, n_uavs=n_uavs,
         use_pretrained=False, enable_governance=False, smoke=smoke
     )
+    checker = GovernanceInvariantChecker(tau=0.80)
     cmdp_compliances = []
     for seed in range(n_seeds):
         result = run_episode(
@@ -99,7 +99,8 @@ def main(config_path: str, smoke: bool = False, use_pretrained: bool = True) -> 
             enable_verification=True,
             enable_coordination=True,
         )
-        cmdp_compliances.append(float(result.governance_compliant))
+        compliance = checker.check_episode(getattr(result, "step_logs", []))
+        cmdp_compliances.append(float(compliance))
 
     ppo_cmdp["governance_compliance_pct"] = round(
         float(np.mean(cmdp_compliances)) * 100, 1

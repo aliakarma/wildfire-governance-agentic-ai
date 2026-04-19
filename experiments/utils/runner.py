@@ -6,7 +6,7 @@ setup loop.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -45,6 +45,8 @@ class EpisodeResult:
         governance_compliant: Whether all alerts had valid governance certs.
         n_injections_attempted: Adversarial injection attempts.
         n_injections_blocked: Injections successfully blocked.
+        step_logs: Per-step trajectory records for post-hoc invariant checks.
+        injection_success: 1 if any unauthorised injection breached, else 0.
     """
 
     seed: int
@@ -59,6 +61,8 @@ class EpisodeResult:
     governance_compliant: bool = True
     n_injections_attempted: int = 0
     n_injections_blocked: int = 0
+    step_logs: List[Dict[str, Any]] = field(default_factory=list)
+    injection_success: int = 0
 
     def __post_init__(self) -> None:
         if self.le2e == 0.0:
@@ -82,6 +86,7 @@ def run_episode(
     sensor_failure_rate: float = 0.0,
     burst_mode: bool = False,
     policy: str = "greedy",
+    attack_type: Optional[str] = None,
 ) -> EpisodeResult:
     """Run one episode and return all metrics.
 
@@ -106,6 +111,7 @@ def run_episode(
         sensor_failure_rate: Fraction of UAV sensors to disable.
         burst_mode: Apply burst multiplier to blockchain delay.
         policy: ``"greedy"`` or ``"ppo"``.
+        attack_type: Optional attack label (e.g., ``"injection"``).
 
     Returns:
         EpisodeResult with all computed metrics.
@@ -308,13 +314,22 @@ def run_episode(
                         n_false += 1
 
                 # Adversarial injection test (runs in background every 50 steps)
-                if t % 50 == 0 and enable_blockchain and contract:
+                if attack_type != "injection" and t % 50 == 0 and enable_blockchain and contract:
                     n_inject_attempted += 1
                     blocked = not contract.attempt_unauthorised_injection(
                         (int(row_idx), int(col_idx), int(row_idx) + 1, int(col_idx) + 1)
                     )
                     if blocked:
                         n_inject_blocked += 1
+
+        if attack_type == "injection" and t % 50 == 0 and enable_blockchain and contract:
+            attack_row, attack_col = np.unravel_index(heat_map.argmax(), heat_map.shape)
+            n_inject_attempted += 1
+            blocked = not contract.attempt_unauthorised_injection(
+                (int(attack_row), int(attack_col), int(attack_row) + 1, int(attack_col) + 1)
+            )
+            if blocked:
+                n_inject_blocked += 1
 
         trajectory.append(step_info)
         if done:
@@ -325,6 +340,7 @@ def run_episode(
     fp_pct = (n_false / max(1, n_alerts)) * 100.0
     mean_bc = float(np.mean(bc_delays)) if bc_delays else 1.2
     mean_hv = float(np.mean(human_delays)) if human_delays else 3.0
+    n_inject_success = max(0, n_inject_attempted - n_inject_blocked)
 
     report = checker.check_trajectory(trajectory)
 
@@ -340,4 +356,6 @@ def run_episode(
         governance_compliant=report.theorem1_satisfied,
         n_injections_attempted=n_inject_attempted,
         n_injections_blocked=n_inject_blocked,
+        step_logs=trajectory,
+        injection_success=int(n_inject_success > 0),
     )

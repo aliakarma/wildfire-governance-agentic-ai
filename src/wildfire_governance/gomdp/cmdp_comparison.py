@@ -75,7 +75,7 @@ class CMDPViolationStudy:
                 enable_blockchain=True, enable_verification=True,
                 enable_coordination=True,
             )
-            if not result.governance_compliant:
+            if not getattr(result, "governance_compliant", False):
                 violations += 1
 
         compliance = 1.0 - violations / self.n_episodes
@@ -117,7 +117,7 @@ class CMDPViolationStudy:
                 enable_blockchain=False, enable_verification=True,
                 enable_coordination=True,
             )
-            if not result.governance_compliant:
+            if not getattr(result, "governance_compliant", False):
                 violations += 1
 
         compliance = 1.0 - violations / self.n_episodes

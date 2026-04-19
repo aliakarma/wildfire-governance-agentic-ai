@@ -5,7 +5,7 @@
 
 .PHONY: install install-dev test test-smoke test-unit test-integration \
         lint format type-check docs docs-serve \
-        download-data download-viirs \
+	download-data download-viirs download-checkpoint generate-synthetic \
         train-ppo eval-ppo \
         reproduce figures \
         adversarial stress-test \
@@ -71,6 +71,12 @@ download-viirs:
 	python data/scripts/download_viirs.py --region mediterranean --start_date 2021-08-01 --end_date 2021-09-30
 	python data/scripts/download_viirs.py --region australia --start_date 2019-11-01 --end_date 2020-02-28
 
+download-checkpoint:
+	python scripts/download_checkpoint.py
+
+generate-synthetic:
+	python data/scripts/generate_synthetic.py
+
 # ---- RL Training ---------------------------------------------------
 
 train-ppo:
@@ -78,6 +84,7 @@ train-ppo:
 	  --config configs/experiments/ppo_training.yaml
 
 eval-ppo:
+	python scripts/download_checkpoint.py
 	python experiments/11b_rl_comparison.py \
 	  --config configs/experiments/paper_main_results.yaml \
 	  --use_pretrained
@@ -103,6 +110,8 @@ stress-test:
 # ---- Full reproduction (all paper results) -------------------------
 
 reproduce:
+	python scripts/download_checkpoint.py
+	python data/scripts/generate_synthetic.py
 	bash experiments/run_all.sh
 
 reproduce-smoke:

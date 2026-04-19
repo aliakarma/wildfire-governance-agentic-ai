@@ -16,7 +16,7 @@ def test_governance_predicate_enforced_end_to_end() -> None:
         enable_blockchain=True, enable_verification=True,
         enable_coordination=True,
     )
-    assert result.governance_compliant is True
+    assert getattr(result, "governance_compliant", False) is True
 
 
 def test_adaptive_ai_no_governance() -> None:

@@ -42,6 +42,8 @@ cd wildfire-governance-agentic-ai
 conda env create -f environment.yml
 conda activate wildfire-gov
 pip install -e ".[dev]"
+python scripts/download_checkpoint.py
+python data/scripts/generate_synthetic.py
 make test-smoke
 ```
 
@@ -52,6 +54,8 @@ Set-Location wildfire-governance-agentic-ai
 conda env create -f environment.yml
 conda activate wildfire-gov
 pip install -e ".[dev]"
+python scripts/download_checkpoint.py
+python data/scripts/generate_synthetic.py
 python -m pytest tests/smoke/ -v --no-cov --timeout=60
 ```
 
@@ -65,6 +69,8 @@ python -m venv .venv
 source .venv/bin/activate          # Linux/macOS
 pip install -r requirements-dev.txt
 pip install -e ".[dev]"
+python scripts/download_checkpoint.py
+python data/scripts/generate_synthetic.py
 make test-smoke
 ```
 
@@ -76,6 +82,8 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements-dev.txt
 pip install -e ".[dev]"
+python scripts/download_checkpoint.py
+python data/scripts/generate_synthetic.py
 python -m pytest tests/smoke/ -v --no-cov --timeout=60
 ```
 
@@ -100,6 +108,10 @@ docker-compose up wildfire-gov
 ## Reproduce All Paper Results
 
 ```bash
+# Ensure checkpoint + synthetic fallback data are present
+python scripts/download_checkpoint.py
+python data/scripts/generate_synthetic.py
+
 # Bash — full reproduction (~2–4 hours on 8 CPU cores, uses pre-trained PPO)
 make reproduce
 
@@ -114,6 +126,10 @@ make figures
 ```
 
 ```powershell
+# Ensure checkpoint + synthetic fallback data are present
+python scripts/download_checkpoint.py
+python data/scripts/generate_synthetic.py
+
 # PowerShell — full reproduction
 bash experiments/run_all.sh --skip_training
 

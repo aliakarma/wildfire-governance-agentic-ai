@@ -35,7 +35,7 @@ def test_smoke_full_pipeline_completes() -> None:
     assert elapsed < MAX_SECONDS, f"Smoke test took {elapsed:.1f}s (limit {MAX_SECONDS}s)"
     assert result.fp_pct >= 0.0
     assert result.fp_pct <= 100.0
-    assert result.governance_compliant is True
+    assert getattr(result, "governance_compliant", False) is True
 
 
 def test_smoke_crypto_operations() -> None:

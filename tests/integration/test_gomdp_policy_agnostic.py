@@ -85,7 +85,7 @@ def test_theorem1_compliance_with_greedy() -> None:
             enable_blockchain=True, enable_verification=True,
             enable_coordination=True,
         )
-        if result.governance_compliant:
+        if getattr(result, "governance_compliant", False):
             n_compliant += 1
 
     compliance_rate = n_compliant / N_EPISODES
