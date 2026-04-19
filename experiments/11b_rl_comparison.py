@@ -86,8 +86,24 @@ def main(config_path: str, smoke: bool = False, use_pretrained: bool = True) -> 
         n_seeds=n_seeds, n_uavs=n_uavs,
         use_pretrained=False, enable_governance=False, smoke=smoke
     )
-    # PPO-CMDP has ~7.2% violation rate (paper Table II)
-    ppo_cmdp["governance_compliance_pct"] = max(0.0, 92.8 if not smoke else ppo_cmdp["governance_compliance_pct"])
+    cmdp_compliances = []
+    for seed in range(n_seeds):
+        result = run_episode(
+            seed=seed,
+            config_name="cmdp_surrogate",
+            n_uavs=n_uavs,
+            n_timesteps=n_timesteps,
+            enable_governance=False,
+            enable_hitl=True,
+            enable_blockchain=False,
+            enable_verification=True,
+            enable_coordination=True,
+        )
+        cmdp_compliances.append(float(result.governance_compliant))
+
+    ppo_cmdp["governance_compliance_pct"] = round(
+        float(np.mean(cmdp_compliances)) * 100, 1
+    )
     rows.append({"method": "PPO-CMDP", "framework": "CMDP", **ppo_cmdp})
 
     # 4. Adaptive AI (no governance)

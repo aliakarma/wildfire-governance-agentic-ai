@@ -55,8 +55,11 @@ def evaluate(
         ckpt = CHECKPOINT_DIR / "ppo_gomdp_best.pt"
         try:
             agent.load_checkpoint(ckpt)
-        except FileNotFoundError:
-            logger.warning("checkpoint_not_found", path=str(ckpt), fallback="random_policy")
+        except FileNotFoundError as exc:
+            raise FileNotFoundError(
+                f"PPO checkpoint not found at {ckpt}. "
+                "Download or provide checkpoint before evaluation."
+            ) from exc
 
     checker = GovernanceInvariantChecker(tau=0.80)
     episode_metrics_list: List[EpisodeMetrics] = []

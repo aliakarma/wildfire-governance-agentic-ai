@@ -281,6 +281,25 @@ def run_episode(
                             n_alerts += 1
                             if not is_true_fire:
                                 n_false += 1
+                elif enable_governance and enable_hitl and not enable_blockchain and hitl_gate:
+                    tx = build_transaction(
+                        event_id=f"evt_{seed}_{t}",
+                        geo_boundary=(int(row_idx), int(col_idx), int(row_idx) + 1, int(col_idx) + 1),
+                        confidence_score=conf,
+                        sensor_readings={"heat": max_heat, "weather": weather_idx},
+                    )
+                    decision, _ = hitl_gate.process(tx, conf)
+                    step_info["human_approval"] = decision.approved
+                    human_delays.append(decision.review_delay_steps)
+
+                    if decision.approved:
+                        step_info["alert_broadcast"] = True
+                        step_info["governance_cert"] = None
+
+                        n_alerts += 1
+
+                        if not is_true_fire:
+                            n_false += 1
                 elif not enable_governance:
                     # Ungoverned baseline: alert without any checks
                     step_info["alert_broadcast"] = True

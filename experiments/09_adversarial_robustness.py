@@ -17,7 +17,6 @@ import numpy as np
 import pandas as pd
 
 from experiments.utils.runner import run_episode
-from wildfire_governance.adversarial.alert_injector import AlertInjector
 from wildfire_governance.blockchain.smart_contract import GovernanceSmartContract
 from wildfire_governance.gomdp.breach_probability import (
     compute_breach_probability_gomdp,
@@ -60,7 +59,6 @@ def main(config_path: str, smoke: bool = False) -> None:
         n_seeds, n_uavs, n_timesteps = 2, 5, 100
 
     rows = []
-    injector = AlertInjector(p_attack=1.0)
 
     for atk in ATTACK_CONFIGS:
         attack_type = atk["attack_type"]
@@ -70,7 +68,6 @@ def main(config_path: str, smoke: bool = False) -> None:
 
         # GOMDP runs
         gomdp_fps, central_fps = [], []
-        n_inject_blocked = 0
         for seed in range(n_seeds):
             # GOMDP
             r_gomdp = run_episode(
@@ -82,7 +79,6 @@ def main(config_path: str, smoke: bool = False) -> None:
                 p_spoof=p_spoof, n_byzantine=n_byzantine,
             )
             gomdp_fps.append(r_gomdp.fp_pct)
-            n_inject_blocked += r_gomdp.n_injections_blocked
 
             # Centralized (no blockchain)
             if attack_type != "byzantine":
@@ -98,17 +94,41 @@ def main(config_path: str, smoke: bool = False) -> None:
 
         # Theoretical breach probability from Theorem 2
         if attack_type == "injection":
-            p_breach_gomdp = 0.000
+            breaches = 0
+            total = 0
+            n_trials = max(1, n_seeds * max(1, n_timesteps // 50))
+            contract = GovernanceSmartContract(tau=0.80)
+
+            for _ in range(n_trials):
+                success = contract.attempt_unauthorised_injection((0, 0, 1, 1))
+                if success:
+                    breaches += 1
+                total += 1
+
+            p_breach_gomdp = breaches / total
             p_breach_central = compute_breach_probability_centralized(1.0)
         elif attack_type == "byzantine":
             p_c = 0.3
-            try:
-                p_breach_gomdp = compute_breach_probability_gomdp(7, max(0, 7//3 - 1), p_c)
-            except ValueError:
+            f_actual = n_byzantine
+
+            if f_actual <= (7 - 1) // 3:
+                p_breach_gomdp = compute_breach_probability_gomdp(7, f_actual, p_c)
+            else:
                 p_breach_gomdp = 1.0
             p_breach_central = None
         else:
-            p_breach_gomdp = 0.000
+            breaches = 0
+            total = 0
+            n_trials = max(1, n_seeds * max(1, n_timesteps // 50))
+            contract = GovernanceSmartContract(tau=0.80)
+
+            for _ in range(n_trials):
+                success = contract.attempt_unauthorised_injection((0, 0, 1, 1))
+                if success:
+                    breaches += 1
+                total += 1
+
+            p_breach_gomdp = breaches / total
             p_breach_central = None
 
         rows.append({
