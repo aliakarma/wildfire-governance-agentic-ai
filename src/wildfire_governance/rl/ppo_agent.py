@@ -134,6 +134,29 @@ class PPOGOMDPAgent:
         self._episode_lds: List[float] = []
         self._training_step: int = 0
 
+    def state_dict(self) -> Dict[str, Any]:
+        """Return serializable training state for checkpointing."""
+        return {
+            "policy_state_dict": self.policy.state_dict(),
+            "value_state_dict": self.value_net.state_dict(),
+            "optimizer_state_dict": self.optimizer.state_dict(),
+            "training_step": self._training_step,
+            "config": {
+                "grid_size": self.grid_size,
+                "n_uavs": self.n_uavs,
+                "n_sectors": self.n_sectors,
+                "gamma": self.gamma,
+                "clip_ratio": self.clip_ratio,
+            },
+        }
+
+    def load_state_dict(self, checkpoint: Dict[str, Any]) -> None:
+        """Load serializable training state from checkpoint payload."""
+        self.policy.load_state_dict(checkpoint["policy_state_dict"])
+        self.value_net.load_state_dict(checkpoint["value_state_dict"])
+        self.optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+        self._training_step = checkpoint.get("training_step", 0)
+
     def select_actions(
         self,
         obs: np.ndarray,
@@ -229,33 +252,18 @@ class PPOGOMDPAgent:
         self._training_step += 1
         return total_loss / self.n_epochs
 
-    def save_checkpoint(self, path: Path) -> None:
+    def save_checkpoint(self, path: str) -> None:
         """Save policy, value network, and optimiser state.
 
         Args:
             path: Output .pt file path.
         """
         import torch
-        path = Path(path)
-        path.parent.mkdir(parents=True, exist_ok=True)
-        torch.save(
-            {
-                "policy_state_dict": self.policy.state_dict(),
-                "value_state_dict": self.value_net.state_dict(),
-                "optimizer_state_dict": self.optimizer.state_dict(),
-                "training_step": self._training_step,
-                "config": {
-                    "grid_size": self.grid_size,
-                    "n_uavs": self.n_uavs,
-                    "n_sectors": self.n_sectors,
-                    "gamma": self.gamma,
-                    "clip_ratio": self.clip_ratio,
-                },
-            },
-            path,
-        )
+        path_obj = Path(path)
+        path_obj.parent.mkdir(parents=True, exist_ok=True)
+        torch.save(self.state_dict(), path_obj)
 
-    def load_checkpoint(self, path: Path) -> None:
+    def load_checkpoint(self, path: str) -> None:
         """Load from a saved checkpoint.
 
         Args:
@@ -265,17 +273,13 @@ class PPOGOMDPAgent:
             FileNotFoundError: If the checkpoint does not exist.
         """
         import torch
-        path = Path(path)
-        if not path.exists():
+        path_obj = Path(path)
+        if not path_obj.exists():
             raise FileNotFoundError(
-                f"PPO-GOMDP checkpoint not found: {path}\n"
+                f"PPO-GOMDP checkpoint not found: {path_obj}\n"
                 "Run: make train-ppo  OR  use --use_pretrained with the pre-trained checkpoint."
             )
-        ckpt = torch.load(path, map_location="cpu")
-        self.policy.load_state_dict(ckpt["policy_state_dict"])
-        self.value_net.load_state_dict(ckpt["value_state_dict"])
-        self.optimizer.load_state_dict(ckpt["optimizer_state_dict"])
-        self._training_step = ckpt.get("training_step", 0)
+        self.load_state_dict(torch.load(path_obj, map_location="cpu"))
 
 
 def _compute_returns(rewards: List[float], gamma: float) -> List[float]:
