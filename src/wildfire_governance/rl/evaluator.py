@@ -19,6 +19,82 @@ logger = get_structured_logger(__name__)
 CHECKPOINT_DIR = Path(__file__).parent / "checkpoints"
 
 
+def _load_checkpoint_if_compatible(
+    agent: PPOGOMDPAgent,
+    checkpoint_path: Path,
+) -> bool:
+    """Load a checkpoint only when its tensor shapes match the current agent.
+
+    Returns:
+        True when the checkpoint was loaded, False when a mismatch or load
+        failure was detected and the agent was left at its random init.
+    """
+    import torch
+
+    try:
+        checkpoint = torch.load(checkpoint_path, map_location="cpu")
+    except FileNotFoundError:
+        raise
+    except Exception as exc:  # noqa: BLE001
+        logger.warning(
+            "checkpoint_load_failed",
+            path=str(checkpoint_path),
+            reason=str(exc),
+        )
+        return False
+
+    if not isinstance(checkpoint, dict) or "policy_state_dict" not in checkpoint:
+        logger.warning(
+            "checkpoint_format_unexpected",
+            path=str(checkpoint_path),
+        )
+        return False
+
+    current_policy_state = agent.policy.state_dict()
+    current_value_state = agent.value_net.state_dict()
+    loaded_policy_state = checkpoint["policy_state_dict"]
+    loaded_value_state = checkpoint.get("value_state_dict", {})
+
+    for key, current_tensor in current_policy_state.items():
+        loaded_tensor = loaded_policy_state.get(key)
+        if loaded_tensor is None or tuple(loaded_tensor.shape) != tuple(current_tensor.shape):
+            logger.warning(
+                "checkpoint_shape_mismatch",
+                path=str(checkpoint_path),
+                component="policy",
+                key=key,
+                expected_shape=tuple(current_tensor.shape),
+                loaded_shape=None if loaded_tensor is None else tuple(loaded_tensor.shape),
+            )
+            return False
+
+    for key, current_tensor in current_value_state.items():
+        loaded_tensor = loaded_value_state.get(key)
+        if loaded_tensor is None or tuple(loaded_tensor.shape) != tuple(current_tensor.shape):
+            logger.warning(
+                "checkpoint_shape_mismatch",
+                path=str(checkpoint_path),
+                component="value",
+                key=key,
+                expected_shape=tuple(current_tensor.shape),
+                loaded_shape=None if loaded_tensor is None else tuple(loaded_tensor.shape),
+            )
+            return False
+
+    try:
+        agent.load_state_dict(checkpoint)
+    except Exception as exc:  # noqa: BLE001
+        logger.warning(
+            "checkpoint_load_failed",
+            path=str(checkpoint_path),
+            reason=str(exc),
+        )
+        return False
+
+    logger.info("checkpoint_loaded", path=str(checkpoint_path))
+    return True
+
+
 def evaluate(
     n_seeds: int = 20,
     n_uavs: int = 20,
@@ -54,7 +130,12 @@ def evaluate(
     if use_pretrained:
         ckpt = CHECKPOINT_DIR / "ppo_gomdp_best.pt"
         try:
-            agent.load_checkpoint(ckpt)
+            if not _load_checkpoint_if_compatible(agent, ckpt):
+                logger.warning(
+                    "checkpoint_compatibility_fallback",
+                    path=str(ckpt),
+                    reason="shape mismatch or load failure; using random init",
+                )
         except FileNotFoundError as exc:
             raise FileNotFoundError(
                 f"PPO checkpoint not found at {ckpt}. "
