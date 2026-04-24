@@ -42,7 +42,6 @@ setup(
         "console_scripts": [
             "wildfire-train=wildfire_governance.rl.trainer:main",
             "wildfire-eval=wildfire_governance.rl.evaluator:main",
-            "wildfire-reproduce=experiments.run_all:main",
         ]
     },
 )
