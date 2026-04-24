@@ -28,6 +28,9 @@ RESULTS_BASE = Path("results/runs")
 
 
 def main(config_path: str, smoke: bool = False, use_pretrained: bool = True) -> None:
+    if smoke:
+        use_pretrained = False
+
     cfg = load_config(config_path)
     run_hash = generate_run_hash(cfg)
     out_dir = RESULTS_BASE / run_hash
