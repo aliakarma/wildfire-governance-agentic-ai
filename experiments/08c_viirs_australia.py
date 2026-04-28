@@ -17,9 +17,7 @@ VIIRS_PATH = Path("data/processed/viirs_grid_australia_2019.npz")
 
 
 def main(config_path: str, smoke: bool = False) -> None:
-    import sys
-    sys.path.insert(0, str(Path(__file__).parent))
-    from _viirs_runner import run_viirs_region  # type: ignore[import]
+    from experiments._viirs_runner import run_viirs_region  # type: ignore[import]
 
     run_viirs_region(
         region="australia_2019",
