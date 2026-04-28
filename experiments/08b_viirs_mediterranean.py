@@ -17,10 +17,8 @@ VIIRS_PATH = Path("data/processed/viirs_grid_mediterranean_2021.npz")
 
 
 def main(config_path: str, smoke: bool = False) -> None:
-    # Import shared VIIRS runner from the california script
-    import sys
-    sys.path.insert(0, str(Path(__file__).parent))
-    from _viirs_runner import run_viirs_region  # type: ignore[import]
+    # Import shared VIIRS runner from the experiments package
+    from experiments._viirs_runner import run_viirs_region  # type: ignore[import]
 
     run_viirs_region(
         region="mediterranean_2021",
