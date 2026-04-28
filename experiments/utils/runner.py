@@ -324,8 +324,10 @@ def run_episode(
                     if not is_true_fire:
                         n_false += 1
 
-                # Adversarial injection test (runs in background every 50 steps)
-                if attack_type != "injection" and t % 50 == 0 and enable_blockchain and contract:
+                # Adversarial injection test.
+                # NOTE: Paper ablations report 100 injection attempts over 3000 steps.
+                # We therefore schedule an attempt every 30 steps (3000/30 = 100).
+                if attack_type != "injection" and t % 30 == 0 and enable_blockchain and contract:
                     n_inject_attempted += 1
                     blocked = not contract.attempt_unauthorised_injection(
                         (int(row_idx), int(col_idx), int(row_idx) + 1, int(col_idx) + 1)
@@ -333,7 +335,7 @@ def run_episode(
                     if blocked:
                         n_inject_blocked += 1
 
-        if attack_type == "injection" and t % 50 == 0 and enable_blockchain and contract:
+        if attack_type == "injection" and t % 30 == 0 and enable_blockchain and contract:
             attack_row, attack_col = np.unravel_index(heat_map.argmax(), heat_map.shape)
             n_inject_attempted += 1
             blocked = not contract.attempt_unauthorised_injection(
