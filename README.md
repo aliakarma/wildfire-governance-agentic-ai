@@ -29,6 +29,8 @@
 
 The GOMDP enforces safety at the environment boundary via a cryptographic invariant; any policy—random, greedy, or trained—satisfies the governance predicate by construction (Theorem 1). Safety is decoupled from optimality (Corollary 1).
 
+Note: In the experiments and codebase the smart-contract and blockchain enforcement are simulated in software (a Python model of a smart contract and consensus). Theorem 1 is a formal property of the GOMDP model; our implementation exercises a simulated cryptographic enforcement mechanism for reproducible experiments and stress tests. Interpret claims about "environment-level cryptographic enforcement" as properties of the GOMDP model together with the simulated smart-contract implementation used for evaluation.
+
 ---
 
 ## Quick Start
