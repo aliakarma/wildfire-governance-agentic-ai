@@ -167,7 +167,11 @@ def run_episode(
         spoofer = SensorSpoofer(p_spoof=p_spoof, rng=rng)
 
     # Tracking
-    ignition_time = 0
+    # Query the environment-provided ignition time (if available) instead
+    # of assuming ignition at t=0. Some environment configurations may
+    # delay ignition; the environment returns an "ignition_time" field
+    # in the per-step info dict when appropriate.
+    ignition_time: Optional[int] = None
     first_detection: Optional[int] = None
     n_alerts = 0
     n_false = 0
@@ -202,6 +206,13 @@ def run_episode(
             continue
 
         obs_dict, done, sim_info = env.step(positions)
+
+        # Update ignition_time from the environment info if provided.
+        if ignition_time is None:
+            try:
+                ignition_time = int(sim_info.get("ignition_time", 0))
+            except Exception:
+                ignition_time = 0
 
         # Apply sensor spoofing
         heat_map = obs_dict["heat_map"].copy()
@@ -336,6 +347,8 @@ def run_episode(
             break
 
     # Compute final metrics
+    if ignition_time is None:
+        ignition_time = 0
     ld = float(first_detection - ignition_time) if first_detection is not None else float(n_timesteps)
     fp_pct = (n_false / max(1, n_alerts)) * 100.0
     mean_bc = float(np.mean(bc_delays)) if bc_delays else 1.2
