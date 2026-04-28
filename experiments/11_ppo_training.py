@@ -189,6 +189,12 @@ def _load_hyperparams(cfg, smoke: bool) -> dict:
         params["num_episodes"] = max(params["num_episodes"], 500)
         # FIX [MEDIUM]: warn if the config value was silently overridden.
         if params["num_episodes"] != original:
+            msg = (
+                f"[WARN] Config override: num_episodes in config is {original}, "
+                f"but minimum 500 episodes enforced for non-smoke runs. "
+                f"Effective value: {params['num_episodes']}."
+            )
+            print(msg)
             logger.warning(
                 "num_episodes_override",
                 config_value=original,
