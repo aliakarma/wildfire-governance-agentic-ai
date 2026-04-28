@@ -187,11 +187,18 @@ def main(config_path: str, smoke: bool = False, use_pretrained: bool = True) -> 
     metric_series["Greedy-GOMDP"] = {"ld": greedy_lds, "fp": greedy_fps}
 
     # 3. PPO-CMDP (no blockchain, Lagrangian constraint)
-    logger.info("evaluating", method="PPO-CMDP")
+    # NOTE: If `--use_pretrained` is not set, the CMDP baseline is evaluated
+    # with an uninitialised/random policy. In that case we label the baseline
+    # as "Random-CMDP" to avoid implying a trained PPO-CMDP checkpoint was used.
+    cmdp_method_label = "PPO-CMDP" if use_pretrained else "Random-CMDP"
+    logger.info("evaluating", method=cmdp_method_label)
     cmdp_seedwise = _evaluate_ppo_seedwise(
-        n_seeds=n_seeds, n_uavs=n_uavs,
+        n_seeds=n_seeds,
+        n_uavs=n_uavs,
         n_timesteps=n_timesteps,
-        use_pretrained=False, enable_governance=False, smoke=smoke
+        use_pretrained=use_pretrained,
+        enable_governance=False,
+        smoke=smoke,
     )
     checker = GovernanceInvariantChecker(tau=0.80)
     cmdp_compliances = []
@@ -212,7 +219,7 @@ def main(config_path: str, smoke: bool = False, use_pretrained: bool = True) -> 
     c_ld_mean, c_ld_std, c_ld_ci = _mean_std_ci(cmdp_seedwise["ld"])
     c_fp_mean, c_fp_std, c_fp_ci = _mean_std_ci(cmdp_seedwise["fp"])
     rows.append({
-        "method": "PPO-CMDP", "framework": "CMDP",
+        "method": cmdp_method_label, "framework": "CMDP",
         "ld_mean": round(c_ld_mean, 2),
         "ld_std": round(c_ld_std, 2),
         "ld_ci95": round(c_ld_ci, 2),
@@ -222,7 +229,7 @@ def main(config_path: str, smoke: bool = False, use_pretrained: bool = True) -> 
         "governance_compliance_pct": round(float(np.mean(cmdp_compliances)) * 100, 1),
         "n_seeds": n_seeds,
     })
-    metric_series["PPO-CMDP"] = {"ld": cmdp_seedwise["ld"], "fp": cmdp_seedwise["fp"]}
+    metric_series[cmdp_method_label] = {"ld": cmdp_seedwise["ld"], "fp": cmdp_seedwise["fp"]}
 
     # 4. Adaptive AI (no governance)
     logger.info("evaluating", method="Adaptive-AI")
