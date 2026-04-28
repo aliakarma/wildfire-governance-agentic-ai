@@ -30,6 +30,9 @@ class InvariantReport:
     n_violations: int = 0
     compliance_rate: float = 1.0
     violation_details: list = field(default_factory=list)
+    # Optional per-step trace (filled when include_stepwise=True).
+    # Each entry includes timestep, alert_broadcast, validity, and reason (if invalid).
+    step_evaluations: list[dict[str, Any]] = field(default_factory=list)
     theorem1_satisfied: bool = True
 
 
@@ -52,7 +55,12 @@ class GovernanceInvariantChecker:
     def __init__(self, tau: float = 0.80) -> None:
         self.tau = tau
 
-    def check_trajectory(self, trajectory: list[dict[str, Any]]) -> InvariantReport:
+    def check_trajectory(
+        self,
+        trajectory: list[dict[str, Any]],
+        *,
+        include_stepwise: bool = False,
+    ) -> InvariantReport:
         """Inspect a full episode trajectory for Theorem 1 violations.
 
         Args:
@@ -67,24 +75,41 @@ class GovernanceInvariantChecker:
             cert = step.get("governance_cert", None)
             confidence = step.get("confidence", 0.0)
             human_approval = step.get("human_approval", False)
-            if not alert:
-                continue
-            report.n_alert_attempts += 1
-            # A valid governance certificate must exist and confidence must exceed tau
-            valid = cert is not None and confidence > self.tau and human_approval
-            if not valid:
-                report.n_violations += 1
-                report.violation_details.append(
+            valid = True
+            reason = None
+
+            if alert:
+                report.n_alert_attempts += 1
+                # A valid governance certificate must exist and confidence must exceed tau
+                valid = cert is not None and confidence > self.tau and human_approval
+                if not valid:
+                    report.n_violations += 1
+                    reason = (
+                        "confidence_below_tau" if confidence <= self.tau
+                        else "no_human_approval" if not human_approval
+                        else "missing_cert"
+                    )
+                    report.violation_details.append(
+                        {
+                            "timestep": t,
+                            "confidence": confidence,
+                            "human_approval": human_approval,
+                            "cert_present": cert is not None,
+                            "reason": reason,
+                        }
+                    )
+
+            if include_stepwise:
+                report.step_evaluations.append(
                     {
                         "timestep": t,
-                        "confidence": confidence,
-                        "human_approval": human_approval,
+                        "alert_broadcast": bool(alert),
+                        "confidence": float(confidence),
+                        "human_approval": bool(human_approval),
                         "cert_present": cert is not None,
-                        "reason": (
-                            "confidence_below_tau" if confidence <= self.tau
-                            else "no_human_approval" if not human_approval
-                            else "missing_cert"
-                        ),
+                        # If no alert, step is trivially safe (no broadcast to violate).
+                        "theorem1_step_satisfied": bool((not alert) or valid),
+                        "violation_reason": reason,
                     }
                 )
 
@@ -92,6 +117,14 @@ class GovernanceInvariantChecker:
             report.compliance_rate = 1.0 - report.n_violations / report.n_alert_attempts
         report.theorem1_satisfied = report.n_violations == 0
         return report
+
+    def check_trajectory_stepwise(
+        self,
+        trajectory: list[dict[str, Any]],
+    ) -> tuple[InvariantReport, list[dict[str, Any]]]:
+        """Convenience API: return (report, per-step evaluations)."""
+        report = self.check_trajectory(trajectory, include_stepwise=True)
+        return report, list(report.step_evaluations)
 
     def compute_episode_compliance(
         self,
