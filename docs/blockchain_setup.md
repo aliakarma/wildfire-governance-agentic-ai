@@ -28,7 +28,7 @@ From the paper (Section III-A): Hyperledger Fabric was chosen because it:
 | Validators (k) | 7 | Standard PBFT deployment |
 | Byzantine tolerance (f) | 2 | f ≤ (k−1)/3 = 2 |
 | Quorum size | 5 = 2f+1 | PBFT requirement |
-| Nominal confirmation delay | 1.2 steps | Locally deployed network |
+| Nominal confirmation delay | 1.2 steps | Simulated consensus latency (Python model) |
 | Burst delay multiplier | 1.35× | 5× anomaly frequency |
 | Hash algorithm | SHA-3 256-bit | NIST standard |
 | Signature algorithm | Ed25519 | High performance, 128-bit security |
