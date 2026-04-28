@@ -61,7 +61,11 @@ def main(config_path: str, smoke: bool = False) -> None:
     cpomdp = WildfireCPOMDP()
     grid_area = 100.0 * 100.0
     velocity = 1.0
-    delta = 4.2  # BC + HV overhead
+    # delta = BC + HV overhead (blockchain confirmation + human verification delay).
+    # Paper Proposition 1: E[Ld] <= A/(v*N) + delta.
+    # Empirical value: mean_bc_delay (1.2) + mean_hv_delay (3.0) ≈ 4.2 steps.
+    # See configs/base.yaml: blockchain.consensus.mean_delay_steps, governance.hitl.mean_review_delay.
+    delta = 4.2
 
     for n_uavs in fleet_sizes:
         for config_name, kwargs in configs_map.items():
