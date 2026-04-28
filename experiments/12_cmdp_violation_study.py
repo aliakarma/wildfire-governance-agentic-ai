@@ -48,8 +48,7 @@ def main(config_path: str, smoke: bool = False) -> None:
         )
         gomdp_compliances.append(float(getattr(r, "governance_compliant", False)))
 
-    # CMDP surrogate: no blockchain enforcement → alerts can bypass governance
-    # (simulates Lagrangian-only constraint with 7.2% empirical violation rate)
+    # CMDP surrogate: no blockchain enforcement → alerts can be broadcast without a cert.
     cmdp_compliances = []
     for seed in range(n_seeds):
         r = run_episode(
@@ -59,9 +58,6 @@ def main(config_path: str, smoke: bool = False) -> None:
             enable_blockchain=False, enable_verification=True,
             enable_coordination=True,
         )
-        # CMDP without blockchain: HITL approval alone does not guarantee
-        # cryptographic non-repudiation; simulated violation rate ≈ 7.2%
-        # (see Table II, PPO-CMDP governance_compliance_pct=92.8%)
         cmdp_compliances.append(float(getattr(r, "governance_compliant", False)))
 
     rows = [
