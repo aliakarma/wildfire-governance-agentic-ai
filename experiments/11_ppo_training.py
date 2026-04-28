@@ -205,13 +205,30 @@ def _load_hyperparams(cfg, smoke: bool) -> dict:
     return params
 
 
-def main(config_path: str, smoke: bool = False, use_pretrained: bool = False) -> None:
-    # FIX [CRITICAL]: mkdir() moved here — only runs when main() is called.
-    CHECKPOINT_PATH.parent.mkdir(parents=True, exist_ok=True)
+def main(
+    config_path: str,
+    smoke: bool = False,
+    use_pretrained: bool = False,
+    *,
+    seed_override: int | None = None,
+    checkpoint_path: str | Path | None = None,
+) -> None:
+    """Train PPO-GOMDP once.
 
-    if use_pretrained and CHECKPOINT_PATH.exists():
-        logger.info("pretrained_checkpoint_found", path=str(CHECKPOINT_PATH))
-        print(f"Pre-trained checkpoint found at {CHECKPOINT_PATH}. Skipping training.")
+    Args:
+        config_path: YAML config path.
+        smoke: Small fast run.
+        use_pretrained: Skip training if checkpoint exists.
+        seed_override: If provided, replaces cfg.seed for this run.
+        checkpoint_path: If provided, writes checkpoint to this path.
+    """
+    ckpt_path = Path(checkpoint_path) if checkpoint_path is not None else CHECKPOINT_PATH
+    # FIX [CRITICAL]: mkdir() moved here — only runs when main() is called.
+    ckpt_path.parent.mkdir(parents=True, exist_ok=True)
+
+    if use_pretrained and ckpt_path.exists():
+        logger.info("pretrained_checkpoint_found", path=str(ckpt_path))
+        print(f"Pre-trained checkpoint found at {ckpt_path}. Skipping training.")
         print("To re-train from scratch, run without --use_pretrained.")
         return
 
@@ -220,6 +237,8 @@ def main(config_path: str, smoke: bool = False, use_pretrained: bool = False) ->
     # FIX [MEDIUM]: extract params *before* computing the run hash so that smoke
     # overrides (grid_size, n_timesteps, num_episodes) are reflected in the hash.
     params = _load_hyperparams(cfg, smoke)
+    if seed_override is not None:
+        params["seed"] = int(seed_override)
     run_hash = generate_run_hash({**vars(cfg), **params})
     out_dir = RESULTS_BASE / run_hash
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -278,7 +297,7 @@ def main(config_path: str, smoke: bool = False, use_pretrained: bool = False) ->
 
             if reward > best_reward:
                 best_reward = reward
-                agent.save_checkpoint(str(CHECKPOINT_PATH))
+                agent.save_checkpoint(str(ckpt_path))
                 print(f"[INFO] New best model saved with reward: {reward:.4f}")
 
             if ep % 50 == 0:
@@ -308,10 +327,10 @@ def main(config_path: str, smoke: bool = False, use_pretrained: bool = False) ->
     print(f"Mean reward: {np.mean(rewards):.4f}")
     print(f"Std reward:  {np.std(rewards):.4f}")
 
-    if not CHECKPOINT_PATH.exists():
+    if not ckpt_path.exists():
         raise RuntimeError("Checkpoint was not created. Training failed.")
 
-    print(f"Checkpoint saved at: {os.path.abspath(str(CHECKPOINT_PATH))}")
+    print(f"Checkpoint saved at: {os.path.abspath(str(ckpt_path))}")
 
     # FIX [HIGH]: eval wrapped in _run_quick_eval() — import errors and signature
     # mismatches are handled gracefully without crashing the training summary.
@@ -336,5 +355,23 @@ if __name__ == "__main__":
     parser.add_argument("--config", default="configs/experiments/ppo_training.yaml")
     parser.add_argument("--smoke", action="store_true")
     parser.add_argument("--use_pretrained", action="store_true")
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help="Override cfg.seed for reproducible multi-seed runs.",
+    )
+    parser.add_argument(
+        "--checkpoint_path",
+        type=str,
+        default=None,
+        help="Override default checkpoint output path (prevents multi-seed overwrite).",
+    )
     args = parser.parse_args()
-    main(args.config, args.smoke, args.use_pretrained)
+    main(
+        args.config,
+        args.smoke,
+        args.use_pretrained,
+        seed_override=args.seed,
+        checkpoint_path=args.checkpoint_path,
+    )
