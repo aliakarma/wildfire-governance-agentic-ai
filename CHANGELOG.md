@@ -18,5 +18,5 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), [Semantic Vers
 - Pre-committed paper result CSVs in results/paper/
 - Docker + Docker Compose for zero-setup reproduction
 - GitHub Actions CI (lint, unit tests, integration tests, theorem verification)
-- Holm-Bonferroni corrected statistical tests throughout
+- Holm-Bonferroni corrected statistical tests (experiments 04, 11b)
 - Data download scripts for NASA FIRMS VIIRS, NIFC, GOES-16, ERA5, MTBS
