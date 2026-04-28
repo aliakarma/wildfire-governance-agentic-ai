@@ -86,6 +86,47 @@ The GOMDP governance invariant (Theorem 1) is deterministic: **100% compliance
 is not a statistical claim** — it is enforced by the cryptographic smart contract
 and will reproduce exactly regardless of hardware or seed.
 
+## Additional Missing Experiments (Multi-Seed + Stepwise Invariants)
+
+### Experiment 1: Multi-seed PPO training reproducibility (seeds 0–4)
+
+Trains PPO-GOMDP from scratch across independent seeds and aggregates learning curve
+variance plus final-episode reward distributions.
+
+```bash
+python experiments/exp1_multiseed_ppo_training.py --config configs/experiments/ppo_training.yaml --seed_start 0 --seed_end 4
+```
+
+Outputs:
+- `results/experiments/<hash>/ppo_multiseed_learning_curves.csv`
+- `results/experiments/<hash>/ppo_multiseed_reward_mean_std_by_episode.csv`
+- `results/experiments/<hash>/ppo_multiseed_final_rewards.csv`
+
+If episode 500 exists, a quick convergence check is written to:
+- `results/experiments/<hash>/ppo_multiseed_episode500_check.txt`
+
+### Experiment 2: Stepwise GovernanceInvariantChecker behavior without blockchain (CMDP)
+
+Logs `theorem1_step_satisfied` per-step (and violation reasons) for CMDP/no-blockchain runs.
+
+```bash
+python experiments/exp2_cmdp_invariant_stepwise.py --config configs/experiments/paper_main_results.yaml --n_seeds 20
+```
+
+Outputs:
+- `results/runs/<hash>/cmdp_stepwise_invariant.csv`
+- `results/runs/<hash>/cmdp_episode_invariant_summary.csv`
+
+### Experiment 3: PPO training-seed ablation vs Greedy baseline
+
+Evaluate multiple PPO checkpoints (trained with different seeds) against Greedy-GOMDP and report
+mean ± std of \(L_d\) improvement (%). This tests whether the 17.5% claim is robust across training seeds.
+
+```bash
+# After running Experiment 1, point this at its checkpoints directory:
+python experiments/exp3_multiseed_rl_ablation.py --checkpoints_dir results/experiments/<hash>/checkpoints --n_eval_seeds 20
+```
+
 ## Pre-Committed Paper Results
 
 All paper result CSVs are committed to `results/paper/`. To regenerate figures
