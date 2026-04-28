@@ -100,6 +100,7 @@ def evaluate(
     n_uavs: int = 20,
     grid_size: int = 100,
     use_pretrained: bool = True,
+    checkpoint_path: str | Path | None = None,
     enable_governance: bool = True,
     smoke: bool = False,
 ) -> Dict[str, Any]:
@@ -128,7 +129,7 @@ def evaluate(
 
     agent = PPOGOMDPAgent(grid_size=grid_size, n_uavs=n_uavs)
     if use_pretrained:
-        ckpt = CHECKPOINT_DIR / "ppo_gomdp_best.pt"
+        ckpt = Path(checkpoint_path) if checkpoint_path is not None else (CHECKPOINT_DIR / "ppo_gomdp_best.pt")
         try:
             if not _load_checkpoint_if_compatible(agent, ckpt):
                 logger.warning(
@@ -191,6 +192,12 @@ def main() -> None:
     parser.add_argument("--config", type=str, default="configs/experiments/paper_main_results.yaml")
     parser.add_argument("--n_seeds", type=int, default=20)
     parser.add_argument("--use_pretrained", action="store_true", default=True)
+    parser.add_argument(
+        "--checkpoint_path",
+        type=str,
+        default=None,
+        help="Optional path to a PPO checkpoint (overrides default).",
+    )
     parser.add_argument("--no_governance", action="store_true")
     parser.add_argument("--smoke", action="store_true")
     args = parser.parse_args()
@@ -198,6 +205,7 @@ def main() -> None:
     results = evaluate(
         n_seeds=args.n_seeds,
         use_pretrained=args.use_pretrained,
+        checkpoint_path=args.checkpoint_path,
         enable_governance=not args.no_governance,
         smoke=args.smoke,
     )
