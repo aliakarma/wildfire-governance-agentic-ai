@@ -146,8 +146,6 @@ bash experiments/run_all.sh --smoke
 | VIIRS 375m Active Fire | NASA FIRMS | Ground-truth fire detection | `make download-viirs` |
 | NIFC Fire Perimeters | NIFC | True alarm labels for Fp | `python data/scripts/download_nifc.py` |
 | GOES-16 Fire Detection | NOAA (free S3) | Satellite feed simulation | `python data/scripts/download_goes16.py` |
-| ERA5 Reanalysis | ECMWF/Copernicus | Meteorological forcing | `python data/scripts/download_era5.py` |
-| MTBS Burn Severity | USGS/USFS | Fuel load maps | `python data/scripts/download_mtbs.py` |
 
 See [`data/README.md`](data/README.md) for full instructions, API key setup, and checksums.
 

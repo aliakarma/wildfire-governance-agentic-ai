@@ -35,8 +35,5 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Installation: installation.md
-  - Quick Start: quickstart.md
-  - Architecture: architecture.md
-  - Datasets: datasets.md
   - Reproducibility: reproducibility.md
   - Blockchain Setup: blockchain_setup.md

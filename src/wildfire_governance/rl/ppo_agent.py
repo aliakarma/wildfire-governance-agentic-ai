@@ -209,45 +209,75 @@ class PPOGOMDPAgent:
         if not observations:
             return 0.0
 
-        obs_tensor = torch.FloatTensor(np.array(observations))
-        reward_tensor = torch.FloatTensor(rewards)
+        obs_tensor: torch.Tensor = torch.tensor(np.asarray(observations), dtype=torch.float32)
 
-        # Compute discounted returns
-        returns = _compute_returns(rewards, self.gamma)
-        returns_tensor = torch.FloatTensor(returns)
+        # Build a dense [T, n_uavs] tensor from the actual rollout actions.
+        action_tensor: torch.Tensor = torch.zeros(
+            (len(actions), self.n_uavs), dtype=torch.long
+        )
+        for t, action_dict in enumerate(actions):
+            for uav_idx, sector_idx in action_dict.items():
+                if 0 <= uav_idx < self.n_uavs:
+                    action_tensor[t, uav_idx] = int(sector_idx)
 
-        # Normalise returns
+        # Compute discounted returns with episode termination support.
+        returns: List[float] = []
+        running_return = 0.0
+        for reward, done in zip(reversed(rewards), reversed(dones)):
+            if done:
+                running_return = 0.0
+            running_return = float(reward) + self.gamma * running_return
+            returns.insert(0, running_return)
+
+        returns_tensor: torch.Tensor = torch.tensor(returns, dtype=torch.float32)
         if returns_tensor.std() > 1e-8:
             returns_tensor = (returns_tensor - returns_tensor.mean()) / (
                 returns_tensor.std() + 1e-8
             )
 
+        # Old log-probabilities are computed from the actual rollout actions.
+        # The policy has not been updated yet, so these match the rollout policy.
+        with torch.no_grad():
+            old_logits_list = self.policy(obs_tensor)
+            old_log_probs: torch.Tensor = torch.zeros(len(observations), dtype=torch.float32)
+            for uav_idx, logits in enumerate(old_logits_list):
+                dist = Categorical(logits=logits)
+                old_log_probs = old_log_probs + dist.log_prob(action_tensor[:, uav_idx])
+
         total_loss = 0.0
+        clip_eps = 0.2
+
         for _ in range(self.n_epochs):
             values = self.value_net(obs_tensor)
-            advantages = (returns_tensor - values.detach())
+            advantages = returns_tensor - values.detach()
+            if advantages.std() > 1e-8:
+                advantages = (advantages - advantages.mean()) / (
+                    advantages.std() + 1e-8
+                )
 
             logits_list = self.policy(obs_tensor)
-            policy_loss = torch.tensor(0.0)
-            entropy_loss = torch.tensor(0.0)
+            new_log_probs: torch.Tensor = torch.zeros(len(observations), dtype=torch.float32)
+            entropy_terms = []
 
-            # Aggregate loss across UAVs
             for uav_idx, logits in enumerate(logits_list):
                 dist = Categorical(logits=logits)
-                entropy_loss = entropy_loss - dist.entropy().mean()
-                # Use a placeholder log-prob (actual action storage omitted for brevity)
-                log_probs = dist.log_prob(
-                    torch.randint(0, self.n_sectors, (len(observations),))
-                )
-                policy_loss = policy_loss - (log_probs * advantages).mean()
+                entropy_terms.append(dist.entropy().mean())
+                new_log_probs = new_log_probs + dist.log_prob(action_tensor[:, uav_idx])
 
+            ratio = torch.exp(new_log_probs - old_log_probs)
+            clipped_ratio = torch.clamp(ratio, 1.0 - clip_eps, 1.0 + clip_eps)
+            surrogate_1 = ratio * advantages
+            surrogate_2 = clipped_ratio * advantages
+            policy_loss = -torch.min(surrogate_1, surrogate_2).mean()
             value_loss = nn.functional.mse_loss(values, returns_tensor)
+            entropy_loss = -torch.stack(entropy_terms).mean() if entropy_terms else torch.tensor(0.0)
+
             loss = policy_loss + 0.5 * value_loss + self.entropy_coeff * entropy_loss
             self.optimizer.zero_grad()
             loss.backward()
             nn.utils.clip_grad_norm_(self.policy.parameters(), 0.5)
             self.optimizer.step()
-            total_loss += loss.item()
+            total_loss += float(loss.item())
 
         self._training_step += 1
         return total_loss / self.n_epochs
