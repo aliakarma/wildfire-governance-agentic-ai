@@ -69,7 +69,7 @@ governance:
   hitl:
     mean_review_delay: 3.0
     std_review_delay: 0.8
-    rejection_rate: 0.0
+    rejection_rate: 0.15  # Human operator rejects 15% of alerts (realistic filtering)
   multi_signature:
     required_signers: 4         # m-of-n (m=4, n=7)
   alert:
