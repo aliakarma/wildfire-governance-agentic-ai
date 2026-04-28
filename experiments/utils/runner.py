@@ -350,6 +350,10 @@ def run_episode(
     if ignition_time is None:
         ignition_time = 0
     ld = float(first_detection - ignition_time) if first_detection is not None else float(n_timesteps)
+    # fp_pct is the False Discovery Rate (FDR): % of broadcast alerts that are false.
+    # NOT the classical False Positive Rate (true negatives vs all negatives).
+    # FDR = n_false / n_alerts, expressed as a percentage.
+    # Paper definition: Fp in Table II, Section VI-B.
     fp_pct = (n_false / max(1, n_alerts)) * 100.0
     mean_bc = float(np.mean(bc_delays)) if bc_delays else 1.2
     mean_hv = float(np.mean(human_delays)) if human_delays else 3.0
