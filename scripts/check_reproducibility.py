@@ -1,32 +1,4 @@
-#!/usr/bin/env bash
-# =============================================================================
-# Check that newly computed results match pre-committed paper values
-# within 5% relative tolerance.
-#
-# Usage:
-#   bash scripts/check_reproducibility.sh
-#
-# Windows (PowerShell): python scripts/check_reproducibility.py
-# =============================================================================
-
-set -euo pipefail
-
-if [ -z "${PYTHON_BIN:-}" ]; then
-    if command -v python3 >/dev/null 2>&1; then
-        PYTHON_BIN="python3"
-    elif command -v python >/dev/null 2>&1; then
-        PYTHON_BIN="python"
-    else
-        echo "[FAIL] Python interpreter not found in PATH (tried python3, python)."
-        exit 1
-    fi
-fi
-
-echo "=== Reproducibility Check ==="
-echo "Tolerance: 5% relative"
-echo ""
-
-"$PYTHON_BIN" - << 'EOF'
+#!/usr/bin/env python3
 import sys
 from pathlib import Path
 import pandas as pd
@@ -132,53 +104,60 @@ checks = {
     "fig5_tradeoff_data.csv": ["config", "n_uavs"],
 }
 
-all_pass = True
-latest_run = get_latest_run_dir()
-if latest_run is None:
-    print("[FAIL] No run directories found under results/runs/. Run experiments first.")
-    sys.exit(1)
+def main():
+    print("=== Reproducibility Check ===")
+    print(f"Tolerance: {TOLERANCE:.0%}")
+    print("")
 
-print(f"Latest run: {latest_run}")
-print("")
+    latest_run = get_latest_run_dir()
+    if latest_run is None:
+        print("[FAIL] No run directories found under results/runs/. Run experiments first.")
+        sys.exit(1)
 
-required_run_files = list(checks.keys())
-missing_run = [name for name in required_run_files if not (latest_run / name).exists()]
-if missing_run:
-    print("[FAIL] Latest run is missing required reproducibility files:")
-    for name in missing_run:
-        print(f"  - {latest_run / name}")
-    print("Run full reproduction first (e.g., bash experiments/run_all.sh --skip_training).")
-    sys.exit(1)
+    print(f"Latest run: {latest_run}")
+    print("")
 
-total_passed = 0
-total_failed = 0
+    required_run_files = list(checks.keys())
+    missing_run = [name for name in required_run_files if not (latest_run / name).exists()]
+    if missing_run:
+        print("[FAIL] Latest run is missing required reproducibility files:")
+        for name in missing_run:
+            print(f"  - {latest_run / name}")
+        print("Run full reproduction first.")
+        sys.exit(1)
 
-for filename, preferred_keys in checks.items():
-    paper_path = PAPER_DIR / filename
-    if not paper_path.exists():
-        print(f"[SKIP] {filename} â€” paper CSV not found")
-        continue
+    total_passed = 0
+    total_failed = 0
+    all_pass = True
 
-    run_path = latest_run / filename
+    for filename, preferred_keys in checks.items():
+        paper_path = PAPER_DIR / filename
+        if not paper_path.exists():
+            print(f"[SKIP] {filename} — paper CSV not found")
+            continue
 
-    print(f"Checking {filename}:")
-    file_ok, passed, failed = compare_file(run_path, paper_path, preferred_keys)
-    total_passed += passed
-    total_failed += failed
-    if not file_ok:
-        all_pass = False
-    print()
+        run_path = latest_run / filename
 
-if all_pass:
-    print(
-        f"All checks PASSED â€” deviations within {TOLERANCE:.0%} tolerance "
-        f"(metrics passed: {total_passed})."
-    )
-    sys.exit(0)
-else:
-    print(
-        f"Some checks FAILED â€” {total_failed} metric deviations exceed "
-        f"{TOLERANCE:.0%} tolerance."
-    )
-    sys.exit(1)
-EOF
+        print(f"Checking {filename}:")
+        file_ok, passed, failed = compare_file(run_path, paper_path, preferred_keys)
+        total_passed += passed
+        total_failed += failed
+        if not file_ok:
+            all_pass = False
+        print()
+
+    if all_pass:
+        print(
+            f"All checks PASSED — deviations within {TOLERANCE:.0%} tolerance "
+            f"(metrics passed: {total_passed})."
+        )
+        sys.exit(0)
+    else:
+        print(
+            f"Some checks FAILED — {total_failed} metric deviations exceed "
+            f"{TOLERANCE:.0%} tolerance."
+        )
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()
