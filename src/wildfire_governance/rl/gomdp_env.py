@@ -158,7 +158,7 @@ class GOMMDPGymEnv:
         alert_broadcast = False
         cert: Optional[str] = None
 
-        if heat_val > 0.80 and self._enable_governance:
+        if heat_val > 0.80:
             # Simulate verification pipeline
             weather_idx = float(np.clip(
                 self._sim._wind_field.mean() - self._sim._humidity_field.mean() + 0.5, 0.0, 1.0
@@ -167,39 +167,39 @@ class GOMMDPGymEnv:
             info["confidence"] = conf
 
             if conf > 0.80:
-                # HITL review
                 row, col = (int(anomaly_location[0]), int(anomaly_location[1])) if anomaly_location else (0, 0)
-                tx = build_transaction(
-                    event_id=f"evt_{self._step_count}",
-                    geo_boundary=(row, col, row + 1, col + 1),
-                    confidence_score=conf,
-                    sensor_readings={"heat": heat_val, "weather": weather_idx},
-                )
-                decision, signature = self._hitl_gate.process(tx, conf)
-                info["human_approval"] = decision.approved
+                is_true_fire = bool(self._sim.fire_mask[row, col] > 0.5)
 
-                if decision.approved and signature is not None:
-                    result = self._smart_contract.verify_and_execute(
-                        tx, signature, self._hitl_gate.public_key_bytes
+                if self._enable_governance:
+                    # HITL review
+                    tx = build_transaction(
+                        event_id=f"evt_{self._step_count}",
+                        geo_boundary=(row, col, row + 1, col + 1),
+                        confidence_score=conf,
+                        sensor_readings={"heat": heat_val, "weather": weather_idx},
                     )
-                    if result.alert_enabled:
-                        cert = result.cert
-                        alert_broadcast = True
-                        self._n_alerts_broadcast += 1
-                        is_true_fire = bool(self._sim.fire_mask[row, col] > 0.5)
-                        if not is_true_fire:
-                            self._n_false_alerts += 1
-                        info["governance_cert"] = cert
-                        info["alert_broadcast"] = True
+                    decision, signature = self._hitl_gate.process(tx, conf)
+                    info["human_approval"] = decision.approved
+
+                    if decision.approved and signature is not None:
+                        result = self._smart_contract.verify_and_execute(
+                            tx, signature, self._hitl_gate.public_key_bytes
+                        )
+                        if result.alert_enabled:
+                            cert = result.cert
+                            alert_broadcast = True
+                            self._n_alerts_broadcast += 1
+                            if not is_true_fire:
+                                self._n_false_alerts += 1
+                            info["governance_cert"] = cert
+                            info["alert_broadcast"] = True
                 else:
-                    # Non-governance path (CMDP comparison)
-                    if conf > 0.80:
-                        alert_broadcast = True
-                        self._n_alerts_broadcast += 1
-                        is_true_fire = bool(self._sim.fire_mask.max() > 0.5)
-                        if not is_true_fire:
-                            self._n_false_alerts += 1
-                        info["alert_broadcast"] = True
+                    # Non-governance path (CMDP comparison / ungoverned)
+                    alert_broadcast = True
+                    self._n_alerts_broadcast += 1
+                    if not is_true_fire:
+                        self._n_false_alerts += 1
+                    info["alert_broadcast"] = True
 
         self._trajectory.append(dict(info))
 

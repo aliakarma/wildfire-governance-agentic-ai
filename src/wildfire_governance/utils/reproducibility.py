@@ -42,6 +42,10 @@ def generate_run_hash(config: Any) -> str:
     Returns:
         String of the form ``YYYYMMDD_HHMMSS_<8-char-hash>``.
     """
+    import os
+    if "GOMDP_RUN_HASH" in os.environ:
+        return os.environ["GOMDP_RUN_HASH"]
+
     from datetime import datetime
 
     try:

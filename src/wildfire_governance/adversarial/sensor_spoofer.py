@@ -45,27 +45,45 @@ class SensorSpoofer:
         self,
         heat_map: np.ndarray,
         fire_mask: np.ndarray,
+        strategic: bool = False,
     ) -> np.ndarray:
         """Apply spoofing to non-fire cells in *heat_map*.
 
         Args:
             heat_map: Current heat map, shape (H, W), values in [0, 1].
             fire_mask: Binary ground-truth fire mask, shape (H, W).
+            strategic: If True, concentrates spoofing budget on cells with highest heat.
 
         Returns:
             Spoofed heat map of shape (H, W). Original array is NOT modified.
         """
         spoofed = heat_map.copy()
         non_fire = (fire_mask < 0.5)
-        candidates = non_fire & (self._rng.random(heat_map.shape) < self.p_spoof)
-        n_candidates = int(candidates.sum())
-        self._n_total += n_candidates
 
-        if n_candidates > 0:
-            # Spoof values: Uniform(tau1, 1.0)
-            spoof_values = self._rng.uniform(self.tau1, 1.0, size=n_candidates).astype(np.float32)
-            spoofed[candidates] = spoof_values
-            self._n_spoofed += n_candidates
+        if strategic:
+            # Sort non-fire cells by heat value descending (corresponds to highest belief)
+            non_fire_indices = np.argwhere(non_fire)
+            if len(non_fire_indices) > 0:
+                heat_vals = heat_map[non_fire]
+                sorted_idx_in_non_fire = np.argsort(heat_vals)[::-1]
+                n_to_spoof = int(self.p_spoof * len(sorted_idx_in_non_fire))
+                if n_to_spoof > 0:
+                    selected_idx = sorted_idx_in_non_fire[:n_to_spoof]
+                    for idx in selected_idx:
+                        r, c = non_fire_indices[idx]
+                        spoofed[r, c] = float(self._rng.uniform(self.tau1, 1.0))
+                        self._n_spoofed += 1
+                    self._n_total += n_to_spoof
+        else:
+            candidates = non_fire & (self._rng.random(heat_map.shape) < self.p_spoof)
+            n_candidates = int(candidates.sum())
+            self._n_total += n_candidates
+
+            if n_candidates > 0:
+                # Spoof values: Uniform(tau1, 1.0)
+                spoof_values = self._rng.uniform(self.tau1, 1.0, size=n_candidates).astype(np.float32)
+                spoofed[candidates] = spoof_values
+                self._n_spoofed += n_candidates
 
         return spoofed
 
