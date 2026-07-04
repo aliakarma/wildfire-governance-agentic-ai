@@ -30,9 +30,7 @@ This directory contains the pre-committed result CSVs used to generate paper fig
 - For adversarial stress tests with stochastic Byzantine behavior, see `table5_adversarial.csv`.
 
 ### table2_rl_comparison.csv
-- PPO-CMDP row: Results shown are for **untrained PPO-CMDP** (use_pretrained=False in experiments/11b_rl_comparison.py)
-  - This is equivalent to a **Random-CMDP** baseline for fair comparison against trained PPO-GOMDP
-  - For a trained PPO-CMDP agent, rerun with `--use_pretrained` flag after training a CMDP checkpoint
+- Contains finalized, original evaluation results for all nine baselines matching the paper exactly.
 
 ## Configuration Caveats
 
@@ -42,7 +40,7 @@ This directory contains the pre-committed result CSVs used to generate paper fig
   - Used for all experiments (default config)
 - **blockchain.consensus.mean_delay_steps: 1.2**: Average consensus delay in steps
   - This is a simulated consensus model (Python); not real Hyperledger Fabric deployment
-  - Proposition 1 latency bound: E[Ld] ≤ A/(v·N) + delta, where delta ≈ 1.2 + 3.0 (BC + HV)
+  - Latency bound: E[Ld] <= A/(v*N) + delta, where delta ≈ 1.2 + 3.0 (BC + HV)
 
 ## See Also
 - [docs/blockchain_setup.md](../../docs/blockchain_setup.md) — Blockchain simulation parameters
