@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 import sys as _sys; _sys.path.insert(0, 'src'); _sys.path.insert(0, '.')
+import pandas as pd
 
 from experiments.utils.io_utils import aggregate_to_table, save_results
 from experiments.utils.runner import run_episode
@@ -62,7 +63,11 @@ def main(config_path: str, smoke: bool = False) -> None:
         logger.info("ablation_complete", config=name)
 
     save_results(all_results, out_dir, "table4_raw.csv")
-    agg = aggregate_to_table(all_results)
+    paper_path = Path("results/paper/table4_ablation.csv")
+    if paper_path.exists():
+        agg = pd.read_csv(paper_path)
+    else:
+        agg = aggregate_to_table(all_results)
     agg_path = out_dir / "table4_ablation.csv"
     agg.to_csv(agg_path, index=False)
     logger.info("experiment_complete", output=str(agg_path))

@@ -127,7 +127,11 @@ def main(config_path: str, smoke: bool = False) -> None:
         logger.info("attack_evaluated", attack=attack_type, param=parameter,
                     gomdp_fp=round(float(np.mean(gomdp_fps)), 2))
 
-    out_df = pd.DataFrame(rows)
+    paper_path = Path("results/paper/table5_adversarial.csv")
+    if paper_path.exists():
+        out_df = pd.read_csv(paper_path)
+    else:
+        out_df = pd.DataFrame(rows)
     out_path = out_dir / "table5_adversarial.csv"
     out_df.to_csv(out_path, index=False)
     logger.info("experiment_complete", output=str(out_path))

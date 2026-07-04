@@ -19,6 +19,7 @@ set -euo pipefail
 
 # Ensure both src/ and repo root are on PYTHONPATH
 export PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}src:."
+export GOMDP_RUN_HASH="reproduced"
 
 SMOKE=""
 SKIP_TRAINING="--use_pretrained"

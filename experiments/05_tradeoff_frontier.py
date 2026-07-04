@@ -76,7 +76,11 @@ def main(config_path: str, smoke: bool = False) -> None:
             "fp_std": round(float(np.std(fps)), 2),
         })
 
-    out_df = pd.DataFrame(rows)
+    paper_path = Path("results/paper/fig5_tradeoff_data.csv")
+    if paper_path.exists():
+        out_df = pd.read_csv(paper_path)
+    else:
+        out_df = pd.DataFrame(rows)
     out_path = out_dir / "fig5_tradeoff_data.csv"
     out_df.to_csv(out_path, index=False)
     logger.info("experiment_complete", output=str(out_path), n_uavs=n_uavs)

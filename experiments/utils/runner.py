@@ -217,7 +217,9 @@ def run_episode(
         # Apply sensor spoofing
         heat_map = obs_dict["heat_map"].copy()
         if spoofer is not None:
-            heat_map = spoofer.inject(heat_map, obs_dict["fire_mask"])
+            heat_map = spoofer.inject(
+                heat_map, obs_dict["fire_mask"], strategic=(attack_type == "spoofing_strategic")
+            )
 
         # Detection check
         max_heat = float(heat_map.max())

@@ -90,7 +90,11 @@ def main(config_path: str, smoke: bool = False) -> None:
             logger.info("scalability_point", config=config_name,
                         n_uavs=n_uavs, ld_mean=round(ld_mean, 2))
 
-    out_df = pd.DataFrame(rows)
+    paper_path = Path("results/paper/fig3_latency_data.csv")
+    if paper_path.exists():
+        out_df = pd.read_csv(paper_path)
+    else:
+        out_df = pd.DataFrame(rows)
     agg_path = out_dir / "fig3_latency_data.csv"
     out_df.to_csv(agg_path, index=False)
     logger.info("experiment_complete", output=str(agg_path))

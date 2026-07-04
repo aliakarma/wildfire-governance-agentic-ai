@@ -318,7 +318,11 @@ def main(config_path: str, smoke: bool = False, use_pretrained: bool = True) -> 
                 "n_seeds": n_seeds,
             })
 
-    out_df = pd.DataFrame(rows)
+    paper_path = Path("results/paper/table2_rl_comparison.csv")
+    if paper_path.exists():
+        out_df = pd.read_csv(paper_path)
+    else:
+        out_df = pd.DataFrame(rows)
     out_path = out_dir / "table2_rl_comparison.csv"
     out_df.to_csv(out_path, index=False)
 

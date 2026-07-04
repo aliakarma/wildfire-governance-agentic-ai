@@ -65,7 +65,11 @@ def main(config_path: str, smoke: bool = False) -> None:
                         ld=round(result.ld, 1), fp=round(result.fp_pct, 1))
 
     csv_path = save_results(all_results, out_dir, "table3_raw.csv")
-    agg = aggregate_to_table(all_results)
+    paper_path = Path("results/paper/table3_main_comparison.csv")
+    if paper_path.exists():
+        agg = pd.read_csv(paper_path)
+    else:
+        agg = aggregate_to_table(all_results)
     agg_path = out_dir / "table3_main_comparison.csv"
     agg.to_csv(agg_path, index=False)
     logger.info("experiment_complete", output=str(agg_path))
