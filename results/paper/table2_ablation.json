@@ -1,0 +1,74 @@
+[
+  {
+    "config": "PPO-GOMDP (full)",
+    "ld_mean": 15.1,
+    "ld_std": 1.1,
+    "fp_mean": 6.0,
+    "fp_std": 1.1,
+    "injections_blocked": 100,
+    "injections_total": 100
+  },
+  {
+    "config": "Greedy-GOMDP (full)",
+    "ld_mean": 18.3,
+    "ld_std": 1.4,
+    "fp_mean": 6.1,
+    "fp_std": 1.3,
+    "injections_blocked": 100,
+    "injections_total": 100
+  },
+  {
+    "config": "- Adaptive coordination",
+    "ld_mean": 29.7,
+    "ld_std": 2.6,
+    "fp_mean": 6.1,
+    "fp_std": 1.2,
+    "injections_blocked": 100,
+    "injections_total": 100
+  },
+  {
+    "config": "- HITL authorization",
+    "ld_mean": 15.2,
+    "ld_std": 1.1,
+    "fp_mean": 22.4,
+    "fp_std": 2.2,
+    "injections_blocked": 100,
+    "injections_total": 100
+  },
+  {
+    "config": "- Consensus (Central+Sig)",
+    "ld_mean": 15.0,
+    "ld_std": 1.1,
+    "fp_mean": 6.0,
+    "fp_std": 1.2,
+    "injections_blocked": 100,
+    "injections_total": 100
+  },
+  {
+    "config": "- All authentication",
+    "ld_mean": 15.1,
+    "ld_std": 1.1,
+    "fp_mean": 6.9,
+    "fp_std": 1.4,
+    "injections_blocked": 0,
+    "injections_total": 100
+  },
+  {
+    "config": "- Multi-stage verif.",
+    "ld_mean": 15.0,
+    "ld_std": 1.1,
+    "fp_mean": 14.8,
+    "fp_std": 2.0,
+    "injections_blocked": 100,
+    "injections_total": 100
+  },
+  {
+    "config": "PPO-CMDP (no blockchain)",
+    "ld_mean": 14.8,
+    "ld_std": 1.0,
+    "fp_mean": 8.3,
+    "fp_std": 2.4,
+    "injections_blocked": 0,
+    "injections_total": 100
+  }
+]

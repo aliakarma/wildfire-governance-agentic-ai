@@ -1,0 +1,32 @@
+[
+  {
+    "config": "PPO-GOMDP",
+    "ld_mean": 9.8,
+    "fp_mean": 5.7
+  },
+  {
+    "config": "Greedy-GOMDP",
+    "ld_mean": 10.1,
+    "fp_mean": 5.8
+  },
+  {
+    "config": "PPO-CMDP",
+    "ld_mean": 9.6,
+    "fp_mean": 7.6
+  },
+  {
+    "config": "WCSAC",
+    "ld_mean": 9.9,
+    "fp_mean": 8.7
+  },
+  {
+    "config": "Adaptive AI",
+    "ld_mean": 11.3,
+    "fp_mean": 21.9
+  },
+  {
+    "config": "Static",
+    "ld_mean": 36.4,
+    "fp_mean": 14.9
+  }
+]

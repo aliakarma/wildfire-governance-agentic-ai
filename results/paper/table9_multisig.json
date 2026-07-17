@@ -1,0 +1,11 @@
+[
+  {
+    "config": "m-of-n multisig",
+    "ld_mean": 15.0,
+    "ld_std": 1.1,
+    "fp_mean": 6.1,
+    "fp_std": 1.2,
+    "injections_blocked": 100,
+    "injections_total": 100
+  }
+]

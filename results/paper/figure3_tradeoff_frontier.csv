@@ -1,0 +1,7 @@
+config,ld_mean,fp_mean
+PPO-GOMDP,9.8,5.7
+Greedy-GOMDP,10.1,5.8
+PPO-CMDP,9.6,7.6
+WCSAC,9.9,8.7
+Adaptive AI,11.3,21.9
+Static,36.4,14.9

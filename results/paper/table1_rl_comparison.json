@@ -1,0 +1,110 @@
+[
+  {
+    "method": "PPO-GOMDP",
+    "framework": "GOMDP",
+    "ld_mean": 15.1,
+    "ld_std": 1.1,
+    "fp_mean": 6.0,
+    "fp_std": 1.1,
+    "fn_mean": 2.1,
+    "fn_std": 0.9,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "method": "Greedy-GOMDP",
+    "framework": "GOMDP",
+    "ld_mean": 18.3,
+    "ld_std": 1.4,
+    "fp_mean": 6.1,
+    "fp_std": 1.3,
+    "fn_mean": 2.3,
+    "fn_std": 1.0,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "method": "Central+Sig",
+    "framework": "GOMDP",
+    "ld_mean": 15.0,
+    "ld_std": 1.1,
+    "fp_mean": 6.0,
+    "fp_std": 1.2,
+    "fn_mean": "",
+    "fn_std": "",
+    "compliance_pct": 100.0,
+    "enforcement": "Sig. only"
+  },
+  {
+    "method": "Shield-PPO",
+    "framework": "Logical",
+    "ld_mean": 15.2,
+    "ld_std": 1.2,
+    "fp_mean": 6.2,
+    "fp_std": 1.3,
+    "fn_mean": "",
+    "fn_std": "",
+    "compliance_pct": 100.0,
+    "enforcement": "Logical"
+  },
+  {
+    "method": "SafeLayer",
+    "framework": "Learned",
+    "ld_mean": 14.9,
+    "ld_std": 1.1,
+    "fp_mean": 7.0,
+    "fp_std": 1.6,
+    "fn_mean": "",
+    "fn_std": "",
+    "compliance_pct": 98.4,
+    "enforcement": "Learned"
+  },
+  {
+    "method": "PPO-CMDP",
+    "framework": "CMDP",
+    "ld_mean": 14.8,
+    "ld_std": 1.0,
+    "fp_mean": 8.3,
+    "fp_std": 2.4,
+    "fn_mean": 2.6,
+    "fn_std": 1.0,
+    "compliance_pct": 92.8,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "method": "WCSAC",
+    "framework": "CMDP",
+    "ld_mean": 14.6,
+    "ld_std": 1.2,
+    "fp_mean": 9.4,
+    "fp_std": 2.0,
+    "fn_mean": 3.8,
+    "fn_std": 1.4,
+    "compliance_pct": 90.6,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "method": "Adaptive AI",
+    "framework": "None",
+    "ld_mean": 16.2,
+    "ld_std": 1.2,
+    "fp_mean": 22.4,
+    "fp_std": 2.1,
+    "fn_mean": 0.9,
+    "fn_std": 0.5,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "method": "Static",
+    "framework": "None",
+    "ld_mean": 41.5,
+    "ld_std": 3.1,
+    "fp_mean": 15.3,
+    "fp_std": 2.4,
+    "fn_mean": 1.8,
+    "fn_std": 0.8,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  }
+]

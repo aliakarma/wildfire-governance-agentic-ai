@@ -1,0 +1,26 @@
+[
+  {
+    "k": 4,
+    "f": 1,
+    "p_break_gomdp_theory": 0.052,
+    "empirical": 0.054
+  },
+  {
+    "k": 7,
+    "f": 2,
+    "p_break_gomdp_theory": 0.026,
+    "empirical": 0.025
+  },
+  {
+    "k": 10,
+    "f": 3,
+    "p_break_gomdp_theory": 0.013,
+    "empirical": 0.013
+  },
+  {
+    "k": 13,
+    "f": 4,
+    "p_break_gomdp_theory": 0.007,
+    "empirical": 0.006
+  }
+]

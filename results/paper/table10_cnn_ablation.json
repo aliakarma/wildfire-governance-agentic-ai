@@ -1,0 +1,16 @@
+[
+  {
+    "architecture": "MLP (main)",
+    "ld_mean": 15.1,
+    "ld_std": 1.1,
+    "episodes_to_convergence": "\u2248 650",
+    "parameters": "2.6M"
+  },
+  {
+    "architecture": "CNN",
+    "ld_mean": 14.9,
+    "ld_std": 1.0,
+    "episodes_to_convergence": "\u2248 480",
+    "parameters": "0.4M"
+  }
+]

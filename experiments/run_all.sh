@@ -92,6 +92,10 @@ python experiments/08_viirs_california.py \
     --config configs/experiments/realworld_viirs.yaml $SMOKE \
     || echo "   -> Skipped (run 'make download-viirs' to enable)"
 
+# Ensure all paper results (including JSON and new table files) are copied to the runs directory
+echo "Copying finalized paper results to results/runs/${GOMDP_RUN_HASH}..."
+cp -R results/paper/* "results/runs/${GOMDP_RUN_HASH}/"
+
 echo ""
 echo "=============================================="
 echo " All experiments complete!"

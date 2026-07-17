@@ -1,0 +1,110 @@
+[
+  {
+    "event": "California '20",
+    "method": "PPO-GOMDP",
+    "ld_mean": 22.4,
+    "ld_std": 3.2,
+    "fp_mean": 8.3,
+    "fp_std": 2.1,
+    "gov_compliance_pct": 100.0
+  },
+  {
+    "event": "California '20",
+    "method": "Greedy-GOMDP",
+    "ld_mean": 26.9,
+    "ld_std": 3.8,
+    "fp_mean": 8.5,
+    "fp_std": 2.3,
+    "gov_compliance_pct": 100.0
+  },
+  {
+    "event": "California '20",
+    "method": "PPO-CMDP",
+    "ld_mean": 22.0,
+    "ld_std": 3.1,
+    "fp_mean": 10.6,
+    "fp_std": 2.7,
+    "gov_compliance_pct": 93.1
+  },
+  {
+    "event": "California '20",
+    "method": "Adaptive AI",
+    "ld_mean": 20.1,
+    "ld_std": 2.9,
+    "fp_mean": 24.6,
+    "fp_std": 3.8,
+    "gov_compliance_pct": 0.0
+  },
+  {
+    "event": "Mediterranean '21",
+    "method": "PPO-GOMDP",
+    "ld_mean": 24.1,
+    "ld_std": 4.1,
+    "fp_mean": 9.1,
+    "fp_std": 2.5,
+    "gov_compliance_pct": 100.0
+  },
+  {
+    "event": "Mediterranean '21",
+    "method": "Greedy-GOMDP",
+    "ld_mean": 28.8,
+    "ld_std": 4.6,
+    "fp_mean": 9.3,
+    "fp_std": 2.6,
+    "gov_compliance_pct": 100.0
+  },
+  {
+    "event": "Mediterranean '21",
+    "method": "PPO-CMDP",
+    "ld_mean": 23.6,
+    "ld_std": 3.9,
+    "fp_mean": 11.4,
+    "fp_std": 3.0,
+    "gov_compliance_pct": 92.4
+  },
+  {
+    "event": "Mediterranean '21",
+    "method": "Adaptive AI",
+    "ld_mean": 21.7,
+    "ld_std": 3.5,
+    "fp_mean": 26.1,
+    "fp_std": 4.2,
+    "gov_compliance_pct": 0.0
+  },
+  {
+    "event": "NSW '19\u201320",
+    "method": "PPO-GOMDP",
+    "ld_mean": 21.8,
+    "ld_std": 2.7,
+    "fp_mean": 7.9,
+    "fp_std": 1.9,
+    "gov_compliance_pct": 100.0
+  },
+  {
+    "event": "NSW '19\u201320",
+    "method": "Greedy-GOMDP",
+    "ld_mean": 26.1,
+    "ld_std": 3.3,
+    "fp_mean": 8.2,
+    "fp_std": 2.1,
+    "gov_compliance_pct": 100.0
+  },
+  {
+    "event": "NSW '19\u201320",
+    "method": "PPO-CMDP",
+    "ld_mean": 21.3,
+    "ld_std": 2.8,
+    "fp_mean": 10.1,
+    "fp_std": 2.4,
+    "gov_compliance_pct": 93.6
+  },
+  {
+    "event": "NSW '19\u201320",
+    "method": "Adaptive AI",
+    "ld_mean": 19.8,
+    "ld_std": 2.6,
+    "fp_mean": 23.9,
+    "fp_std": 3.5,
+    "gov_compliance_pct": 0.0
+  }
+]
