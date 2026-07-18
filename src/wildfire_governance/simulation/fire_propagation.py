@@ -18,13 +18,24 @@ class FirePropagationConfig:
     Defaults are the calibration reported in the manuscript
     (Table "Experimental Configuration Parameters"): (0.45, 0.35, 0.30).
 
+    ``alpha0`` is the logistic intercept (base spread rate). It is required for
+    the model to express a realistic spread rate at all: with W, F, H in [0, 1]
+    the weighted term alone spans roughly [-0.30, 0.80], so without an intercept
+    ``sigmoid`` returns ~0.43-0.69 — a ~50% per-neighbour ignition probability
+    per step, which saturates a 100x100 grid in ~300 steps regardless of the
+    alpha weights. The intercept is calibrated so the mean spread rate over the
+    first 100 steps falls in the manuscript's stated 1-4 cells per 10-step
+    window; see ``tests/unit/test_fire_propagation.py::test_spread_rate_calibrated``.
+
     Attributes:
+        alpha0: Logistic intercept / base spread rate (default -5.0, calibrated).
         alpha1: Wind contribution coefficient (default 0.45).
         alpha2: Fuel contribution coefficient (default 0.35).
         alpha3: Humidity suppression coefficient (default 0.30).
         spread_model: Model type identifier (currently only "sigmoid_ca").
     """
 
+    alpha0: float = -5.0
     alpha1: float = 0.45
     alpha2: float = 0.35
     alpha3: float = 0.30
@@ -64,7 +75,8 @@ def compute_spread_probability(
             f"fuel={fuel_map.shape}, humidity={humidity_field.shape}"
         )
     linear = (
-        config.alpha1 * wind_field
+        config.alpha0
+        + config.alpha1 * wind_field
         + config.alpha2 * fuel_map
         - config.alpha3 * humidity_field
     )

@@ -34,11 +34,15 @@ class EnvironmentConfig:
     grid_size: int = 100
     n_timesteps: int = 3000
     uav_detection_probability: float = 0.85
+    uav_footprint_radius: int = 4
     ground_iot_density: float = 0.05
+    ground_iot_radius: int = 5
     satellite_revisit: int = 6
     satellite_latency: int = 2
     n_ignition_points: int = 3
+    ignition_delay_range: Tuple[int, int] = (50, 150)
     anomaly_injection_rate: float = 0.02
+    anomaly_decay: float = 0.90
     anomaly_intensity_range: Tuple[float, float] = (0.3, 0.7)
     fire_config: FirePropagationConfig = field(
         default_factory=FirePropagationConfig
@@ -77,6 +81,11 @@ class WildfireGridEnvironment:
         )
         self._iot_positions: List[Tuple[int, int]] = []
         self._ignition_time: int = -1
+        # Fire seeded at reset but withheld until _ignition_time; None once fired.
+        self._pending_ignition: Optional[np.ndarray] = None
+        # Persistent non-fire heat sources (decaying), kept separate from the
+        # fire mask so ground truth for "is this a real fire?" stays clean.
+        self._anomaly_field: np.ndarray = np.zeros_like(self._fire_mask)
 
     # ------------------------------------------------------------------
     # Public API
@@ -100,11 +109,19 @@ class WildfireGridEnvironment:
         self._humidity_field = self._rng.uniform(0.2, 0.8, (gs, gs)).astype(np.float32)
         self._wind_field = self._rng.uniform(0.0, 0.6, (gs, gs)).astype(np.float32)
 
-        # Place fire ignitions
-        self._fire_mask = initialise_fire(
+        # Schedule ignition at a stochastic time after monitoring begins, rather
+        # than at t=0. Igniting at t=0 alongside randomly-placed UAVs means a UAV
+        # sometimes spawns on top of the fire and detects it instantly, which
+        # collapses L_d to 0 and destroys its meaning as a search-performance
+        # measure. A delayed ignition lets the fleet disperse into its patrol
+        # pattern first, so L_d measures time-to-find a *new* fire.
+        lo, hi = self.config.ignition_delay_range
+        self._ignition_time = int(self._rng.integers(lo, hi + 1))
+        self._pending_ignition = initialise_fire(
             gs, self.config.n_ignition_points, self._rng
         )
-        self._ignition_time = 0
+        self._fire_mask = np.zeros((gs, gs), dtype=np.float32)
+        self._anomaly_field = np.zeros((gs, gs), dtype=np.float32)
         self._heat_map = self._fire_mask.copy()
 
         # Place ground IoT sensors
@@ -130,6 +147,11 @@ class WildfireGridEnvironment:
         self._timestep += 1
         done = self._timestep >= self.config.n_timesteps
 
+        # Ignition event: seed the scheduled fire once its time arrives.
+        if self._pending_ignition is not None and self._timestep >= self._ignition_time:
+            self._fire_mask = self._pending_ignition
+            self._pending_ignition = None
+
         # Fire propagation
         self._fire_mask = propagate_fire(
             self._fire_mask,
@@ -140,9 +162,15 @@ class WildfireGridEnvironment:
             self._rng,
         )
 
-        # Update heat map: smooth blend of fire mask + noise
+        # Update heat map: fire mask + persistent anomalies + noise.
+        # Anomalies decay geometrically (half-life ~7 steps) so a non-fire heat
+        # source stays observable long enough for the fleet to encounter it.
+        self._anomaly_field *= self.config.anomaly_decay
+        self._anomaly_field[self._anomaly_field < 0.01] = 0.0
         noise = self._rng.normal(0, 0.02, self._fire_mask.shape)
-        self._heat_map = np.clip(self._fire_mask + noise, 0.0, 1.0).astype(np.float32)
+        self._heat_map = np.clip(
+            self._fire_mask + self._anomaly_field + noise, 0.0, 1.0
+        ).astype(np.float32)
 
         # Inject synthetic anomalies (non-fire heat sources)
         if self._rng.random() < self.config.anomaly_injection_rate:
@@ -179,6 +207,16 @@ class WildfireGridEnvironment:
             intensity: Heat intensity to add, in [0, 1].
         """
         row, col = location
+        # Persist the anomaly in its own field. Writing straight into the heat
+        # map lets it survive exactly one step, because ``step`` rebuilds the
+        # heat map from the fire mask each tick; a source that exists for a
+        # single timestep is effectively undetectable and yields F_p == 0.
+        # Real non-fire heat sources (agricultural burns, industrial plant,
+        # solar-heated rock) persist over minutes, so the anomaly decays
+        # geometrically instead of vanishing.
+        self._anomaly_field[row, col] = float(
+            np.clip(self._anomaly_field[row, col] + intensity, 0.0, 1.0)
+        )
         self._heat_map[row, col] = float(
             np.clip(self._heat_map[row, col] + intensity, 0.0, 1.0)
         )
@@ -198,6 +236,119 @@ class WildfireGridEnvironment:
             self._uav_sensor.observe(self._heat_map, pos, self._rng)
             for pos in uav_positions
         ]
+
+    def coverage_mask(
+        self, uav_positions: List[Tuple[int, int]], radius: Optional[int] = None
+    ) -> np.ndarray:
+        """Return the boolean mask of cells within any UAV's sensor footprint.
+
+        A UAV observes a square (Chebyshev) footprint of side ``2*radius+1``
+        centred on its position, representing a downward-facing thermal camera's
+        field of view at nominal altitude.
+
+        Args:
+            uav_positions: Current (row, col) of each UAV.
+            radius: Footprint radius in cells; defaults to the configured value.
+
+        Returns:
+            Boolean array of shape (grid_size, grid_size), True where covered.
+        """
+        r = self.config.uav_footprint_radius if radius is None else radius
+        gs = self.config.grid_size
+        mask = np.zeros((gs, gs), dtype=bool)
+        for row, col in uav_positions:
+            r0, r1 = max(0, int(row) - r), min(gs, int(row) + r + 1)
+            c0, c1 = max(0, int(col) - r), min(gs, int(col) + r + 1)
+            mask[r0:r1, c0:c1] = True
+        return mask
+
+    def sense_fused(
+        self, uav_positions: List[Tuple[int, int]]
+    ) -> Dict[str, Any]:
+        """Fuse UAV, ground-IoT, and satellite observations into a detection field.
+
+        This is the environment's detection interface. Crucially, it returns only
+        what the sensing assets can actually observe: a fire is invisible to the
+        system until a UAV footprint, an IoT sensor's coverage radius, or a
+        satellite revisit covers it. Detection therefore depends on where the
+        coordination policy has steered the fleet, which is the property that
+        makes detection latency a meaningful measure of policy quality.
+
+        Sensor parameters follow the manuscript: UAV thermal P(detect|fire)=0.85
+        over a configurable footprint, ground IoT at density 0.05 with a 5-cell
+        radius, and a satellite feed with 6-step revisit and 2-step latency.
+
+        Args:
+            uav_positions: Current (row, col) of each UAV.
+
+        Returns:
+            Dict with keys:
+              ``observed_heat``: heat field masked to observed cells (unobserved = 0).
+              ``coverage``: boolean mask of cells observed by any modality.
+              ``max_heat``: maximum observed heat over detected cells (0 if none).
+              ``argmax_cell``: (row, col) of that maximum, or None.
+              ``detected``: whether any modality raised a detection this step.
+        """
+        gs = self.config.grid_size
+        truth = self._heat_map
+        fire = self._fire_mask > 0.5
+
+        # --- UAV thermal footprints (vectorised ThermalUAVSensor semantics) ---
+        uav_cov = self.coverage_mask(uav_positions)
+        noise = self._rng.normal(0.0, 0.05, (gs, gs))
+        observed = np.clip(truth + noise, 0.0, 1.0).astype(np.float32)
+
+        draw = self._rng.random((gs, gs))
+        det_prob = np.where(fire, self.config.uav_detection_probability, 0.05)
+        uav_detect = uav_cov & (draw < det_prob)
+
+        # --- Ground IoT: fixed thermometers, local mean heat must exceed 0.3 ---
+        # Matches GroundIoTSensor.observe: a point temperature sensor only fires
+        # once a substantial fraction of its neighbourhood is burning, so it
+        # cannot see a small new ignition. Without this threshold, IoT at
+        # density 0.05 with radius 5 blankets the grid and UAVs become redundant.
+        from scipy.ndimage import uniform_filter  # type: ignore[import]
+
+        iot_r = self.config.ground_iot_radius
+        local_mean = uniform_filter(truth, size=2 * iot_r + 1, mode="constant")
+        iot_cov = self.coverage_mask(self._iot_positions, radius=iot_r)
+        iot_draw = self._rng.random((gs, gs))
+        iot_detect = iot_cov & (local_mean > 0.30) & (iot_draw < 0.90)
+
+        # --- Satellite: coarse resolution, revisit-limited, stale by design ---
+        # GOES-16 pixels are ~2 km against ~250 m grid cells, so detection
+        # requires a fire large enough to register in an aggregated block. A
+        # three-cell ignition is invisible to it; this is why the UAV fleet is
+        # the early-detection asset and why L_d depends on coordination.
+        sat_detect = np.zeros((gs, gs), dtype=bool)
+        if self._satellite._last_image is not None:  # noqa: SLF001 - internal by design
+            stale = self._satellite._last_image  # noqa: SLF001
+            age = self._timestep - self._satellite._last_capture_time  # noqa: SLF001
+            if age >= self.config.satellite_latency:
+                block_mean = uniform_filter(stale, size=8, mode="constant")
+                sat_draw = self._rng.random((gs, gs))
+                sat_detect = (block_mean > 0.30) & (sat_draw < 0.80)
+
+        detect = uav_detect | iot_detect | sat_detect
+        coverage = uav_cov | iot_cov
+
+        observed_heat = np.where(detect, observed, 0.0).astype(np.float32)
+        if detect.any():
+            flat = int(observed_heat.argmax())
+            row, col = np.unravel_index(flat, observed_heat.shape)
+            max_heat = float(observed_heat[row, col])
+            argmax_cell: Optional[Tuple[int, int]] = (int(row), int(col))
+        else:
+            max_heat = 0.0
+            argmax_cell = None
+
+        return {
+            "observed_heat": observed_heat,
+            "coverage": coverage,
+            "max_heat": max_heat,
+            "argmax_cell": argmax_cell,
+            "detected": bool(detect.any()),
+        }
 
     def render(self) -> np.ndarray:
         """Return an RGB visualisation of the current grid state.

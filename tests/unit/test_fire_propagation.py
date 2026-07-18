@@ -65,7 +65,14 @@ def test_spread_stochastic_between_seeds() -> None:
     cfg = FirePropagationConfig()
     results = set()
     for s in range(10):
-        m = propagate_fire(fire, wind, fuel, humidity, cfg, np.random.default_rng(s))
+        rng = np.random.default_rng(s)
+        m = fire
+        # The calibrated model spreads at ~0.005 per neighbour per step, so a
+        # single step from one cell almost always yields zero new ignitions and
+        # every seed returns the same count. Integrate over enough steps for the
+        # stochastic difference between seeds to actually show up.
+        for _ in range(200):
+            m = propagate_fire(m, wind, fuel, humidity, cfg, rng)
         results.add(int(m.sum()))
     assert len(results) > 1, "Expected some variation across seeds"
 
@@ -102,3 +109,53 @@ def test_fire_spread_only_from_burning() -> None:
     expected_region[0:2, 0:2] = 1.0
     illegal = new_fire * (1.0 - expected_region)
     assert float(illegal.sum()) == 0.0
+
+
+def test_spread_rate_calibrated_to_manuscript() -> None:
+    """Spread must match the manuscript's stated 1-4 cells per 10-step window.
+
+    Regression guard for the missing logistic intercept: without ``alpha0`` the
+    weighted term alone puts P_spread near 0.5, which saturates a 100x100 grid
+    in ~300 steps (roughly 450 cells per 10-step window, two orders of magnitude
+    off the stated calibration) and drives the false-alert rate to zero because
+    every cell is genuinely on fire.
+    """
+    from wildfire_governance.simulation.grid_environment import (
+        EnvironmentConfig,
+        WildfireGridEnvironment,
+    )
+
+    rates = []
+    for seed in range(5):
+        env = WildfireGridEnvironment(
+            EnvironmentConfig(grid_size=100, n_timesteps=400, ignition_delay_range=(1, 1))
+        )
+        env.reset(seed=seed)
+        counts = []
+        for _ in range(200):
+            _, _, info = env.step([(0, 0)])
+            counts.append(info["fire_cells"])
+        windows = [counts[i + 10] - counts[i] for i in range(0, 100, 10)]
+        rates.append(sum(windows) / len(windows))
+
+    mean_rate = sum(rates) / len(rates)
+    assert 1.0 <= mean_rate <= 4.0, (
+        f"Mean spread rate {mean_rate:.2f} cells/10-step is outside the "
+        f"manuscript's stated 1-4 band; per-seed rates: {rates}"
+    )
+
+
+def test_fire_does_not_saturate_grid() -> None:
+    """A 100x100 grid must not be fully consumed within a standard episode."""
+    from wildfire_governance.simulation.grid_environment import (
+        EnvironmentConfig,
+        WildfireGridEnvironment,
+    )
+
+    env = WildfireGridEnvironment(
+        EnvironmentConfig(grid_size=100, n_timesteps=1500, ignition_delay_range=(1, 1))
+    )
+    env.reset(seed=0)
+    for _ in range(1500):
+        _, _, info = env.step([(0, 0)])
+    assert info["fire_cells"] < 10000, "Grid fully saturated; F_p is meaningless"

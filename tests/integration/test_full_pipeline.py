@@ -36,15 +36,19 @@ def test_static_baseline_has_high_latency() -> None:
     """Static monitoring must have higher Ld than adaptive on average (3 seeds)."""
     from statistics import mean
 
+    # The grid must be large enough that the fleet cannot cover it outright,
+    # or the comparison is vacuous: on a 20x20 grid, 5 UAVs with a 9x9 sensor
+    # footprint observe every cell, so both policies detect instantly and
+    # coordination quality cannot express itself in L_d.
     adaptive_lds, static_lds = [], []
-    for seed in range(3):
+    for seed in range(5):
         r_adaptive = run_episode(
-            seed=seed, config_name="adaptive", grid_size=20, n_timesteps=200,
+            seed=seed, config_name="adaptive", grid_size=60, n_timesteps=600,
             n_uavs=5, enable_governance=False, enable_hitl=False,
             enable_blockchain=False, enable_verification=False, enable_coordination=True
         )
         r_static = run_episode(
-            seed=seed, config_name="static", grid_size=20, n_timesteps=200,
+            seed=seed, config_name="static", grid_size=60, n_timesteps=600,
             n_uavs=5, enable_governance=False, enable_hitl=False,
             enable_blockchain=False, enable_verification=False, enable_coordination=False
         )

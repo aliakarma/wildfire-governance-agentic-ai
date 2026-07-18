@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
@@ -26,6 +26,50 @@ from wildfire_governance.simulation.grid_environment import (
     WildfireGridEnvironment,
 )
 from wildfire_governance.utils.reproducibility import set_global_seed
+from wildfire_governance.verification.bayesian_update import BayesianConfidenceUpdate
+from wildfire_governance.verification.fusion import CrossModalFusion
+
+# Verification thresholds, manuscript Table "Experimental Configuration
+# Parameters": (tau_1, tau_2) = (0.60, 0.80). tau_2 is also the alert threshold
+# tau in the governance predicate, Eq. (4).
+TAU_1 = 0.60
+TAU_2 = 0.80
+
+# Two alerts within this Chebyshev distance are treated as the same event, so a
+# spreading fire raises one alert rather than one per step.
+ALERT_RADIUS = 8
+
+
+def _select_candidate(
+    observed: np.ndarray,
+    alerted: List[Tuple[int, int]],
+    tau_1: float,
+    radius: int,
+) -> Optional[Tuple[int, int]]:
+    """Return the strongest observed cell not already covered by an alert.
+
+    Args:
+        observed: Observed heat field; unobserved cells are 0.
+        alerted: Cells for which an alert has already been broadcast.
+        tau_1: Stage-1 threshold a candidate must exceed.
+        radius: Chebyshev de-duplication radius around each prior alert.
+
+    Returns:
+        (row, col) of the best new candidate, or None if there is none.
+    """
+    field = observed
+    if alerted:
+        field = observed.copy()
+        for ar, ac in alerted:
+            r0, r1 = max(0, ar - radius), min(field.shape[0], ar + radius + 1)
+            c0, c1 = max(0, ac - radius), min(field.shape[1], ac + radius + 1)
+            field[r0:r1, c0:c1] = 0.0
+
+    best = float(field.max())
+    if best <= tau_1:
+        return None
+    row, col = np.unravel_index(int(field.argmax()), field.shape)
+    return int(row), int(col)
 
 
 @dataclass
@@ -157,8 +201,15 @@ def run_episode(
     contract = GovernanceSmartContract(consensus=consensus) if enable_blockchain else None
     oracle = HumanOperatorOracle(rng=rng) if enable_hitl else None
     hitl_gate = HITLAuthorisationGate(oracle=oracle, rng=rng) if enable_hitl else None
-    gomdp = GovernanceInvariantMDP(tau=0.80)
-    checker = GovernanceInvariantChecker(tau=0.80)
+    checker = GovernanceInvariantChecker(tau=TAU_2)
+
+    # Two-stage verification pipeline (manuscript Section "Two-Stage
+    # Probabilistic Verification"): weighted cross-modal fusion followed by a
+    # Bayesian update on a secondary UAV verification pass.
+    fusion = CrossModalFusion(w_h=0.65, w_w=0.35)
+    stage2 = BayesianConfidenceUpdate(
+        detection_probability=0.85, false_alarm_probability=0.15
+    )
 
     # Sensor spoofer
     spoofer = None
@@ -180,6 +231,8 @@ def run_episode(
     trajectory: List[Dict] = []
     n_inject_attempted = 0
     n_inject_blocked = 0
+    # Cells already covered by a broadcast alert, for event de-duplication.
+    alerted_cells: List[Tuple[int, int]] = []
 
     # Greedy policy setup
     greedy = None
@@ -214,17 +267,34 @@ def run_episode(
             except Exception:
                 ignition_time = 0
 
-        # Apply sensor spoofing
-        heat_map = obs_dict["heat_map"].copy()
+        # Fused multi-sensor observation, restricted to what the fleet and the
+        # fixed sensor network can actually see this step. Detection is a
+        # property of where the UAVs are, not of the global heat field: an
+        # unobserved fire is undetected. This is what makes L_d respond to the
+        # coordination policy and to fleet size.
+        sensed = env.sense_fused(positions)
+        heat_map = sensed["observed_heat"]
+
+        # Apply sensor spoofing to the observed field (an attacker injects into
+        # the sensing channel, so only observed cells can be corrupted).
         if spoofer is not None:
             heat_map = spoofer.inject(
                 heat_map, obs_dict["fire_mask"], strategic=(attack_type == "spoofing_strategic")
             )
 
-        # Detection check
+        # Detection check — over observed cells only, and only on genuine fire.
+        # Latching onto a non-fire heat anomaly is a false alarm, not a
+        # detection; counting it as one produced negative L_d (detection
+        # "before" ignition) whenever an anomaly preceded the fire.
         max_heat = float(heat_map.max())
-        if max_heat > 0.60 and first_detection is None:
-            first_detection = t
+        if first_detection is None:
+            observed_fire = heat_map * (obs_dict["fire_mask"] > 0.5)
+            if float(observed_fire.max()) > TAU_1:
+                # env.step() has already advanced the environment clock to t+1,
+                # so the observation just returned belongs to timestep t+1.
+                # Recording t here made L_d off by one and produced L_d = -1
+                # when the fire was detected on the very step it ignited.
+                first_detection = sim_info["timestep"]
 
         # UAV movement (adaptive vs static)
         if enable_coordination and greedy is not None:
@@ -262,20 +332,47 @@ def run_episode(
             "human_approval": False,
         }
 
-        if max_heat > 0.80 and first_detection is not None:
+        # Select the strongest candidate event that is not already covered by a
+        # previously broadcast alert. Without this de-duplication the pipeline
+        # re-alerts on the same fire every step (~1100 alerts/episode), which
+        # makes the false-alert *rate* F_p = n_false / n_alerts meaningless: the
+        # denominator is dominated by repeats of one true event. Alerts must be
+        # discrete events for the manuscript's FDR definition to hold.
+        candidate = _select_candidate(heat_map, alerted_cells, TAU_1, ALERT_RADIUS)
+
+        if candidate is not None and first_detection is not None:
+            row_idx, col_idx = candidate
+            cand_heat = float(heat_map[row_idx, col_idx])
             weather_idx = float(np.clip(
                 obs_dict["wind_field"].mean() - obs_dict["humidity_field"].mean() + 0.5,
                 0.0, 1.0,
             ))
+            is_true_fire = bool(obs_dict["fire_mask"][row_idx, col_idx] > 0.5)
+            max_heat = cand_heat
+
             if enable_verification:
-                conf = float(np.clip(0.65 * max_heat + 0.35 * weather_idx, 0.0, 1.0))
+                # Stage 1 — cross-modal fusion, Eq. (1).
+                conf1 = fusion.compute_stage1_confidence(
+                    heat_anomaly_index=max_heat, weather_index=weather_idx
+                )
+
+                # Stage 2 — Bayesian update on a secondary verification pass,
+                # Eq. (2). A verification UAV re-observes the candidate cell;
+                # the draw is P(V|fire)=0.85 on a real fire and the false-alarm
+                # rate P(V|no fire)=0.15 on a non-fire heat anomaly. This is what
+                # separates true events from injected anomalies, and it is the
+                # only path by which confidence can exceed tau_2 = 0.80: stage 1
+                # alone caps at ~0.755 for this weather model.
+                p_verify = 0.85 if is_true_fire else 0.15
+                verification_positive = bool(rng.random() < p_verify)
+                conf = stage2.update(conf1, verification_positive)
             else:
+                # Ablation: single-stage. No Bayesian verification pass, so the
+                # raw observed heat is taken as the confidence directly.
                 conf = max_heat
             step_info["confidence"] = conf
 
-            if conf > 0.80:
-                row_idx, col_idx = np.unravel_index(heat_map.argmax(), heat_map.shape)
-                is_true_fire = bool(obs_dict["fire_mask"][row_idx, col_idx] > 0.5)
+            if conf > TAU_2:
 
                 if enable_governance and enable_hitl and enable_blockchain and hitl_gate and contract:
                     tx = build_transaction(
@@ -298,6 +395,7 @@ def run_episode(
                             step_info["alert_broadcast"] = True
                             step_info["governance_cert"] = result.cert
                             n_alerts += 1
+                            alerted_cells.append((row_idx, col_idx))
                             if not is_true_fire:
                                 n_false += 1
                 elif enable_governance and enable_hitl and not enable_blockchain and hitl_gate:
@@ -316,6 +414,7 @@ def run_episode(
                         step_info["governance_cert"] = None
 
                         n_alerts += 1
+                        alerted_cells.append((row_idx, col_idx))
 
                         if not is_true_fire:
                             n_false += 1
@@ -323,6 +422,7 @@ def run_episode(
                     # Ungoverned baseline: alert without any checks
                     step_info["alert_broadcast"] = True
                     n_alerts += 1
+                    alerted_cells.append((row_idx, col_idx))
                     if not is_true_fire:
                         n_false += 1
 
