@@ -69,6 +69,15 @@ docs/api/
 node_modules/
 
 # Logs
-*.log
 logs/
-/Paper
+
+# LaTeX build artefacts — the manuscript source itself IS tracked (see Paper/)
+*.aux
+*.bbl
+*.blg
+*.synctex.gz
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.log

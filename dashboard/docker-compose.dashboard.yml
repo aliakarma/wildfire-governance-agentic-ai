@@ -1,0 +1,17 @@
+# One-command dashboard: builds the frontend, serves UI + API from one container.
+#   docker compose -f dashboard/docker-compose.dashboard.yml up --build
+# Then open http://localhost:8123
+services:
+  dashboard:
+    build:
+      context: ..
+      dockerfile: dashboard/Dockerfile
+    image: wildfire-governance-dashboard:latest
+    ports:
+      - "8123:8123"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8123/api/health').status==200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

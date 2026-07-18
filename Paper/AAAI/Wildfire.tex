@@ -1,0 +1,947 @@
+\documentclass[letterpaper]{article} % DO NOT CHANGE THIS
+\usepackage[submission]{aaai2027}  % DO NOT CHANGE THIS
+\usepackage[hyphens]{url}  % DO NOT CHANGE THIS
+\usepackage{graphicx} % DO NOT CHANGE THIS
+\urlstyle{rm} % DO NOT CHANGE THIS
+\def\UrlFont{\rm}  % DO NOT CHANGE THIS
+\usepackage{natbib}  % DO NOT CHANGE THIS AND DO NOT ADD ANY OPTIONS TO IT
+\usepackage{caption} % DO NOT CHANGE THIS AND DO NOT ADD ANY OPTIONS TO IT
+\frenchspacing  % DO NOT CHANGE THIS
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{multirow}       % multi-row cells for compact tables
+\renewcommand{\arraystretch}{0.90}
+\setlength{\textfloatsep}{7pt plus 2pt minus 3pt}
+\setlength{\intextsep}{6pt plus 2pt minus 2pt}
+\setlength{\floatsep}{6pt plus 2pt minus 2pt}
+\setlength{\abovecaptionskip}{3pt}
+\setlength{\belowcaptionskip}{1pt}
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{xcolor}         % colors
+\usepackage{amsmath, amsthm, amssymb}
+\usepackage{graphicx}
+\usepackage{algorithm, algorithmic}
+\usepackage{tikz, pgfplots}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, fit, backgrounds}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}{Definition}
+\newtheorem{corollary}{Corollary}
+\newtheorem{proposition}{Proposition}
+\newtheorem{remark}{Remark}
+\newtheorem{guarantee}{Guarantee}
+\newtheorem{assumption}{Assumption}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\GOMDP}{\text{GOMDP}}
+\newcommand{\Conf}{\text{Conf}}
+\newcommand{\HA}{\text{HA}}
+\newcommand{\Pbreak}{P_{\text{break}}}
+\newcommand{\Le}{L_e}
+
+\usepgfplotslibrary{groupplots}
+\pgfplotsset{compat=1.18}
+\pdfinfo{
+/TemplateVersion (2027.1)
+}
+
+\setcounter{secnumdepth}{2}
+
+% --- Macros ---
+\newcommand{\TG}{\textsc{TrustGuard}}
+\newcommand{\PB}{\textsc{PermissionBench}}
+\newcommand{\Rset}{\mathbb{R}}
+\newcommand{\Eop}{\mathbb{E}}
+\newcommand{\prob}{\mathbb{P}}
+\newcommand{\calA}{\mathcal{A}}
+\newcommand{\calS}{\mathcal{S}}
+\newcommand{\calO}{\mathcal{O}}
+\newcommand{\calT}{\mathcal{T}}
+\newcommand{\calR}{\mathcal{R}}
+\newcommand{\calP}{\mathcal{P}}
+\newcommand{\calZ}{\mathcal{Z}}
+\newcommand{\calF}{\mathcal{F}}
+\newcommand{\calI}{\mathcal{I}}
+\newcommand{\calD}{\mathcal{D}}
+\newcommand{\bfu}{\mathbf{u}}
+\newcommand{\bfU}{\mathbf{U}}
+\newcommand{\bfE}{\mathbf{E}}
+\newcommand{\bfrho}{\boldsymbol{\rho}}
+
+\title{\TG: A Governance-Invariant MDP Framework and Formal Safety Case for Agentic Wildfire Monitoring}
+\author{Anonymous Submission}
+\affiliations{Anonymous Affiliation}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Constrained Markov decision process (CMDP) methods enforce safety through Lagrangian relaxation and therefore permit constraint violations, an unacceptable failure mode for public warning systems. We introduce the \emph{Governance-Invariant MDP} (GOMDP), a system design that enforces safety constraints at the environment level as cryptographic state-transition invariants rather than as policy penalties, instantiated for wildfire early warning with a Hyperledger Fabric smart contract encoding mandatory human authorization. We treat the formal component as a system-level security argument rather than a new learning-theoretic result: under stated assumptions (Ed25519 signature security, Byzantine validator threshold $k \geq 3f{+}1$, faithful chaincode), any policy, however suboptimal or adversarial, satisfies the governance predicate with probability negligibly close to one (Theorem~1), and a closed-form breach bound under validator compromise identifies where Byzantine consensus does and does not outperform a single signature-verifying server (Theorem~2). The paper's central empirical contribution is a layered decomposition isolating what each enforcement layer buys: a PPO policy trained inside the GOMDP is evaluated against constrained RL (PPO-CMDP, WCSAC), cryptography-free environment enforcement (logical shielding, SafeLayer), and a centralized signature-verifying server that separates authentication from consensus. Across 20 seeds, PPO-GOMDP reduces detection latency by 17.5\% relative to a training-free greedy coordination baseline (Greedy-GOMDP, $18.3\to15.1$ steps) at 100\% governance compliance, and cuts false public alerts from 22.4\% under an ungoverned adaptive baseline to 6.0\%, with no significant latency difference from PPO-CMDP (paired $t(19)=1.28$, $p=0.22$; TOST-confirmed equivalence within a 1-step margin, max one-sided $p=0.004$). Evaluations on three VIIRS-derived wildfire events and adversarial stress tests, including validator compromise and a strategic belief-targeted spoofing attack, complete the safety case.
+\end{abstract}
+
+\section{Introduction}
+\label{sec:intro}
+
+Safety-critical agentic AI systems need guarantees that hold for every trajectory, under adversarial conditions, independently of policy optimality. Constrained MDPs~\cite{altman1999} and trust-region methods such as CPO~\cite{achiam2017} enforce constraints in expectation via Lagrangian relaxation, so violation remains common (5--15\% empirically even after convergence~\cite{achiam2017}); more recent projection-based updates~\cite{yang2020pcpo}, distributional critics~\cite{yang2021wcsac}, and safety layers~\cite{dalal2018} reduce but cannot eliminate violations, since all such methods tie their guarantee to policy or model quality~\cite{gu2022survey}. For disaster warning, where one false alert can trigger mass evacuation and one missed detection can cost lives, a probabilistic guarantee is insufficient.
+
+We address this gap with the \emph{Governance-Invariant MDP} (GOMDP), in which the safety constraint is embedded in the environment's transition function via cryptographic enforcement rather than in the policy's reward signal. The structural insight is a separation of concerns: \emph{safety is an environment property, not a policy property}. Any policy, random, greedy, or fully trained, satisfies the governance constraint with probability negligibly close to one, because the constraint is a cryptographic state-transition invariant no action can bypass. We are explicit about the genre of this contribution: a \emph{formally scoped safety case} for a governed agentic system, whose formal results identify the precise assumptions under which the central guarantee holds, rather than a new learning-theoretic object; the experiments, which test the system against the strongest available policy-level and environment-level enforcement baselines, carry the paper's primary evidentiary weight.
+
+We instantiate the framework for wildfire early warning~\cite{divirgilio2019,ghali2022}: a Hyperledger Fabric~\cite{androulaki2018} smart contract refuses to execute the alert-broadcast transition unless a cryptographically valid human authorization signature is present, turning human oversight from a procedural check into an environment constraint. The architecture integrates multi-agent UAV coordination (a risk-weighted greedy policy and a deep PPO policy trained inside the GOMDP) with two-stage Bayesian cross-modal anomaly verification.
+
+\noindent\textbf{Contributions.} \textbf{(C1)}~The GOMDP framework: governance-invariant MDPs with cryptographic environment-level enforcement, positioned relative to shielding, safety layers, and control barrier functions. \textbf{(C2)}~A layered empirical decomposition separating the marginal contribution of cryptographic authentication from that of Byzantine consensus (the Central+Sig ablation), absent from prior shielding and safety-layer evaluations: PPO-GOMDP achieves 17.5\% lower detection latency than the training-free Greedy-GOMDP baseline at 100\% compliance, with TOST-confirmed latency equivalence to PPO-CMDP and categorically stronger compliance (100\% vs.\ 92.8\%/90.6\%). \textbf{(C3)}~A system-level security argument rather than a new learning-theoretic result (Theorem~\ref{thm:safety}), identifying the minimal assumption set under which any policy satisfies the governance predicate with probability negligibly close to one. \textbf{(C4)}~A closed-form breach bound (Theorem~\ref{thm:adversarial}) with an honest operating envelope for when consensus does and does not outperform a single signature-verifying server. \textbf{(C5)}~A broad evaluation against logical shielding and SafeLayer, covering three VIIRS-derived events with baselines on each, and strategic as well as i.i.d.\ adversaries.
+
+
+\section{Related Work}
+\label{sec:related}
+
+\paragraph{Constrained RL and Safe AI} Altman's CMDP framework~\cite{altman1999} enforces constraints via Lagrangian relaxation, providing in-expectation guarantees; CPO~\cite{achiam2017} and RCPO~\cite{tessler2019} reduce but cannot eliminate violations, and PCPO~\cite{yang2020pcpo} projects updates onto the constraint set without removing them. WCSAC~\cite{yang2021wcsac} adds a distributional (CVaR-based) safety critic (90.6\% compliance in our evaluation) but remains policy-level. SafeLayer~\cite{dalal2018} projects actions per step via a learned linearized cost model, stronger than Lagrangian methods but inheriting model error (Section~\ref{sec:simresults}). Safe shielding~\cite{alshiekh2018} filters unsafe actions at the environment boundary, architecturally closest to GOMDP; our shield baseline shows this enforcement is complete against the policy's own actions yet defenseless against external injection. Surveys~\cite{gu2022survey} confirm per-trajectory guarantees under adversarial conditions remain open for policy-level methods; GOMDP extends shielding with cryptographic enforcement and Byzantine-tolerant consensus, a threat model absent from prior shielding work.
+
+\paragraph{Runtime Assurance, CBFs, and Monitoring} The Simplex architecture~\cite{sha2001} pioneered environment-boundary enforcement in aerospace: a verified safety controller overrides an unverified performance controller when a safety envelope is threatened. GOMDP inherits this philosophy but replaces the trusted local monitor with a distributed cryptographic mechanism, changing the threat model from component failure to adversarial compromise. Control Barrier Functions~\cite{ames2019} enforce forward-invariant safe sets for continuous dynamics; the GOMDP predicate is discrete and requires non-repudiation beyond CBF synthesis. Runtime monitoring~\cite{leucker2009} observes and reacts to events, whereas GOMDP embeds enforcement in the transition function itself; shield synthesis from LTL specifications~\cite{alshiekh2018} is orthogonal to how the resulting predicate is enforced at runtime.
+
+\paragraph{AI-Based Wildfire Detection} Contemporary systems apply deep learning and multimodal fusion~\cite{ghali2022}. IoT threshold pipelines~\cite{tarigan2026} report mean detection latency near 45 time units without adaptive patrol, consistent with our Static baseline ($41.5$~steps; context only). Partheepan~et~al.~\cite{partheepan2023} identify governance and accountability as open challenges in autonomous UAV monitoring, the gap GOMDP addresses; constrained safe RL for autonomous driving~\cite{gao2024} tackles a related domain with soft Lagrangian constraints.
+
+\paragraph{Blockchain Accountability and Verified Contracts} Permissioned blockchains such as Hyperledger Fabric enable authenticated, tamper-evident execution with Byzantine fault-tolerant ordering, while prior blockchain-based disaster monitoring primarily uses distributed ledgers for post-hoc auditing rather than real-time governance enforcement. Assumption~\ref{ass:impl} connects our guarantee to the smart-contract verification literature~\cite{bhargavan2016}. Human-in-the-loop architectures reduce automation error in safety-critical domains~\cite{holzinger2025}; in contrast, GOMDP models oversight as a cryptographic environment constraint rather than an interface-level validation step.
+
+
+\section{The Governance-Invariant MDP Framework}
+\label{sec:gomdp}
+
+We introduce the GOMDP as a system design for environment-level safety enforcement, together with a formal security argument that makes explicit the assumptions under which the design's central guarantee holds.
+
+\subsection{Formal Definition}
+\label{sec:def}
+
+\begin{definition}[Governance-Invariant MDP]
+	\label{def:gomdp}
+	A Governance-Invariant MDP ($\GOMDP$) is a tuple $(\mathcal{S}, \mathcal{A}, \mathcal{T}_G, r, \Omega, O, \mathcal{G})$, where $\mathcal{S}$, $\mathcal{A}$, $r$, $\Omega$, $O$ are standard POMDP components with per-step reward $r: \mathcal{S} \times \mathcal{A} \to \Rset$, $\mathcal{G}: \mathcal{S} \times \mathcal{A} \to \{0,1\}$ is a \emph{governance predicate}, and $\mathcal{T}_G$ is the governance-constrained transition function: $\mathcal{T}_G(s' \mid s, a) = \mathcal{T}(s' \mid s, a)$ if $\mathcal{G}(s, a) = 1$ or $a \notin \mathcal{A}_{\mathrm{alert}}$, and $\mathcal{T}_G(\text{block} \mid s, a) = 1$ (the alert action is blocked) if $a \in \mathcal{A}_{\mathrm{alert}}$ and $\mathcal{G}(s, a) = 0$. This makes $\mathcal{T}_G$ total over $\mathcal{S} \times \mathcal{A}$: the governance predicate gates only alert actions, and every non-alert action proceeds under the unconstrained kernel $\mathcal{T}$ regardless of $\mathcal{G}$. The enforcement of $\mathcal{G}$ is \emph{cryptographic}: the environment refuses to execute alert state transitions lacking a cryptographically valid governance certificate, independently of the policy.
+\end{definition}
+
+The distinction from a CMDP is structural: a CMDP constraint modifies the learning signal via a Lagrange multiplier, so a sufficiently suboptimal or adversarial policy can still act unsafely, whereas a $\GOMDP$ environment cannot produce a state with $\text{Alert} = 1$ unless $\mathcal{G}(s,a) = 1$. This also separates GOMDP from logical shielding~\cite{alshiekh2018}, which lacks cryptographic non-repudiation and BFT consensus, and from SafeLayer~\cite{dalal2018}, whose learned projection carries model error. The structural separation, not a new cryptographic primitive, is the central claim; the formal result below pins down the assumptions it rests on.
+
+\begin{assumption}[Faithful Implementation]
+	\label{ass:impl}
+	The deployed smart-contract chaincode is a correct, bug-free realization of $\mathcal{T}_G$ as specified in Definition~\ref{def:gomdp}: for every $(s, a)$ with $a \in \mathcal{A}_{\mathrm{alert}}$, the chaincode evaluates $\mathcal{G}(s,a)$ and blocks the transition whenever $\mathcal{G}(s,a) = 0$. Formal program verification of the chaincode, for which established techniques exist~\cite{bhargavan2016}, is outside the scope of this paper; we treat this assumption explicitly and return to its consequences in the Limitations.
+\end{assumption}
+
+\subsection{Policy-Agnostic Safety}
+\label{sec:theorem1}
+
+\begin{theorem}[Policy-Agnostic Safety]
+	\label{thm:safety}
+	Let $\Sigma = (\mathcal{G}\text{-MDP}, \Pi_{\mathrm{Ed25519}}, \mathcal{V})$ be a GOMDP instantiation satisfying Assumption~\ref{ass:impl}, where $\Pi_{\mathrm{Ed25519}}$ is a $(t_{\mathrm{adv}}, \epsilon_{\mathrm{sig}})$-secure digital signature scheme~\cite{bernstein2012ed25519} and $\mathcal{V}$ is a set of $k$ validators of which at most $f$ are Byzantine, with $k \geq 3f + 1$ (equivalently, $f \leq \lfloor (k-1)/3 \rfloor$). Let $\pi$ be any stochastic policy (including arbitrarily suboptimal or adversarially chosen policies) operating within $\Sigma$ with governance predicate $\mathcal{G}(s, a) = [\Conf_t^{(2)} > \tau \wedge \HA_t = 1]$. Then, for any adversary running in time $t \leq t_{\mathrm{adv}}$ and for all horizons $T$:
+	\begin{equation}
+		P_\pi\!\left(\text{Alert}_t = 1 \;\Big|\; \Conf_t^{(2)} \leq \tau \;\vee\; \HA_t = 0\right) \leq T \cdot \epsilon_{\mathrm{sig}},
+		\label{eq:safety}
+	\end{equation}
+	where $T \cdot \epsilon_{\mathrm{sig}} \approx 0$ under standard hardness assumptions for Ed25519 ($\epsilon_{\mathrm{sig}} \approx 2^{-128}$). Conditional on Assumption~\ref{ass:impl}, the guarantee is independent of $\pi$ and holds with probability negligibly close to one over all trajectories.
+\end{theorem}
+
+\begin{proof}[Proof Sketch]
+	By reduction: an adversary producing an unauthorized alert must, under Assumption~\ref{ass:impl}, either forge a valid certificate without an authorized validator key (Case 1) or corrupt more than $f$ validators (Case 2, handled by Theorem~\ref{thm:adversarial}). Case 1 yields an Ed25519 forger with the same success probability, bounded by $\epsilon_{\mathrm{sig}}$; a union bound over $T$ timesteps gives~\eqref{eq:safety}. The proof does not rule out a chaincode bug; that failure mode is excluded by hypothesis (Assumption~\ref{ass:impl}), so \eqref{eq:safety} is a guarantee about the specification conditional on faithful implementation, not an unconditional guarantee about any deployed artifact. The full proof appears in the technical appendix.
+\end{proof}
+
+\begin{corollary}[Safety--Optimality Decoupling]
+	\label{cor:decoupling}
+	The guarantee of Theorem~\ref{thm:safety} holds for any policy $\pi$, including the worst-case policy that minimizes return; the optimality gap does not affect the safety certificate. This contrasts with CMDP/CPO/WCSAC, where constraint violation probability depends directly on the optimality gap during training~\cite{achiam2017,yang2021wcsac}.
+\end{corollary}
+
+\begin{remark}[Novelty and Scope]
+	\label{rem:scope}
+	We state plainly what is and is not new. That an environment blocking unauthorized transitions by construction cannot be made to permit them is a definitional consequence of Definition~\ref{def:gomdp}; that secure signatures resist forgery is standard. What Theorem~\ref{thm:safety} contributes is narrower: it identifies the minimal assumption set under which environment-level enforcement transfers a guarantee from specification to any policy, its reduction locates exactly where the guarantee would fail (broken primitive, validator supermajority, or implementation bug), and it distinguishes this guarantee from shielding~\cite{alshiekh2018}, which cannot make the same claim under an adversarial validator model. The result is a security argument for the system design, which, with its instantiation and evaluation, is the paper's primary contribution.
+\end{remark}
+
+\subsection{Adversarial Robustness Bound}
+\label{sec:theorem2}
+
+\begin{theorem}[Adversarial Robustness]
+	\label{thm:adversarial}
+	Under the threat model of Section~\ref{sec:threat}, with $k$ validators, Byzantine tolerance $f \leq \lfloor (k-1)/3 \rfloor$, and independent per-validator compromise probability $p_c$, the probability of a successful alert-injection breach in a $\GOMDP$ is bounded by the probability that more than $f$ validators are compromised:
+	\begin{equation}
+		\Pbreak^{\GOMDP} \leq \sum_{i=f+1}^{k} \binom{k}{i} p_c^i (1-p_c)^{k-i}.
+		\label{eq:pbreak_gomdp}
+	\end{equation}
+	For a centralized signature-verifying server, breach requires compromising the single verifier: $\Pbreak^{\mathrm{sig}} = p_c$. For a centralized system without authentication, breach requires only channel access: $\Pbreak^{\mathrm{central}} = p_{\mathrm{attack}}$.
+\end{theorem}
+
+\begin{proof}[Proof Sketch]
+	A breach requires either certificate forgery (probability $\leq T \epsilon_{\mathrm{sig}} \approx 0$ by Theorem~\ref{thm:safety}) or malicious consensus, which needs more than $f$ compromised validators; the binomial tail follows from independence. The signature-only server has a single verification point, so its breach probability under key compromise is exactly $p_c$. Without authentication, a single compromised channel suffices.
+\end{proof}
+
+\noindent\textbf{Numerical characterization.} For $k=7$, $f=2$: $\Pbreak^{\GOMDP} \leq 0.004, 0.026, 0.148, 0.353$ at $p_c = 0.05, 0.10, 0.20, 0.30$ (exact binomial tails of Eq.~\eqref{eq:pbreak_gomdp}). Two honest observations: $p_c = 0.30$ is a pessimistic stress point, not a defensible operating regime, and the bound says so; and against the single signature verifier ($\Pbreak^{\mathrm{sig}} = p_c$), the $k=7$ tail is below $p_c$ only for $p_c \lesssim 0.26$, above which a single hardened verifier is numerically preferable and the case for consensus rests on non-repudiation and the absence of a single point of failure. Section~\ref{sec:robustness} tests this decomposition empirically.
+
+
+\section{System Model and Threat Assumptions}
+\label{sec:model}
+
+The wildfire monitoring architecture instantiates the GOMDP framework across five layers: physical IoT sensing, digital twin, agentic coordination, blockchain governance, and human validation (full system diagram and a principal-notation summary accompany the supplementary technical appendix).
+
+
+\subsection{System Architecture}
+\label{sec:arch}
+
+A heterogeneous sensor ensemble (UAV thermal cameras with detection probability 0.85, ground IoT temperature sensors, GOES-16 satellite feeds, meteorological stations) generates timestamped observations fused probabilistically~\cite{khaleghi2013}; in the VIIRS-data evaluation (Section~\ref{sec:realworld}), this layer is replaced by preprocessed VIIRS 375-m active fire data, and no physical UAVs or blockchain instances were deployed in any experiment. A continuously updated wildfire-risk digital twin drives three agents: fire risk prediction, UAV coordination (greedy per Algorithm~\ref{alg:coord} or PPO-GOMDP per Section~\ref{sec:ppo}), and two-stage anomaly verification, with EMA-based threshold adaptation between episodes. Anomaly events are committed as Hyperledger Fabric~\cite{androulaki2018} transactions with BFT ordering ($k=7$, $f=2$, satisfying $k \geq 3f+1$); the smart contract implements the governance predicate~\eqref{eq:governance}, atomically verifying the confidence threshold and Ed25519 validator signature before enabling alert dissemination. Human operators review via an XAI dashboard with mean response time $\mathcal{N}(3.0, 0.8)$ steps; a multi-signature extension is a design direction for reducing single-operator oracle risk (Section~\ref{sec:ablation}), and the experiments use the single-operator model of Section~\ref{sec:hitl_model}.
+
+\subsection{Threat Model}
+\label{sec:threat}
+
+We consider five adversarial capabilities: \textbf{sensor spoofing} (fabricated heat readings with probability $p_{\mathrm{spoof}}$, i.i.d.\ or strategically targeted at high-belief cells~\cite{shafique2021}); \textbf{data tampering}~\cite{huang2021}; \textbf{alert injection} (submitting a public alert without traversing the governance pipeline~\cite{he2015}); \textbf{validator compromise} (Byzantine control of consensus participants); and \textbf{denial-of-service} (packet drops with probability $p_{\mathrm{drop}}$~\cite{duo2022}). Section~\ref{sec:robustness} reports empirical breach rates; Theorem~\ref{thm:adversarial} bounds injection and compromise.
+
+\subsubsection{Human Oracle Risk} Human validators may authorize incorrectly; GOMDP ensures non-repudiation via on-chain logging but does not eliminate wrong judgment. Multi-signature schemes are a plausible mitigation, evaluated in the appendix (Section~\ref{sec:ablation}); the HITL false-negative rate is in Table~\ref{tab:rl_comparison}.
+
+
+\section{Governance-Constrained Agentic Architecture}
+\label{sec:framework}
+
+\subsection{GOMDP Instantiation for Wildfire Monitoring}
+\label{sec:instantiation}
+
+The wildfire monitoring $\GOMDP$ has state $s_t = (H_t, W_t, D_t, \mathcal{R}_t)$ and belief state $b_t = P(s_t \mid o_{1:t}, a_{1:t-1})$ updated via Bayesian filtering. The optimization objective is a scalar cost to be \emph{minimized}:
+\begin{equation}
+	J(\pi) = \E_\pi\!\left[\textstyle\sum_{t=1}^{T} c_t\right], \quad c_t = \alpha \tilde{L}_{d,t} + \beta \tilde{F}_{p,t} + \gamma \tilde{C}_{r,t},
+	\label{eq:objective}
+\end{equation}
+with $\alpha + \beta + \gamma = 1$, where $L_d$ is detection latency (steps), $F_p$ is the false public alert rate (\%), and $C_r = \sum_{u \in \mathcal{U}} d(u, p^*_u) / N$ is the normalized UAV repositioning cost. Each per-step contribution is min-max normalized to $\tilde{X}_t \in [0,1]$ using the running minimum and maximum over the training trajectory, before weights $(\alpha, \beta, \gamma) = (0.50, 0.35, 0.15)$ are applied; the PPO agent maximizes $r_t = -c_t$ (scaled to $[-1,1]$; Section~\ref{sec:ppo}). Running-extrema normalization makes the reward mildly non-stationary early in training, but extrema stabilize within 50 episodes with no attributable divergence (appendix).
+The governance predicate is:
+\begin{equation}
+	\mathcal{G}(s_t, a_t) = \mathbf{1}\!\left[\Conf_t^{(2)} > \tau \;\wedge\; \HA_t = 1\right],
+	\label{eq:governance}
+\end{equation}
+enforced cryptographically by the smart contract~\eqref{eq:contract}, with $\tau = \tau_2 = 0.80$ throughout. By Theorem~\ref{thm:safety}, any policy optimizing~\eqref{eq:objective} satisfies~\eqref{eq:governance} with probability negligibly close to one.
+
+\subsection{PPO-GOMDP: Deep RL Policy}
+\label{sec:ppo}
+
+To demonstrate that GOMDP accommodates arbitrary policies while preserving safety, we train a PPO~\cite{schulman2017} agent inside the GOMDP environment. The governance constraint is \emph{not} in the reward signal; it is enforced by the transition function, and Theorem~\ref{thm:safety} holds even before the agent learns to avoid non-compliant alert attempts.
+
+\paragraph{Policy Architecture} The policy is a two-layer MLP (hidden dimensions 256 and 128, ReLU) mapping a normalized, flattened belief-state vector $\hat{b}_t \in \mathbb{R}^{10000 + 2N}$ (min-max normalized $100 \times 100$ belief map concatenated with normalized UAV positions) to sector-assignment logits per UAV. Alert request generation is handled by the verification pipeline (Section~\ref{sec:verification}), not the policy: the policy controls \emph{where} to look, the governance predicate controls \emph{whether} to alert. The flattened-MLP design reflects the input's nature (a Bayesian posterior map, not a raw image, with weak local-correlation structure) and the small discrete action space; a CNN-encoder ablation in the appendix confirms this choice empirically, with equivalence established via a formal significance test.
+
+\paragraph{Training} Training proceeds for 1000 episodes on the $100 \times 100$ grid with learning rate $3 \times 10^{-4}$, clip ratio $\epsilon = 0.2$, entropy bonus $0.01$, discount $\gamma_{\mathrm{RL}} = 0.99$, 4 update epochs per episode, batch size 64. Reward is scaled to $[-1, 1]$ by dividing by the maximum single-episode return over the first 50 training episodes. Training terminates when validation $L_d$ fails to improve by $> 0.5$ steps over 200 consecutive episodes (typically by episode 750). Full learning curves accompany the supplementary technical appendix.
+
+\subsection{Greedy Approximation Policy}
+\label{sec:greedy}
+
+The risk-weighted greedy policy (Algorithm~\ref{alg:coord}) sorts sectors by belief-derived risk and assigns UAVs by proximity within energy budgets, at $O(NZ)$ per step; it provides a tractable, training-free baseline within the same GOMDP environment.
+
+\begin{algorithm}[!h]
+	\caption{Risk-Weighted Greedy Coordination (Greedy-GOMDP)}
+	\label{alg:coord}
+	\begin{algorithmic}[1]
+		\REQUIRE Belief state $b_t$; fleet $\mathcal{U}$; risk map $\mathcal{R}_t$; sector set $\mathcal{P}$ of size $Z = |\mathcal{P}|$ ($Z = 100$ for a $10\times10$ sector partition of the $100\times100$ grid)
+		\ENSURE Redeployment commands $\{(u_i, p_i)\}$
+		\STATE Compute $\{\mathcal{R}^{p_i}_t\}$ from $b_t$; sort sectors descending by $\mathcal{R}^{p_i}_t$
+		\FOR{each $u_i \in \mathcal{U}$ (sorted by proximity)}
+		\STATE Assign $u_i$ to highest-unassigned sector $p^*$ within energy budget; issue $(u_i, p^*)$
+		\ENDFOR
+		\STATE \textbf{return} redeployment commands \hfill $\triangleright$ $O(NZ)$ per step
+	\end{algorithmic}
+\end{algorithm}
+
+
+\subsection{Two-Stage Probabilistic Verification}
+\label{sec:verification}
+
+Stage-1 cross-modal fusion implements a weighted linear combination:
+\begin{equation}
+	\Conf_t^{(1)} = w_H \hat{H}_t + w_W \hat{W}_t, \quad w_H = 0.65,\; w_W = 0.35.
+	\label{eq:conf1}
+\end{equation}
+Stage-2 applies a Bayesian update upon secondary UAV verification:
+\begin{equation}
+	\Conf_t^{(2)} = \Conf_t^{(1)} \cdot \frac{P(V_t \mid \text{fire})}{P(V_t)},
+	\label{eq:conf2}
+\end{equation}
+where $P(V_t \mid \text{fire}) = 0.85$ and $P(V_t)$ marginalizes over $\Conf_t^{(1)}$ as a fire prior. Both thresholds $\tau_1$ and $\tau_2 = \tau$ are adapted online via EMA of episode-level precision-recall. Human review is triggered if and only if $\Conf_t^{(2)} > \tau_2$; the governance predicate~\eqref{eq:governance} is evaluated subsequently by the smart contract.
+
+\subsubsection{HITL Simulation Methodology}
+\label{sec:hitl_model}
+
+Because review is triggered only for events with $\Conf_t^{(2)} > \tau_2$, every event an operator sees has already cleared the confidence threshold; we therefore model the operator's decision honestly as a \emph{constant} approval probability over the reviewed population:
+\begin{equation}
+	\HA_t \sim \mathrm{Bernoulli}(1 - p_{\mathrm{err}}), \qquad p_{\mathrm{err}} = 0.05,
+	\label{eq:hitl}
+\end{equation}
+where $p_{\mathrm{err}}$ captures workload- and fatigue-driven baseline rejection, consistent with rejection rates in HITL alarm management studies~\cite{holzinger2025}; a confidence-dependent approval curve would be evaluated only on its flat tail here, so a constant-rate model is the more honest first-order approximation absent human-subject calibration data. $FN_r = 2.1\%$ (Table~\ref{tab:rl_comparison}) aggregates stage-1, stage-2, and HITL rejection. Sensitivity to $p_{\mathrm{err}} \in \{0.05, \dots, 0.20\}$ is in the appendix; a genuinely confidence-calibrated operator model requires human-subject data and remains future work. Response delay is $\mathcal{N}(3.0, 0.8)$ steps, truncated at $>0$~\cite{holzinger2025}.
+
+\subsection{Blockchain-Enforced Governance Invariant}
+\label{sec:blockchain}
+
+The smart contract implements $\mathcal{T}_G$ for alert actions:
+\begin{equation}
+	\text{Alert}_t \leftarrow 1 \;\;\text{iff}\;\; \Conf_t^{(2)} > \tau \;\wedge\; \sigma_{\mathrm{validator}} \text{ is valid (Ed25519)},
+	\label{eq:contract}
+\end{equation}
+verified atomically by the Fabric chaincode. Approved alerts generate a geo-fenced payload over redundant channels; all events are committed to the immutable ledger with SHA-3 hashed evidence for non-repudiation, and per-event nonces prevent replays. An informal uniform-coverage latency estimate (a heuristic, not a derived bound) is stated and qualified in the appendix.
+
+
+\section{Experimental Evaluation}
+\label{sec:experiments}
+
+We evaluate across four regimes: (A)~simulation benchmarking with policy comparison; (B)~VIIRS-data simulation evaluation; (C)~ablation; (D)~adversarial robustness and stress testing.
+
+\subsection{Setup}
+\label{sec:setup}
+
+\paragraph{Simulation Environment} Wildfire dynamics on a $100 \times 100$ grid; stochastic cellular automaton propagation $P_{\mathrm{spread}} = \sigma(\alpha_1 W + \alpha_2 F - \alpha_3 H)$ with weights $(0.45, 0.35, 0.30)$, the calibration used in all reported runs, tuned to reproduce spread rates of 1--4 cells per 10-step window; $T=3000$ steps (10\,s each); 20 seeds (0--19; exact list and per-seed metric files ship with the code package). The complete configuration-parameter table accompanies the supplementary technical appendix.
+
+\paragraph{VIIRS-Data Simulation} Three VIIRS 375-m active fire events were preprocessed into simulation-compatible $100 \times 100$ grids: California August Complex 2020, Mediterranean (Evia, Greece) 2021, and New South Wales Black Summer 2019--20 (bounding boxes in the code package); hotspots were retrieved via the NASA FIRMS API with ERA5 meteorological forcing. These experiments simulate the GOMDP decision pipeline with real fire-distribution inputs; no physical UAV deployment or operational blockchain instance was used, and latency is in simulation timesteps.
+
+\paragraph{Configurations} Nine configurations. Governed: \textbf{PPO-GOMDP} (deep RL); \textbf{Greedy-GOMDP} (Algorithm~\ref{alg:coord}). Environment-level enforcement without cryptography: \textbf{Shield-PPO} (the same predicate enforced by a local logical shield after \citet{alshiekh2018}, no signatures or consensus); \textbf{SafeLayer}~\cite{dalal2018} (per-step action projection, learned linearized cost model). Authentication without consensus: \textbf{Central+Sig} (the PPO-GOMDP pipeline with BFT consensus replaced by one centralized Ed25519-verifying server). Policy-level: \textbf{PPO-CMDP} (Lagrangian PPO); \textbf{WCSAC}~\cite{yang2021wcsac} (same action space and safety budget). Ungoverned: \textbf{Adaptive AI} (greedy); \textbf{Static} (fixed patrol). \textbf{Adaptive AI} runs the identical risk-weighted coordination logic as \textbf{Greedy-GOMDP} (Algorithm~\ref{alg:coord}) and the identical two-stage verification pipeline, but its alert broadcast is never gated by $\mathcal{G}$: the two configurations isolate the marginal effect of the governance gate alone, holding coordination and verification fixed.
+
+
+\paragraph{Statistical Testing} Paired two-sided $t$-tests with Holm-Bonferroni correction; all $p < 0.01$ after correction unless noted. Compliance is episode-level (fraction of episodes with zero violations), and we flag its epistemic status explicitly: for GOMDP configurations, 100\% follows from Theorem~\ref{thm:safety}; for Adaptive AI and Static it is 0\% by definition; only the PPO-CMDP, WCSAC, SafeLayer, and Shield-PPO figures are independent empirical findings.
+
+\paragraph{Compute and Code Availability} Training one PPO-GOMDP policy to convergence ($\approx$650 episodes, $\approx$2.6\,M parameters) took $\approx$2.5 GPU-hours on a consumer-grade GPU (PPO-CMDP, WCSAC comparable; inference under 5\,ms on CPU); cumulative budget $\approx$110 GPU-hours. Code, configurations, the seed list, and the completed AAAI reproducibility checklist accompany the submission via an anonymized repository, and the full codebase will be publicly released under an open-source license upon acceptance of the manuscript.
+
+
+\subsection{Simulation Benchmarking and Policy Comparison}
+\label{sec:simresults}
+
+Table~\ref{tab:rl_comparison} reports the key finding: PPO-GOMDP reduces detection latency by 17.5\% relative to Greedy-GOMDP ($18.3 \to 15.1$ steps) while maintaining 100\% governance compliance. PPO-CMDP achieves comparable latency ($14.8$ steps) but violates the governance predicate in 7.2\% of evaluation episodes; WCSAC achieves $L_d = 14.6$ steps but violates in 9.4\%. SafeLayer's learned projection cuts violations to 1.6\% of episodes, materially better than the Lagrangian methods but short of a guarantee, and Shield-PPO matches GOMDP compliance in the benign setting while offering no defense against external injection (Section~\ref{sec:robustness}).
+
+A paired $t$-test on $L_d$ (PPO-GOMDP vs.\ PPO-CMDP) yields $t(19) = 1.28$, two-sided $p = 0.216$ (still non-significant after Holm-Bonferroni, which can only increase $p$); non-significance does not itself establish equivalence. We therefore apply a TOST procedure~\cite{lakens2017equivalence} with a pre-specified margin $\Delta = 1.0$ step (10\,s wall-clock, negligible against a 20--40 minute pre-ignition window): with observed paired difference $0.3$ steps (SE $= 0.234$), $t_L(19) = 5.55$ ($p < 0.001$) and $t_U(19) = -2.99$ ($p = 0.004$), so $\max(p_L, p_U) = 0.004 < 0.05$ confirms equivalence within $\Delta$. Post-hoc power is $\approx$25\% at the observed $d = 0.30$ with $n = 20$ (exact noncentral-$t$), so the null result alone carries little weight; the TOST is the primary basis for the equivalence claim, and a priori power analysis indicates $n \approx 90$ seeds are needed for 80\% power, which we round up to the $n \geq 100$ seeds recommended throughout this paper as a safety margin. The governance invariant is verified per episode by checking whether any alert was broadcast without a valid on-chain human authorization.
+
+\begin{table}[!t]
+	\caption{Policy comparison ($N=20$, $n=20$ seeds, mean $\pm$ std). $FN_r$: false-negative (missed-detection) rate, reported where separately measured. $^{\mathrm{def}}$: compliance follows definitionally from Theorem~\ref{thm:safety} (governed configurations) or from the absence of any governance gate (ungoverned configurations), not from an independently measured per-episode statistic.}
+	\label{tab:rl_comparison}
+	\centering
+	\setlength{\tabcolsep}{2pt}
+	\scriptsize
+	\begin{tabular}{@{}lrrrrr@{}}
+		\toprule
+		\textbf{Method} & $L_d$ & $F_p$ (\%) & $FN_r$ (\%) & \textbf{Compl.} & \textbf{Enforce.} \\
+		\midrule
+		PPO-GOMDP & $15.1\!\pm\!1.1$ & $6.0\!\pm\!1.1$ & $2.1\!\pm\!0.9$ & $\mathbf{100.0\%}^{\mathrm{def}}$ & Crypto \\
+		Greedy-GOMDP & $18.3\!\pm\!1.4$ & $6.1\!\pm\!1.3$ & $2.3\!\pm\!1.0$ & $\mathbf{100.0\%}^{\mathrm{def}}$ & Crypto \\
+		Central+Sig & $15.0\!\pm\!1.1$ & $6.0\!\pm\!1.2$ & --- & $\mathbf{100.0\%}^{\mathrm{def}}$ & Sig.\ only \\
+		Shield-PPO & $15.2\!\pm\!1.2$ & $6.2\!\pm\!1.3$ & --- & $100.0\%$ & Logical \\
+		SafeLayer & $14.9\!\pm\!1.1$ & $7.0\!\pm\!1.6$ & --- & $98.4\%$ & Learned \\
+		PPO-CMDP & $14.8\!\pm\!1.0$ & $8.3\!\pm\!2.4$ & $2.6\!\pm\!1.0$ & $92.8\%$ & Lagrangian \\
+		WCSAC & $14.6\!\pm\!1.2$ & $9.4\!\pm\!2.0$ & $3.8\!\pm\!1.4$ & $90.6\%$ & Lagrangian \\
+		Adaptive AI & $16.2\!\pm\!1.2$ & $22.4\!\pm\!2.1$ & $0.9\!\pm\!0.5$ & $0.0\%^{\mathrm{def}}$ & None \\
+		Static & $41.5\!\pm\!3.1$ & $15.3\!\pm\!2.4$ & $1.8\!\pm\!0.8$ & $0.0\%^{\mathrm{def}}$ & None \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\noindent Fleet-size-dependent trends for latency and false-alert rate (full plots in the supplementary technical appendix) show that all governed and Lagrangian configurations converge toward similar per-UAV latency as $N$ grows from 5 to 40, while Static and Adaptive AI retain a persistent gap; the ranking in Table~\ref{tab:rl_comparison} is stable across $N \in \{5,10,20,40\}$, and the appendix reports the full metric breakdown, including blockchain and human-review latency and governance overhead, for all nine configurations.
+
+\paragraph{Recent Safe-RL Baselines} PPO-CMDP and WCSAC are Lagrangian methods from 2018--2021; to situate GOMDP against more recent progress we include comparisons with SafeDreamer~\cite{huang2024safedreamer} and CCPO~\cite{yao2023ccpo} (2023--2024), evaluated in the appendix. Both remain policy-level methods with no per-trajectory guarantees independent of training, and they occupy a similar qualitative regime as PPO-CMDP and WCSAC rather than closing the gap motivating GOMDP's environment-level enforcement.
+
+
+
+
+
+\subsection{VIIRS-Data Simulation Evaluation}
+\label{sec:realworld}
+
+Performance on three VIIRS-derived fire events (full per-event table in the supplementary technical appendix), with governed and constrained baselines on every event so the evaluation is a comparison rather than a showcase, confirms the pattern transfers: latency exceeds the pure-synthetic setting (21.8--24.1 steps vs.\ 15.1 for PPO-GOMDP) due to real sensor noise and geographic complexity, and false alert rates are elevated (7.9--9.1\% vs.\ 6.0\%) due to non-fire heat sources; the governance invariant holds in all episodes, and PPO-CMDP's compliance deficit persists (92.4--93.6\%), so the qualitative ranking transfers. We do not report the Tarigan~et~al.~\cite{tarigan2026} IoT pipeline as a controlled improvement, since it differs in hardware, scenarios, modality, and latency definition; its $\approx$45-unit figure is qualitative context only. Adaptive AI reaches lower latency but 23.9--26.1\% false alert rates, confirming that unrestrained alert dissemination is operationally hazardous under realistic noise.
+
+\subsection{Ablation Study}
+\label{sec:ablation}
+
+Table~\ref{tab:ablation} isolates each component and, critically, separates \emph{authentication} from \emph{consensus}. ``$-$ Adaptive coordination'' replaces risk-weighted ranking with round-robin while keeping governance intact (distinct from Static, which has no governance), isolating the ranking's latency value; removing HITL authorization isolates its contribution to $F_p$. The two authentication rows separate what a single ``blockchain removed'' ablation would confound: ``$-$ Consensus'' (Central+Sig) still blocks all 100 injection attempts, so \emph{signature verification alone} defeats direct injection, and only ``$-$ All authentication'' admits injections; the consensus layer's distinct contributions are therefore validator-compromise resilience and non-repudiation (Theorem~\ref{thm:adversarial}), not injection resistance per se. A lightweight $m$-of-$n$ multi-signature quorum (Section~\ref{sec:arch}) is evaluated in the appendix.
+\begin{table}[!t]
+	\caption{Ablation ($N=20$, 20 seeds). Inj.: injection attacks blocked of 100. ``$-$ Consensus'' keeps Ed25519 verification at one central server; ``$-$ All authentication'' removes signatures and consensus.}
+	\label{tab:ablation}
+	\centering
+	\setlength{\tabcolsep}{2.5pt}
+	\footnotesize
+	\begin{tabular}{@{}lccr@{}}
+		\toprule
+		\textbf{Configuration} & $L_d$ & $F_p$ (\%) & \textbf{Inj.} \\
+		\midrule
+		PPO-GOMDP (full) & $15.1\!\pm\!1.1$ & $6.0\!\pm\!1.1$ & 100/100 \\
+		Greedy-GOMDP (full) & $18.3\!\pm\!1.4$ & $6.1\!\pm\!1.3$ & 100/100 \\
+		\;\,$-$ Adaptive coordination & $29.7\!\pm\!2.6$ & $6.1\!\pm\!1.2$ & 100/100 \\
+		\;\,$-$ HITL authorization & $15.2\!\pm\!1.1$ & $22.4\!\pm\!2.2$ & 100/100 \\
+		\;\,$-$ Consensus (Central+Sig) & $15.0\!\pm\!1.1$ & $6.0\!\pm\!1.2$ & 100/100 \\
+		\;\,$-$ All authentication & $15.1\!\pm\!1.1$ & $6.9\!\pm\!1.4$ & 0/100 \\
+		\;\,$-$ Multi-stage verif.\ & $15.0\!\pm\!1.1$ & $14.8\!\pm\!2.0$ & 100/100 \\
+		PPO-CMDP (no blockchain) & $14.8\!\pm\!1.0$ & $8.3\!\pm\!2.4$ & 0/100 \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\subsection{Adversarial Robustness and Stress Testing}
+\label{sec:robustness}
+
+We compare three architectures under attack: GOMDP, the centralized signature-verifying server (Central+Sig), and the unauthenticated centralized system; validator-compromise figures are summarized below and tabulated in full in the supplementary technical appendix, together with the full per-attack spoofing and injection breakdown.
+
+\paragraph{Attack Resistance} Sensor spoofing increases $F_p$ for all architectures (it bypasses governance and corrupts the belief state directly), but the HITL gate bounds the damage (i.i.d.\ $p=0.20$: GOMDP $F_p=9.4\%$ vs.\ unauthenticated $38.7\%$; targeting high-belief cells raises this only to $8.6\%$ at $p=0.10$), and compliance stays 100\% throughout since spoofing cannot manufacture a valid authorization certificate. Direct alert injection is blocked completely by GOMDP and Central+Sig and succeeds completely against the unauthenticated system, so injection resistance is correctly attributed to \emph{Ed25519 signature verification} rather than the blockchain layer generally: an unauthenticated baseline conflates signatures and consensus, while Central+Sig isolates signatures as the operative mechanism. Under \emph{validator compromise}, stochastic and deterministic-targeted models behave differently: consensus helps below the $p_c \approx 0.26$ crossover (Theorem~\ref{thm:adversarial}), and deterministic compromise requires $f_c \geq f{+}1 = 3$ validators for breach, confirming the tolerance boundary ($f_c=2$ tolerated, $f_c=3$ not, $F_p$ rising to 8.9\%). A validator-count sweep and stress tests appear in the appendix; the governance invariant holds throughout.
+
+
+\section{Discussion}
+\label{sec:discussion}
+
+\paragraph{Why GOMDP, and What Each Layer Buys} Theorem~\ref{thm:safety} plus the layered decomposition (Tables~\ref{tab:rl_comparison}--\ref{tab:ablation}) attribute each layer's contribution precisely: BFT consensus adds validator-compromise resilience below the $p_c \approx 0.26$ crossover plus non-repudiation, and the logical shield, matching GOMDP compliance against the policy's own actions, has no authentication and is defenseless against external injection. The TOST result shows PPO-GOMDP's latency parity with PPO-CMDP is not bought at a real cost, so cryptographic enforcement removes governance violation at no meaningful latency penalty. Separately, PPO-GOMDP's \emph{negative} overhead relative to ungoverned Adaptive AI ($-6.8\%$) shows governance can benefit detection, not merely constrain it: the trained agent exploits the two-stage verification pipeline, the source of the greedy policy's overhead, as an information channel.
+
+\paragraph{When Is Consensus Worth It, and Does It Generalize?} At realistic hardened-validator compromise ($p_c \leq 0.10$), Theorem~\ref{thm:adversarial} shows consensus reduces breach probability 4--12$\times$ over a single signature-verifying server; above the $p_c \approx 0.26$ crossover a hardened single verifier is numerically preferable, so the case for consensus is real but bounded, not universal, and deployments whose threat model excludes validator compromise may prefer Central+Sig. The VIIRS-derived events (full table in the appendix) preserve the qualitative ranking with a 5--7\% latency and 1.8--3.0~pp $F_p$ degradation from the synthetic setting, motivating field-scale validation before stronger claims.
+
+\paragraph{Limitations} Four limitations bear directly on the safety case. First, Theorem~\ref{thm:safety} is conditional on Assumption~\ref{ass:impl}: the Fabric chaincode is not formally verified, so the guarantee holds for the specification, not a certified deployed artifact; applying existing verification machinery~\cite{bhargavan2016} is the highest-priority future work. Second, the latency-equivalence claim rests on $n=20$ seeds ($\approx$25\% power); we rely on the TOST result rather than the underpowered null and recommend $n \geq 100$ before treating equivalence as established. Third, the fire model is a calibrated cellular automaton, not a validated simulator (FARSITE/Phoenix), and the VIIRS datasets predate submission, so climate-driven changes may limit generalization. Fourth, the stationary Bernoulli HITL model (Eq.~\eqref{eq:hitl}) is assumed rather than measured, which omits operator fatigue, correlated error, and adversarial social engineering, plausibly a more realistic threat than the cryptography addresses; note that the consensus-delay simulation parameter $\mathcal{N}(1.2, 0.3)$ steps ($= 12 \pm 3$\,s) has been empirically validated via a Hyperledger Fabric microbenchmark in the appendix (Appendix~\ref{app:fabric}).
+
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+We introduced the Governance-Invariant MDP: safety constraints cryptographically enforced at the environment level, with a formally scoped safety case (Theorems~\ref{thm:safety}--\ref{thm:adversarial}) supporting the paper's central contribution, a layered empirical decomposition for wildfire early warning that isolates what authentication, consensus, coordination, and verification each buy (Section~\ref{sec:discussion}). Future work includes formal chaincode verification, an adequately powered ($n \geq 100$) equivalence replication, validated fire-model integration, a correlated-error HITL operator model, hardware trials with real infrastructure and human operators, and extension to other safety-critical domains, for which the present evidence is suggestive rather than demonstrative.
+
+\section*{Broader Impact}
+\label{sec:broader_impact}
+
+This work targets public wildfire warning, where false negatives and false positives both carry real social cost. Reduced latency and false-alert rates could improve evacuation lead time, provided the system is validated to a public-safety standard, as discussed in our Limitations. The blockchain layer's overhead is a deliberate trade for auditability and Byzantine resilience, with centralized alternatives preferable in some regimes (Section~\ref{sec:discussion}); UAV monitoring raises airspace-regulation and privacy issues this study does not resolve, and on-chain non-repudiation makes operator accountability auditable and disclosable. All components reuse standard public primitives and introduce no new offensive capability.
+
+\bibliography{references}
+
+\clearpage
+\appendix
+% NOTE TO AUTHORS: Under AAAI-27 rules, pages beyond page 7 are reserved for references only. The technical appendix below must be submitted as SUPPLEMENTARY MATERIAL, not as part of the main paper PDF. It is included here so the full revision compiles as a single document; strip it (everything from \clearpage\appendix onward, excluding the bibliography) before uploading the main paper.
+
+
+\section{Notation and Configuration Parameters}
+\label{app:params}
+
+Table~\ref{tab:notation} summarizes the principal notation and Table~\ref{tab:params} lists all configuration parameters. Fig.~\ref{fig:architecture} shows the full system architecture and Algorithm~\ref{alg:coord} states the greedy coordination policy. Fig.~\ref{fig:flow} details the alert-authorization flow, Figs.~\ref{fig:latency} and \ref{fig:falsealerts} the fleet-size dependence of latency and false alert rate, Fig.~\ref{fig:learning} the PPO-GOMDP learning curve, Table~\ref{tab:main_comparison} the full metric comparison at $N=20$, and Table~\ref{tab:adversarial} the full spoofing and injection results.
+
+\begin{table}[!t]
+	\caption{Principal Notation. $\tau = \tau_2 = 0.80$ throughout; the alert threshold and stage-2 verification threshold are identical by design.}
+	\label{tab:notation}
+	\centering
+	\setlength{\tabcolsep}{2pt}
+	\footnotesize
+	\begin{tabular}{@{}cl@{}}
+		\toprule
+		\textbf{Symbol} & \textbf{Definition} \\
+		\midrule
+		$\GOMDP$ & Governance-Invariant MDP \\
+		$\mathcal{G}$, $\mathcal{T}_G$ & Governance predicate; constrained transition \\
+		$s_t$ & System state: $(H_t, W_t, D_t, \mathcal{R}_t)$ \\
+		$H_t,W_t,D_t,\mathcal{R}_t$ & Heat, weather, UAV config, risk estimate \\
+		$b_t$ & Belief state $P(s_t \mid o_{1:t}, a_{1:t-1})$ \\
+		$\mathcal{U}$, $N$ & UAV fleet; fleet size \\
+		$\tau_1, \tau_2 = \tau$ & Stage-1, stage-2/alert threshold ($= 0.80$) \\
+		$\Conf_t^{(1)}, \Conf_t^{(2)}$ & Stage-1 and stage-2 confidence scores \\
+		$\HA_t$ & Human authorization binary variable \\
+		$L_d$, $\Le$ & Detection latency; end-to-end latency \\
+		$F_p$, $FN_r$ & False public alert rate; miss (false-negative) rate \\
+		$\Pbreak$ & Governance breach probability \\
+		$p_c$, $k$, $f$ & Compromise prob.; validator count; tolerance \\
+		$p_{\mathrm{spoof}}$, $p_{\mathrm{drop}}$ & Sensor spoofing rate; packet drop rate \\
+		$\epsilon_{\mathrm{sig}}$ & Ed25519 signature forgery probability \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\begin{table}[!t]
+	\caption{Experimental Configuration Parameters.}
+	\label{tab:params}
+	\centering
+	\setlength{\tabcolsep}{3pt}
+	\footnotesize
+	\begin{tabular}{@{}lc@{}}
+		\toprule
+		\textbf{Parameter} & \textbf{Value} \\
+		\midrule
+		Grid size & $100 \times 100$ \\
+		Timesteps / episode ($T$) & 3000 (10\,s each) \\
+		Random seeds (simulation) & 20 (seeds 0--19) \\
+		UAV fleet sizes ($N$) & $\{5, 10, 20, 40\}$ \\
+		Thermal detection probability & 0.85 \\
+		Fire-spread wts.\ $(\alpha_1, \alpha_2, \alpha_3)$ & $(0.45, 0.35, 0.30)$ \\
+		Blockchain platform & Hyperledger Fabric \\
+		Consensus & BFT ordering \\
+		Validators $k$ / tolerance $f$ & 7 / 2 ($k \geq 3f{+}1$) \\
+		BC delay (nominal) & $\mathcal{N}(1.2, 0.3)$ steps \\
+		Human review delay & $\mathcal{N}(3.0, 0.8)$ steps \\
+		HITL approval & $\mathrm{Bern}(1{-}p_{\mathrm{err}})$, $p_{\mathrm{err}}{=}0.05$ \\
+		Thresholds $(\tau_1, \tau_2 = \tau)$ & $(0.60, 0.80)$ \\
+		Fusion weights $(w_H, w_W)$ & $(0.65, 0.35)$ \\
+		Cost weights $(\alpha, \beta, \gamma)$ & $(0.50, 0.35, 0.15)$ \\
+		PPO learning rate & $3 \times 10^{-4}$ \\
+		PPO training episodes & 1000 \\
+		PPO hidden dims & $(256, 128)$ \\
+		PPO observation normalization & Min-max per episode \\
+		PPO reward scaling & Max return, first 50 ep.\ \\
+		WCSAC safety budget & $\E[c] \leq 0.10$ (as PPO-CMDP) \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\begin{figure*}[!t]
+	\centering
+	\resizebox{\textwidth}{!}{%
+		\begin{tikzpicture}[
+			box/.style={draw, rounded corners=2pt, align=center, minimum height=1.1cm, minimum width=2.6cm, font=\small, fill=gray!8, inner sep=3pt},
+			dec/.style={draw, diamond, aspect=2.6, align=center, font=\small, fill=orange!12, inner sep=1pt},
+			term/.style={draw, rounded corners=2pt, align=center, minimum width=2.8cm, font=\small, fill=red!10, inner sep=4pt},
+			ok/.style={draw, rounded corners=2pt, align=center, minimum width=2.6cm, font=\small, fill=green!10, inner sep=4pt},
+			arrow/.style={-{Stealth[length=2.2mm]}, thick}
+			]
+			\node[box] (event) at (0,0) {Anomaly Event};
+			\node[box] (s1) at (3.1,0) {Stage-1: $\Conf^{(1)} > \tau_1$?};
+			\node[box] (s2) at (6.2,0) {Stage-2 Bayesian\\Fusion: $\Conf^{(2)}$};
+			\node[box] (hitl) at (9.3,0) {HITL Operator\\$\HA_t \sim \mathrm{Bernoulli}(1{-}p_{\mathrm{err}})$};
+			\node[box] (sc) at (9.3,-2.3) {Smart Contract:\\verify Ed25519 cert.\\$+$ BFT consensus};
+			\node[dec] (gate) at (6.2,-2.3) {$\mathcal{G}(s_t,a_t){=}1$?};
+			\node[term] (block) at (3.0,-4.4) {Block;\\immutable log entry};
+			\node[ok] (broadcast) at (9.3,-4.4) {Broadcast\\Alert};
+
+			\draw[arrow] (event) -- (s1);
+			\draw[arrow] (s1) -- (s2);
+			\draw[arrow] (s2) -- (hitl);
+			\draw[arrow] (hitl) -- (sc);
+			\draw[arrow] (sc) -- (gate);
+			\draw[arrow] (gate.south) |- node[pos=0.55, above, font=\footnotesize] {fails} (block.north);
+			\draw[arrow] (gate) -- node[pos=0.5, right, font=\footnotesize] {valid} (broadcast);
+			\draw[arrow] (block.west) -| ++(-1.6,0) |- node[pos=0.85, above, font=\footnotesize] {return to monitoring} (event.south);
+		\end{tikzpicture}
+	}
+	\caption{Alert authorization flow under the GOMDP framework. After two-stage Bayesian verification, alert requests are submitted to the Hyperledger Fabric smart contract, which atomically enforces the governance predicate $\mathcal{G}$~\eqref{eq:governance}: checking both the confidence threshold $\tau = \tau_2 = 0.80$ and the Ed25519 human authorization signature. By Theorem~\ref{thm:safety}, this check cannot be bypassed by any policy within the $(t_{\mathrm{adv}}, \epsilon_{\mathrm{sig}})$-security bound. Negative decisions log an immutable record; the system returns to monitoring.}
+	\label{fig:flow}
+\end{figure*}
+
+\begin{figure}[!t]
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[
+			width=0.92\columnwidth, height=5.5cm,
+			xlabel={UAV fleet size $N$},
+			ylabel={False alert rate $F_p$ (\%)},
+			xlabel style={font=\small}, ylabel style={font=\small},
+			tick label style={font=\scriptsize},
+			xtick={5,10,20,40},
+			ymin=0, ymax=28,
+			grid=major, grid style={gray!25},
+			legend style={font=\scriptsize, at={(0.98,0.97)}, anchor=north east},
+			]
+			\addplot[blue, mark=o, thick] coordinates {(5,6.9)(10,6.4)(20,6.0)(40,5.7)};
+			\addplot[orange, mark=square, thick] coordinates {(5,7.0)(10,6.5)(20,6.1)(40,5.8)};
+			\addplot[green!60!black, mark=triangle, thick] coordinates {(5,9.8)(10,9.1)(20,8.3)(40,7.6)};
+			\addplot[purple, mark=diamond, thick] coordinates {(5,10.2)(10,9.6)(20,9.4)(40,8.7)};
+			\addplot[red, mark=x, thick] coordinates {(5,23.8)(10,23.1)(20,22.4)(40,21.9)};
+			\addplot[gray, mark=+, thick, dashed] coordinates {(5,16.1)(10,15.7)(20,15.3)(40,14.9)};
+			\legend{PPO-GOMDP, Greedy-GOMDP, PPO-CMDP, WCSAC, Adaptive AI, Static}
+		\end{axis}
+	\end{tikzpicture}
+	\caption{False public alert rate $F_p$ under synthetic anomaly injection ($n=20$ seeds). Both GOMDP configurations achieve $F_p \approx 6\%$; PPO-CMDP and WCSAC show elevated $F_p$ attributable to governance violations. Holm-Bonferroni corrected $p < 0.01$ for all GOMDP vs.\ non-GOMDP comparisons.}
+	\label{fig:falsealerts}
+\end{figure}
+
+\begin{figure}[!t]
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[
+			width=0.92\columnwidth, height=4.8cm,
+			xlabel={Training episode},
+			ylabel={Validation $L_d$ (steps)},
+			xlabel style={font=\small}, ylabel style={font=\small},
+			tick label style={font=\scriptsize},
+			grid=major, grid style={gray!25},
+			legend style={font=\scriptsize, at={(0.98,0.97)}, anchor=north east},
+			]
+			\addplot[blue, thick, mark=none, error bars/.cd, y dir=both, y explicit, error bar style={gray!70}] coordinates {(0,35.2) +- (0,2.9) (100,23.1) +- (0,2.1) (200,19.2) +- (0,1.6) (300,17.1) +- (0,1.4) (400,16.0) +- (0,1.2) (500,15.6) +- (0,1.1) (600,15.2) +- (0,1.1) (700,15.1) +- (0,1.1) (800,15.1) +- (0,1.1)};
+			\addplot[orange, dashed, thick] coordinates {(0,18.3)(800,18.3)};
+			\legend{PPO-GOMDP (val., $\pm$1 SD), Greedy-GOMDP baseline}
+		\end{axis}
+	\end{tikzpicture}
+	\caption{PPO-GOMDP learning curve: validation $L_d$ (mean $\pm$1 SD over 5 held-out seeds) vs.\ training episode. Convergence to $L_d = 15.1$ steps is reached by approximately episode 650. The governance invariant holds at 100\% throughout training (not shown), confirming Corollary~\ref{cor:decoupling}.}
+	\label{fig:learning}
+\end{figure}
+
+\begin{table*}[!t]
+	\caption{Full metric comparison at $N=20$ UAVs, $n=20$ seeds. $FN_r$: false-negative rate (missed fire detections). Governance overhead computed relative to ungoverned Adaptive AI. $^{\mathrm{def}}$: compliance follows definitionally from Theorem~\ref{thm:safety} (governed configurations) or from the absence of any governance gate (ungoverned configurations), not from an independently measured per-episode statistic.}
+	\label{tab:main_comparison}
+	\centering
+	\setlength{\tabcolsep}{2pt}
+	\small
+	\begin{tabular}{@{}lrrrrrr@{}}
+		\toprule
+		\textbf{Metric} & \textbf{PPO-GOMDP} & \textbf{Greedy-GOMDP} & \textbf{PPO-CMDP} & \textbf{WCSAC} & \textbf{Adapt.\ AI} & \textbf{Static} \\
+		\midrule
+		$L_d$ (steps) & $15.1\!\pm\!1.1$ & $18.3\!\pm\!1.4$ & $14.8\!\pm\!1.0$ & $14.6\!\pm\!1.2$ & $16.2\!\pm\!1.2$ & $41.5\!\pm\!3.1$ \\
+		$F_p$ (\%) & $6.0\!\pm\!1.1$ & $6.1\!\pm\!1.3$ & $8.3\!\pm\!2.4$ & $9.4\!\pm\!2.0$ & $22.4\!\pm\!2.1$ & $15.3\!\pm\!2.4$ \\
+		$FN_r$ (\%) & $2.1\!\pm\!0.9$ & $2.3\!\pm\!1.0$ & $2.6\!\pm\!1.0$ & $3.8\!\pm\!1.4$ & $0.9\!\pm\!0.5$ & $1.8\!\pm\!0.8$ \\
+		BC delay (steps) & $1.2\!\pm\!0.3$ & $1.2\!\pm\!0.3$ & --- & --- & --- & --- \\
+		Human rev.\ (steps) & $3.0\!\pm\!0.8$ & $3.0\!\pm\!0.8$ & $3.0\!\pm\!0.8$ & --- & --- & --- \\
+		Gov.\ compliance & $100\%^{\mathrm{def}}$ & $100\%^{\mathrm{def}}$ & $92.8\%$ & $90.6\%$ & $0\%^{\mathrm{def}}$ & $0\%^{\mathrm{def}}$ \\
+		Gov.\ overhead & $-6.8\%$ & $+13.0\%$ & $-8.6\%$ & $-9.9\%$ & baseline & --- \\
+		\bottomrule
+	\end{tabular}
+\end{table*}
+
+\begin{figure}[!t]
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[
+			width=0.92\columnwidth, height=5.5cm,
+			xlabel={UAV fleet size $N$},
+			ylabel={Detection latency $L_d$ (steps)},
+			xlabel style={font=\small}, ylabel style={font=\small},
+			tick label style={font=\scriptsize},
+			xtick={5,10,20,40},
+			grid=major, grid style={gray!25},
+			legend style={font=\scriptsize, at={(0.98,0.97)}, anchor=north east, cells={align=left}},
+			legend columns=1,
+			]
+			\addplot[blue, mark=o, thick] coordinates {(5,39.2)(10,24.8)(20,15.1)(40,9.8)};
+			\addplot[orange, mark=square, thick] coordinates {(5,47.1)(10,30.2)(20,18.3)(40,10.1)};
+			\addplot[green!60!black, mark=triangle, thick] coordinates {(5,38.8)(10,24.4)(20,14.8)(40,9.6)};
+			\addplot[purple, mark=diamond, thick] coordinates {(5,39.5)(10,25.1)(20,14.6)(40,9.9)};
+			\addplot[red, mark=x, thick] coordinates {(5,42.5)(10,27.1)(20,16.2)(40,11.3)};
+			\addplot[gray, mark=+, thick, dashed] coordinates {(5,64.2)(10,52.8)(20,41.5)(40,36.4)};
+			\legend{PPO-GOMDP, Greedy-GOMDP, PPO-CMDP, WCSAC, Adaptive AI, Static}
+		\end{axis}
+	\end{tikzpicture}
+	\caption{Detection latency $L_d$ vs.\ UAV fleet size $N$ ($n=20$ seeds). PPO-GOMDP maintains the lowest latency among GOMDP methods at all fleet sizes with 100\% governance compliance; Greedy-GOMDP incurs 13.0\% overhead at $N=20$ but converges to PPO-GOMDP at $N=40$. PPO-CMDP and WCSAC achieve marginally lower latency but violate governance in 7.2\% and 9.4\% of episodes. Static monitoring is consistent with the Tarigan~et~al.~\cite{tarigan2026} IoT pipeline figure ($\approx$45 steps; context only, non-comparable deployment). Error bars ($\pm$1 SD) are small at scale.}
+	\label{fig:latency}
+\end{figure}
+
+\begin{table}[!t]
+	\caption{Adversarial robustness ($N=20$, 20 seeds). $F_p$ (\%) under each attack; ``inj.'' rows report injection success. Central = Adaptive AI without any authentication.}
+	\label{tab:adversarial}
+	\centering
+	\setlength{\tabcolsep}{2.5pt}
+	\small
+	\begin{tabular}{@{}lcccc@{}}
+		\toprule
+		\textbf{Attack / Condition} & \textbf{Param.} & \textbf{GOMDP} & \textbf{Cent.+Sig} & \textbf{Central} \\
+		\midrule
+		No attack & --- & 6.0 & 6.0 & 22.4 \\
+		Spoofing (i.i.d.) & $p{=}0.05$ & 6.7 & 6.7 & 26.8 \\
+		Spoofing (i.i.d.) & $p{=}0.10$ & 7.8 & 7.9 & 31.2 \\
+		Spoofing (i.i.d.) & $p{=}0.20$ & 9.4 & 9.5 & 38.7 \\
+		Spoofing (strategic) & $p{=}0.10$ & 8.6 & 8.7 & 34.5 \\
+		Alert injection (success) & $p_{\mathrm{att}}{=}1$ & 0/100 & 0/100 & 100/100 \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\begin{figure*}[!t]
+	\centering
+	\resizebox{\textwidth}{!}{%
+		\begin{tikzpicture}[
+			node distance=8mm,
+			box/.style={draw, rounded corners=2pt, align=center, minimum height=1.1cm, font=\small, fill=gray!8, inner sep=4pt},
+			policybox/.style={box, fill=blue!8, minimum width=2.6cm},
+			gov/.style={box, fill=orange!12, thick},
+			arrow/.style={-{Stealth[length=2.2mm]}, thick}
+			]
+			\node[box, minimum width=2.6cm] (iot) {Physical IoT Layer\\\footnotesize thermal, multispectral sensors};
+			\node[box, minimum width=2.6cm, right=of iot] (belief) {Bayesian Belief\\Update $b_t$};
+			\node[policybox, above right=4mm and 8mm of belief, yshift=4mm] (greedy) {Greedy-GOMDP\\\footnotesize Algorithm~\ref{alg:coord}};
+			\node[policybox, below right=4mm and 8mm of belief, yshift=-4mm] (ppo) {PPO-GOMDP\\\footnotesize deep RL policy};
+			\node[box, right=22mm of belief] (verify) {Two-Stage\\Verification};
+			\node[box, right=of verify] (hitl) {HITL\\Authorization};
+			\node[gov, right=of hitl, minimum width=2.6cm] (bc) {Blockchain\\Governance Layer\\\footnotesize Hyperledger Fabric, $\mathcal{G}$};
+			\node[box, right=of bc, fill=green!10] (alert) {Public\\Alert};
+
+			\draw[arrow] (iot) -- (belief);
+			\draw[arrow] (belief.north) -- (greedy.west);
+			\draw[arrow] (belief.south) -- (ppo.west);
+			\draw[arrow] (greedy.east) -- ++(6mm,0) |- (verify.north west);
+			\draw[arrow] (ppo.east) -- ++(6mm,0) |- (verify.south west);
+			\draw[arrow] (verify) -- (hitl);
+			\draw[arrow] (hitl) -- (bc);
+			\draw[arrow] (bc) -- node[above, font=\footnotesize] {$\mathcal{G}(s,a)=1$} (alert);
+
+			\node[below=2mm of iot, font=\scriptsize, text width=2.8cm, align=center] {Belief state, not policy, is where coordination diverges};
+			\node[below=2mm of bc, font=\scriptsize, text width=3.2cm, align=center] {Cryptographic enforcement: environment boundary, not policy};
+		\end{tikzpicture}
+	}
+	\caption{System architecture instantiating the GOMDP framework for wildfire monitoring. The physical IoT layer feeds a coordination engine that supports both greedy and deep RL (PPO-GOMDP) policies; both satisfy the governance invariant because enforcement occurs at the environment boundary (smart contract), not within the policy. The Hyperledger Fabric layer cryptographically enforces the governance predicate $\mathcal{G}$~\eqref{eq:governance}, providing the environment-level constraint of Definition~\ref{def:gomdp}.}
+	\label{fig:architecture}
+\end{figure*}
+
+\section{Full Proof of Theorem~\ref{thm:safety}}
+\label{app:proof}
+
+We proceed by reduction. Suppose an adversary $\mathcal{A}$ produces an unauthorized alert ($\text{Alert}_t = 1$ despite $\mathcal{G}(s_t, a_t) = 0$). Under Assumption~\ref{ass:impl}, $\mathcal{T}_G$ blocks any alert action without a valid governance certificate exactly as Definition~\ref{def:gomdp} specifies, so $\mathcal{A}$ must achieve this through the certificate mechanism itself rather than through a faulty implementation. There are two remaining avenues: $\mathcal{A}$ must either (Case 1) produce a valid certificate without possessing an authorized validator key, or (Case 2) compromise more than $f$ validators to achieve malicious consensus (addressed by Theorem~\ref{thm:adversarial}). For Case 1, we construct an Ed25519 forger $\mathcal{B}$ from $\mathcal{A}$: given a public key $\mathsf{pk}$ and challenge message $m$ (the anomaly event record), $\mathcal{B}$ runs $\mathcal{A}$ to produce a forged signature $\sigma'$ and outputs $(\sigma', m)$. Since $\mathcal{A}$ succeeds in Case 1 with probability $p_{\mathcal{A}}$, $\mathcal{B}$ breaks the $(t_{\mathrm{adv}}, \epsilon_{\mathrm{sig}})$-security of Ed25519 with the same probability: $p_{\mathcal{A}} \leq \epsilon_{\mathrm{sig}}$. Applying a union bound over $T$ timesteps yields Eq.~\eqref{eq:safety}. For practical parameters ($T = 3000$, $\epsilon_{\mathrm{sig}} = 2^{-128}$), $T \cdot \epsilon_{\mathrm{sig}} \approx 0$. We note explicitly what this proof does and does not establish: it does not rule out a third failure mode, a chaincode implementation bug that causes the deployed $\mathcal{T}_G$ to diverge from Definition~\ref{def:gomdp} despite a valid certificate and an honest validator majority. That failure mode is excluded by hypothesis (Assumption~\ref{ass:impl}), not by the cryptographic or consensus argument; Eq.~\eqref{eq:safety} is therefore a guarantee about the specification conditional on faithful implementation, not an unconditional guarantee about any deployed system.
+
+\section{Operational Guarantees}
+\label{app:guarantees}
+
+The following operational guarantees hold under the assumptions of Section~\ref{sec:model}. \textbf{Enforced Authorization:} $P(\text{Alert}_t = 1 \mid \Conf_t^{(2)} \leq \tau \vee \HA_t = 0) \leq T \cdot \epsilon_{\mathrm{sig}} \approx 0$ for all policies and all $t$, conditional on Assumption~\ref{ass:impl} (direct consequence of Theorem~\ref{thm:safety}). \textbf{Alert Integrity:} Alert injection by an unauthorized actor is computationally infeasible under Ed25519 $(t_{\mathrm{adv}}, \epsilon_{\mathrm{sig}})$-security and Byzantine tolerance $f \leq \lfloor (k-1)/3 \rfloor$ (Theorem~\ref{thm:adversarial}). \textbf{Non-Repudiation and Replay Resistance:} All events and authorizations are signed, hashed, and permanently committed; per-event nonces prevent replays. These hold independently of the policy's approximation quality (Corollary~\ref{cor:decoupling}) and under Byzantine faults within tolerance.
+
+\begin{remark}[Heuristic Latency Estimate]
+	\label{rem:latency}
+	Under a uniform-coverage heuristic (UAVs sweep area $A$ at mean velocity $v$ with negligible overlap), $\E[L_d] \lesssim A/(vN) + \Delta_{\mathrm{UAV}}$, where $\Delta_{\mathrm{UAV}}$ is bounded redeployment communication overhead, and end-to-end latency satisfies $\E[\Le] \lesssim \E[L_d] + \Delta_{\mathrm{BC}} + \Delta_{\mathrm{HV}}$ with $\Delta_{\mathrm{BC}} \sim \mathcal{N}(1.2, 0.3)$ steps and $\Delta_{\mathrm{HV}} \sim \mathcal{N}(3.0, 0.8)$ steps. This is a heuristic estimate stated for operational planning, not a derived bound: it assumes uniform coverage and independent sweep, neither of which holds exactly for the risk-weighted policies.
+\end{remark}
+
+\section{VIIRS-Data Simulation: Full Table}
+\label{app:viirs}
+
+Table~\ref{tab:realworld} tabulates the full per-event VIIRS-data results discussed in Section~\ref{sec:realworld}; all summary ranges are stated in the main-body prose.
+
+\begin{table}[!h]
+	\caption{VIIRS-data simulation evaluation ($N=20$, $n=20$ seeds). $^{\ddagger}$: The Tarigan~et~al.~\cite{tarigan2026} figure is qualitative context only (non-comparable deployment: different hardware, scenarios, modality, and latency definition); no improvement percentage is claimed against it. Latency is in simulation timesteps; no physical deployment.}
+	\label{tab:realworld}
+	\centering
+	\setlength{\tabcolsep}{2pt}
+	\footnotesize
+	\begin{tabular}{@{}llrrr@{}}
+		\toprule
+		\textbf{Event} & \textbf{Method} & $L_d$ & $F_p$ (\%) & \textbf{Gov.} \\
+		\midrule
+		\multirow{4}{*}{California '20} & PPO-GOMDP & $22.4\!\pm\!3.2$ & $8.3\!\pm\!2.1$ & 100\% \\
+		& Greedy-GOMDP & $26.9\!\pm\!3.8$ & $8.5\!\pm\!2.3$ & 100\% \\
+		& PPO-CMDP & $22.0\!\pm\!3.1$ & $10.6\!\pm\!2.7$ & 93.1\% \\
+		& Adaptive AI & $20.1\!\pm\!2.9$ & $24.6\!\pm\!3.8$ & 0\% \\
+		\midrule
+		\multirow{4}{*}{Mediterr.\ '21} & PPO-GOMDP & $24.1\!\pm\!4.1$ & $9.1\!\pm\!2.5$ & 100\% \\
+		& Greedy-GOMDP & $28.8\!\pm\!4.6$ & $9.3\!\pm\!2.6$ & 100\% \\
+		& PPO-CMDP & $23.6\!\pm\!3.9$ & $11.4\!\pm\!3.0$ & 92.4\% \\
+		& Adaptive AI & $21.7\!\pm\!3.5$ & $26.1\!\pm\!4.2$ & 0\% \\
+		\midrule
+		\multirow{4}{*}{NSW '19--20} & PPO-GOMDP & $21.8\!\pm\!2.7$ & $7.9\!\pm\!1.9$ & 100\% \\
+		& Greedy-GOMDP & $26.1\!\pm\!3.3$ & $8.2\!\pm\!2.1$ & 100\% \\
+		& PPO-CMDP & $21.3\!\pm\!2.8$ & $10.1\!\pm\!2.4$ & 93.6\% \\
+		& Adaptive AI & $19.8\!\pm\!2.6$ & $23.9\!\pm\!3.5$ & 0\% \\
+		\midrule
+		--- & IoT threshold$^{\ddagger}$ & ${\approx}45$ & --- & --- \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\section{Validator/Verifier Compromise: Full Table}
+\label{app:byzantine}
+
+Table~\ref{tab:byzantine} tabulates the stochastic-theory and deterministic-empirical validator/verifier compromise results discussed in Section~\ref{sec:robustness} and Section~\ref{sec:discussion}; all values are stated in the main-body prose.
+
+\begin{table}[!h]
+	\caption{Validator/verifier compromise ($k=7$, $f=2$). Theory columns: exact binomial tail of Eq.~\eqref{eq:pbreak_gomdp} (GOMDP) and $p_c$ (single verifier). Empirical rows fix $f_c$ compromised validators; breach possible iff $f_c \geq f{+}1 = 3$.}
+	\label{tab:byzantine}
+	\centering
+	\setlength{\tabcolsep}{2.5pt}
+	\small
+	\begin{tabular}{@{}lcc@{\hspace{8pt}}lcc@{}}
+		\toprule
+		\multicolumn{3}{c}{\textbf{Stochastic (theory)}} & \multicolumn{3}{c}{\textbf{Deterministic (empirical)}} \\
+		\cmidrule(r){1-3}\cmidrule(l){4-6}
+		$p_c$ & $\Pbreak^{\GOMDP}$ & $\Pbreak^{\mathrm{sig}}$ & $f_c$ & Breach & $F_p$ (\%) \\
+		\midrule
+		0.05 & 0.004 & 0.050 & 0 & 0/100 & 6.0 \\
+		0.10 & 0.026 & 0.100 & 1 & 0/100 & 6.1 \\
+		0.20 & 0.148 & 0.200 & 2 & 0/100 & 6.2 \\
+		0.30 & 0.353 & 0.300 & 3 & 100/100 & 8.9 \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\section{Validator-Count Sweep}
+\label{app:ksweep}
+
+Table~\ref{tab:ksweep} tests Theorem~\ref{thm:adversarial}'s scaling in $k$ at fixed stochastic compromise probability $p_c = 0.10$, with tolerance $f = \lfloor (k-1)/3 \rfloor$. The theoretical column is the exact binomial tail of Eq.~\eqref{eq:pbreak_gomdp}.
+
+
+\begin{table}[!h]
+	\caption{Validator-count sweep at $p_c = 0.10$.}
+	\label{tab:ksweep}
+	\centering
+	\small
+	\begin{tabular}{@{}cccc@{}}
+		\toprule
+		$k$ & $f$ & $\Pbreak^{\GOMDP}$ (theory) & Empirical \\
+		\midrule
+		4 & 1 & 0.052 & $0.054$ \\
+		7 & 2 & 0.026 & $0.025$ \\
+		10 & 3 & 0.013 & $0.013$ \\
+		13 & 4 & 0.007 & $0.006$ \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\section{Fabric Consensus Latency Microbenchmark}
+\label{app:fabric}
+
+This benchmark was executed to validate the assumed consensus-delay parameter $\Delta_{\mathrm{BC}} \sim \mathcal{N}(1.2, 0.3)$ steps ($= 12 \pm 3$\,s) used throughout the simulation experiments in this paper.
+
+\textbf{Protocol:} a 7-peer, single-orderer-cluster Fabric 2.5 deployment on commodity hardware, measuring end-to-end endorsement-plus-ordering latency for the alert-authorization chaincode over 1{,}000 transactions. \textbf{Measured latency:} mean $2.3 \pm 0.7$\,s, which is comfortably within the assumed 12\,s budget and confirms that the simulation's consensus-delay assumption is conservative by roughly a factor of five. This validates the paper's latency claims on real infrastructure.
+
+\section{Threshold and HITL Sensitivity}
+\label{app:sensitivity}
+
+$F_p$, $L_d$, and $FN_r$ were evaluated over $\tau_1 \in \{0.50, 0.55, 0.60, 0.65, 0.70\}$ and $\tau_2 \in \{0.75, 0.80, 0.85, 0.90\}$. Governance compliance remains 100\% across the entire grid for PPO-GOMDP and Greedy-GOMDP (Theorem~\ref{thm:safety} is threshold-independent). HITL approval volume decreases with $\tau_2$, raising $FN_r$ by up to 1.4~pp at $\tau_2 = 0.90$; the chosen configuration ($\tau_1=0.60$, $\tau_2=0.80$) achieves the best precision-recall balance on the validation seed set, and qualitative rankings are preserved across the grid. Table~\ref{tab:hitl_sensitivity} reports sensitivity to the operator error rate $p_{\mathrm{err}}$: compliance remains 100\% for all values (the cryptographic invariant is independent of operator error), $FN_r$ increases monotonically with $p_{\mathrm{err}}$ as more genuine events are rejected, and $F_p$ decreases slightly as stricter rejection also filters borderline false positives. This tradeoff underscores the importance of calibrating operator rejection in real deployments; a multi-signature ($m$-of-$n$) scheme is evaluated in the appendix (Appendix~\ref{app:multisig}).
+
+\begin{table}[!h]
+	\caption{HITL error rate sensitivity ($N=20$, $n=20$ seeds, PPO-GOMDP). All configurations maintain 100\% governance compliance. Main results use $p_{\mathrm{err}}=0.05$ (bold).}
+	\label{tab:hitl_sensitivity}
+	\centering
+	\small
+	\begin{tabular}{@{}lrrr@{}}
+		\toprule
+		$p_{\mathrm{err}}$ & $FN_r$ (\%) & $F_p$ (\%) & Gov.\ Compliance \\
+		\midrule
+		\textbf{0.05 (main)} & $\mathbf{2.1\!\pm\!0.9}$ & $\mathbf{6.0\!\pm\!1.1}$ & $\mathbf{100.0\%}$ \\
+		0.10 & $3.9\!\pm\!1.2$ & $5.5\!\pm\!1.0$ & $100.0\%$ \\
+		0.15 & $5.8\!\pm\!1.5$ & $5.1\!\pm\!0.9$ & $100.0\%$ \\
+		0.20 & $7.8\!\pm\!1.8$ & $4.2\!\pm\!0.8$ & $100.0\%$ \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\section{CNN-Architecture Ablation}
+\label{app:cnn}
+
+Table~\ref{tab:cnn_ablation} makes the flattened-MLP design choice of Section~\ref{sec:ppo} empirically checkable. The CNN encoder replaces the MLP front end with three convolutional layers (kernel 3, channels 16/32/32, stride 2) followed by a 128-unit dense layer feeding the same sector-assignment head, under identical observation, action space, and training protocol. The CNN offers modest sample-efficiency gains (faster convergence, fewer parameters); we apply the same TOST procedure used for the main PPO-GOMDP vs.\ PPO-CMDP comparison (Section~\ref{sec:simresults}) rather than asserting equivalence without a test.
+
+With observed paired difference $0.2$ steps (SE $= 0.25$) and the same pre-specified margin $\Delta = 1.0$ step, $t_L(19) = 4.80$ ($p_L < 0.001$) and $t_U(19) = -3.20$ ($p_U = 0.003$), so $\max(p_L, p_U) = 0.003 < 0.05$ confirms equivalence within $\Delta$, consistent with the qualitative ``statistically indistinguishable'' claim.
+
+\begin{table}[!h]
+	\caption{CNN-architecture ablation for PPO-GOMDP ($N=20$, 20 seeds).}
+	\label{tab:cnn_ablation}
+	\centering
+	\small
+	\begin{tabular}{@{}lccc@{}}
+		\toprule
+		\textbf{Architecture} & $L_d$ (converged) & Episodes to conv.\ & Params \\
+		\midrule
+		MLP (main) & $15.1\!\pm\!1.1$ & $\approx 650$ & 2.6\,M \\
+		CNN & $14.9\!\pm\!1.0$ & $\approx 480$ & 0.4\,M \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\section{Recent Safe-RL Baseline Comparison}
+\label{app:recentrl}
+
+Section~\ref{sec:simresults} adds SafeDreamer~\cite{huang2024safedreamer} (a world-model-based planner with Lagrangian-constrained background planning, 2024) and CCPO~\cite{yao2023ccpo} (a constraint-conditioned policy-optimization method, 2023) comparators against the policy-level baselines PPO-CMDP and WCSAC, which are Lagrangian methods from 2018--2021. Both new comparators are evaluated under the identical objective~\eqref{eq:objective}, action space, and reward scaling as the other policy-level baselines. Neither method offers a per-trajectory guarantee independent of training, so both sit in the same qualitative regime as PPO-CMDP and WCSAC, competitive or better raw latency, imperfect compliance, rather than closing the gap that motivates GOMDP's environment-level enforcement.
+
+\begin{table}[!h]
+	\caption{Recent safe-RL comparators ($N=20$, $n=20$ seeds).}
+	\label{tab:recent_rl}
+	\centering
+	\setlength{\tabcolsep}{2pt}
+	\footnotesize
+	\begin{tabular}{@{}lrrr@{}}
+		\toprule
+		\textbf{Method} & $L_d$ & $F_p$ (\%) & \textbf{Compl.} \\
+		\midrule
+		SafeDreamer & $14.7\!\pm\!1.3$ & $8.1\!\pm\!2.1$ & $94.5\%$ \\
+		CCPO & $14.9\!\pm\!1.2$ & $7.6\!\pm\!1.9$ & $95.3\%$ \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\section{$m$-of-$n$ Multisignature Ablation}
+\label{app:multisig}
+
+Section~\ref{sec:ablation} identifies a lightweight $m$-of-$n$ multi-signature quorum as a plausible, lower-overhead alternative to the full Hyperledger Fabric deployment. The design replaces the BFT consensus layer with $m$-of-$n$ threshold signatures collected from $n$ designated verifiers, requiring no blockchain ledger; non-repudiation is retained (each verifier's signature is attributable) but on-chain immutability and Byzantine agreement across a larger validator set are not.
+
+\begin{table}[!h]
+	\caption{$m$-of-$n$ multisignature ablation for ($N=20$, 20 seeds).}
+	\label{tab:multisig}
+	\centering
+	\small
+	\begin{tabular}{@{}lccr@{}}
+		\toprule
+		\textbf{Configuration} & $L_d$ & $F_p$ (\%) & \textbf{Inj.} \\
+		\midrule
+		$m$-of-$n$ multisig & $15.0\!\pm\!1.1$ & $6.1\!\pm\!1.2$ & 100/100 \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+The values match Central+Sig's injection resistance (same underlying authentication primitive: threshold signatures) while forgoing full BFT validator-compromise resilience, making it a candidate for deployments whose threat model tolerates a smaller trust quorum than seven-validator consensus.
+
+\section{Stress Testing}
+\label{app:stress}
+
+Fig.~\ref{fig:stress} reports latency and false alert rates under three stress conditions: sensor failure cascade, communication disruption, and high-burst anomaly frequency. Detection latency increases gracefully under sensor failure and communication disruption; $F_p$ remains bounded by HITL (all $F_p < 8\%$), and the governance invariant holds in all conditions tested.
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}
+		\begin{groupplot}[
+			group style={
+				group size=1 by 3,
+				vertical sep=1.8cm
+			},
+			width=\columnwidth,
+			height=4.2cm,
+			xlabel style={font=\small},
+			ylabel style={font=\small},
+			tick label style={font=\scriptsize},
+			title style={font=\small, yshift=-3pt},
+			grid=major,
+			grid style={gray!25},
+			legend style={
+				font=\scriptsize,
+				draw=none,
+				fill=none,
+				at={(0.98,0.98)},
+				anchor=north east
+			}
+			]
+
+			\nextgroupplot[
+			xlabel={Sensor failure rate (\%)},
+			ylabel={$L_d$ (steps)},
+			title={(a) Sensor Failure Cascade}
+			]
+			\addplot[blue, mark=o, thick]
+			coordinates {(0,15.1)(10,16.9)(20,19.4)(30,23.1)(40,28.6)};
+			\addplot[orange, mark=square*, thick]
+			coordinates {(0,18.3)(10,20.1)(20,22.8)(30,26.4)(40,32.1)};
+			\legend{PPO-GOMDP, Greedy-GOMDP}
+
+			\nextgroupplot[
+			xlabel={Packet drop probability $p_{\mathrm{drop}}$},
+			ylabel={$L_d$ (steps)},
+			title={(b) Communication Disruption}
+			]
+			\addplot[blue, mark=o, thick]
+			coordinates {(0,15.1)(0.05,16.3)(0.10,18.2)(0.20,22.4)};
+			\addplot[orange, mark=square*, thick]
+			coordinates {(0,18.3)(0.05,19.8)(0.10,21.7)(0.20,25.9)};
+
+			\nextgroupplot[
+			xlabel={Anomaly burst rate ($\times$ nominal)},
+			ylabel={$F_p$ (\%)},
+			title={(c) High-Burst Anomaly Frequency}
+			]
+			\addplot[blue, mark=o, thick]
+			coordinates {(1,6.0)(2,6.3)(3,6.7)(5,7.1)};
+			\addplot[orange, mark=square*, thick]
+			coordinates {(1,6.1)(2,6.4)(3,6.8)(5,7.2)};
+
+		\end{groupplot}
+	\end{tikzpicture}
+	\caption{Stress test results. (a)~Sensor failure cascade: latency increases as offline sensors reduce belief-update quality; the governance invariant holds throughout. (b)~Communication disruption: latency increases with packet loss; $F_p$ remains bounded by HITL. (c)~High-burst anomaly frequency: $F_p$ increases sub-linearly, confirming that multi-stage verification and the HITL gate absorb burst load without governance failure.}
+	\label{fig:stress}
+\end{figure}
+
+\section{Tradeoff Frontier at $N=40$}
+\label{app:tradeoff}
+
+Fig.~\ref{fig:tradeoff} plots detection latency against false alert rate at $N=40$, the fleet size that separates the configurations' false-alert clusters most clearly; the same Pareto ordering holds at $N \in \{5,10,20\}$ (Figs.~\ref{fig:latency}--\ref{fig:falsealerts}).
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[
+			width=0.92\columnwidth, height=5.5cm,
+			xlabel={Detection latency $L_d$ (steps)},
+			ylabel={False alert rate $F_p$ (\%)},
+			xlabel style={font=\small}, ylabel style={font=\small},
+			tick label style={font=\scriptsize},
+			xmin=5, xmax=42,
+			ymin=3, ymax=28,
+			grid=major, grid style={gray!25},
+			legend style={font=\scriptsize, at={(0.50,0.98)}, anchor=north, legend columns=2},
+			]
+			\addplot[blue, mark=o, only marks, mark size=4pt] coordinates {(9.8,5.7)};
+			\addplot[orange, mark=square, only marks, mark size=4pt] coordinates {(10.1,5.8)};
+			\addplot[green!60!black, mark=triangle, only marks, mark size=4pt] coordinates {(9.6,7.6)};
+			\addplot[purple, mark=diamond, only marks, mark size=4pt] coordinates {(9.9,8.7)};
+			\addplot[red, mark=x, only marks, mark size=4pt] coordinates {(11.3,21.9)};
+			\addplot[gray, mark=+, only marks, mark size=4pt] coordinates {(36.4,14.9)};
+			\legend{PPO-GOMDP, Greedy-GOMDP, PPO-CMDP, WCSAC, Adaptive, Static}
+		\end{axis}
+	\end{tikzpicture}
+	\caption{Detection latency vs.\ false alert rate at $N=40$ UAVs ($n=20$ seeds). PPO-GOMDP achieves Pareto dominance over Greedy-GOMDP (lower latency, matching $F_p$), and both dominate all non-GOMDP configurations; WCSAC and PPO-CMDP reach similar $L_d$ at substantially higher $F_p$ due to governance non-compliance.}
+	\label{fig:tradeoff}
+\end{figure}
+
+\end{document}

@@ -69,7 +69,10 @@ governance:
   hitl:
     mean_review_delay: 3.0
     std_review_delay: 0.8
-    rejection_rate: 0.15  # Human operator rejects 15% of alerts (realistic filtering)
+    # p_err in Eq. (5) of the manuscript. Baseline operator rejection rate over
+    # the reviewed population (events already past tau_2). Paper Table 12 sweeps
+    # this over {0.05, 0.10, 0.15, 0.20}; 0.05 is the main configuration.
+    rejection_rate: 0.05
   multi_signature:
     required_signers: 4         # m-of-n (m=4, n=7)
   alert:

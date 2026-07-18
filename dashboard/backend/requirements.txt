@@ -1,0 +1,9 @@
+# Dashboard backend dependencies (in addition to the repo's own requirements).
+# Install:  pip install -r dashboard/backend/requirements.txt
+fastapi>=0.110
+uvicorn[standard]>=0.29
+imageio>=2.30
+imageio-ffmpeg>=0.4
+matplotlib>=3.7
+websockets>=12
+python-multipart>=0.0.9

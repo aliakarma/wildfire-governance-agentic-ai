@@ -15,16 +15,19 @@ import numpy as np
 class FirePropagationConfig:
     """Parameters for the stochastic CA fire model.
 
+    Defaults are the calibration reported in the manuscript
+    (Table "Experimental Configuration Parameters"): (0.45, 0.35, 0.30).
+
     Attributes:
-        alpha1: Wind contribution coefficient (default 0.3).
-        alpha2: Fuel contribution coefficient (default 0.5).
-        alpha3: Humidity suppression coefficient (default 0.4).
+        alpha1: Wind contribution coefficient (default 0.45).
+        alpha2: Fuel contribution coefficient (default 0.35).
+        alpha3: Humidity suppression coefficient (default 0.30).
         spread_model: Model type identifier (currently only "sigmoid_ca").
     """
 
-    alpha1: float = 0.3
-    alpha2: float = 0.5
-    alpha3: float = 0.4
+    alpha1: float = 0.45
+    alpha2: float = 0.35
+    alpha3: float = 0.30
     spread_model: str = "sigmoid_ca"
 
 

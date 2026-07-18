@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* --------------------------------------------------------------------------
+   Design tokens (Dashboard_Guide.md §9.1). Light is the default; dark overrides
+   apply when <html data-theme="dark">.
+   -------------------------------------------------------------------------- */
+:root,
+:root[data-theme="light"] {
+  --bg: #f7f6f3;
+  --surface: #ffffff;
+  --surface-2: #efede8;
+  --border: #dad6ce;
+  --text: #1b1e24;
+  --text-muted: #5b616e;
+  --accent: #e4572e;
+  --accent-soft: #f2a65a;
+  --ok: #0f8a6a;
+  --danger: #c7263e;
+  --warn: #c77d0a;
+  --info: #2d6bb0;
+  --focus: #2d6bb0;
+
+  --font-sans: system-ui, "Segoe UI", "IBM Plex Sans", Roboto, Helvetica, Arial, sans-serif;
+  --font-sans-ar: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, "Noto Sans Arabic", sans-serif;
+  --font-mono: "IBM Plex Mono", "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
+}
+
+:root[data-theme="dark"] {
+  --bg: #0b0e14;
+  --surface: #12161f;
+  --surface-2: #1a2030;
+  --border: #263041;
+  --text: #e8edf4;
+  --text-muted: #9aa6b8;
+  --accent: #ff6b3d;
+  --accent-soft: #ffb067;
+  --ok: #35d0a5;
+  --danger: #ff5c72;
+  --warn: #f2b455;
+  --info: #6fb1ff;
+  --focus: #6fb1ff;
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  color-scheme: light dark;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Arabic uses an Arabic-first stack and slightly larger line-height. */
+html[lang="ar"] body {
+  font-family: var(--font-sans-ar);
+  line-height: 1.7;
+}
+
+/* Tabular numerals for metrics everywhere. */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Visible focus ring for keyboard users. */
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* Honor reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Thin custom scrollbars. */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 8px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.pulse-dot {
+  animation: pulse 1.4s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
