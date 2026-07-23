@@ -5,7 +5,7 @@ Compares PPO-GOMDP, Greedy-GOMDP, PPO-CMDP, Adaptive AI, and Static Monitoring.
 The governance compliance column confirms Theorem 1: GOMDP configs achieve 100%.
 
 Paper reference: Table II, Section VI-B (Simulation Benchmarking).
-Output: results/runs/<hash>/table2_rl_comparison.csv
+Output: results/runs/<hash>/table1_rl_comparison.csv
 """
 from __future__ import annotations
 
@@ -318,12 +318,8 @@ def main(config_path: str, smoke: bool = False, use_pretrained: bool = True) -> 
                 "n_seeds": n_seeds,
             })
 
-    paper_path = Path("results/paper/table2_rl_comparison.csv")
-    if paper_path.exists():
-        out_df = pd.read_csv(paper_path)
-    else:
-        out_df = pd.DataFrame(rows)
-    out_path = out_dir / "table2_rl_comparison.csv"
+    out_df = pd.DataFrame(rows)
+    out_path = out_dir / "table1_rl_comparison.csv"
     out_df.to_csv(out_path, index=False)
 
     stats_df = pd.DataFrame(structured_rows)

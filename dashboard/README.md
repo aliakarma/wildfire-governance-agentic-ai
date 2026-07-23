@@ -43,12 +43,28 @@ Benchmarks/Reproducibility, **A/B Compare**, and **shareable permalinks**). See
   live simulation's L_d/F_p do not match the manuscript's hardcoded values)
   rather than hiding them — see [Scientific integrity](#scientific-integrity).
 - **PyroRL-style grid** — green grass on a visible white gridline, fire drawn
-  as a warm yellow→orange→red gradient keyed by how long each cell has burned,
-  slow natural spread (avg P_spread ~0.04 vs the paper model's ~0.55), and
-  prominent agents with motion trails and battery rings.
+  as a warm yellow→orange→red gradient keyed by how long each cell has burned.
+  The live viewer uses a deliberately gentle fire model (P_spread ~0.03–0.05 at
+  mean field conditions vs the paper model's ~0.55) so a 500-step episode burns
+  ~15% of the grid as a connected, growing front the fleet can search, verify and
+  encircle — with per-UAV flight-path trails, heading cues and battery rings.
 - **VIIRS real-world screen** — three VIIRS-observed events
   (California ’20 / Mediterranean ’21 / NSW ’19–20) with a live regional
   simulation and the manuscript's VIIRS-validation reference metrics (labeled).
+- **A paper-coverage view for every table & figure** — beyond the core screens,
+  dedicated views surface each manuscript artifact with a provenance badge
+  (Exact / Calibration / Reference / Supplementary):
+  - **All Experiments** — every one of the paper's artifacts as provenance-badged
+    cards, sourced live from `/api/artifacts`.
+  - **Ablation** (Table 2) — component-knockout L_d/F_p bars + injections-blocked.
+  - **Scalability** (Fig 2 & 4) — F_p-vs-N and L_d-vs-N with the Proposition-1 bound.
+  - **Learning** (Fig 3) — PPO-GOMDP validation-L_d curve vs the greedy baseline.
+  - **HITL** (Table 7) — FN_r/F_p vs operator error p_err, compliance pinned 100%.
+  - **CNN** (Table 10) — MLP-vs-CNN architecture comparison (labeled *reference*).
+  - **Adversarial → Consensus reference** — closed-form byzantine + k-sweep +
+    multisig (Tables for validator compromise / k-sweep / multisig), badged *Exact*.
+  The tradeoff-frontier and stress views carry a *Supplementary — not in the paper*
+  badge. Map: [../PROVENANCE.md](../PROVENANCE.md) · [../results/paper/MANIFEST.yaml](../results/paper/MANIFEST.yaml).
 - **A/B Compare** — two episodes on the **same seed** with synchronized
   playback (e.g. Greedy-GOMDP vs Adaptive AI): the governed side enforces 100%
   compliance and blocks injections while the ungoverned side does neither.
@@ -74,11 +90,24 @@ Benchmarks/Reproducibility, **A/B Compare**, and **shareable permalinks**). See
 Requires the repo's Python env (with `wildfire_governance` importable),
 Node 18+, and the backend extras.
 
+### Easiest — one command (auto-builds the UI)
+
+```bash
+pip install -r dashboard/backend/requirements.txt
+python dashboard/run_dashboard.py --port 8123
+```
+
+The launcher builds the Next.js frontend on first run (the build output
+`dashboard/frontend/out/` is git-ignored, so a fresh clone has none), then starts
+the integrated server. Open **http://127.0.0.1:8123/**.
+
+### Manual — explicit steps
+
 ```bash
 # 1. Backend deps (in the repo's Python environment)
 pip install -r dashboard/backend/requirements.txt
 
-# 2. Build the frontend (produces dashboard/frontend/out/)
+# 2. Build the frontend (produces dashboard/frontend/out/) — REQUIRED once
 cd dashboard/frontend
 npm install
 npm run build
@@ -90,8 +119,23 @@ python -m uvicorn dashboard.backend.main:app --host 127.0.0.1 --port 8123
 
 Open **http://127.0.0.1:8123/**.
 
+> **If you see `{"detail":"Not Found"}` or a "FRONTEND NOT BUILT" page at `/`,**
+> the frontend hasn't been built yet — run step 2 (or use the one-command
+> launcher above). The build directory is git-ignored, so it is never present in
+> a fresh checkout.
+>
 > On Windows, ports in some reserved ranges (e.g. 8000) may be blocked with a
 > "socket access forbidden" error — pick another port such as 8123.
+
+---
+
+## Security & Localhost-Only Notice
+
+> [!WARNING]
+> The dashboard is designed strictly for local demonstration and artifact validation:
+> 1. **No Authentication:** The backend endpoints and WebSocket stream are completely unauthenticated.
+> 2. **CORS Restrictions:** CORS is locked down specifically to `localhost:3000` and `127.0.0.1:3000`.
+> 3. **Safe Binding:** Do not bind the server to `0.0.0.0` or expose the port to the public internet. Always run locally using the default `127.0.0.1` interface.
 
 ### Split dev mode (hot-reload frontend)
 
@@ -182,6 +226,7 @@ signal, so PPO vs greedy changes the movement pattern, not L_d/F_p.)
 | 4b | PPO checkpoint wiring (pretrained policy at grid=100, N=20) | ✅ done |
 | 4c | VIIRS real-world screen + PyroRL-style renderer (green grid, warm slow fire, agent trails) | ✅ done |
 | 4d | Command palette (⌘K) + guided onboarding tour | ✅ done |
+| 4e | Paper-coverage screens (All Experiments, Ablation, Scalability, Learning, HITL, CNN) + consensus reference + supplementary badges | ✅ done |
 
 Multi-view navigation shares one live run across screens (a single episode feeds
 Live, Governance, and Adversarial). The backend endpoints for benchmarks,
@@ -198,4 +243,5 @@ them.
 | `POST /api/benchmark` | Live multi-seed mean ± 95% CI |
 | `POST /api/export/gif` | Server-side episode GIF |
 | `GET /api/breach-probability` | Theorem-2 breach curve (GOMDP vs centralized) |
-| `GET /api/paper-results/{table}` | Manuscript reference values (labeled) |
+| `GET /api/paper-results/{table}` | Manuscript reference values (labeled) for any canonical CSV |
+| `GET /api/artifacts` | Enumerates every paper artifact with provenance class + CSV-present flag (drives the All-Experiments screen) |

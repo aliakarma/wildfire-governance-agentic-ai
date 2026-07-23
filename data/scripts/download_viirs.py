@@ -38,6 +38,8 @@ def download_viirs(
     start_date: str,
     end_date: str,
     api_key: str | None = None,
+    source: str = "VIIRS_SNPP_SP",
+    day_range: int = 5,
 ) -> Path:
     """Download VIIRS active fire CSV for the specified region and date range.
 
@@ -48,6 +50,11 @@ def download_viirs(
         start_date: Start date in YYYY-MM-DD format.
         end_date: End date in YYYY-MM-DD format.
         api_key: NASA FIRMS MAP_KEY. If None, reads from NASA_FIRMS_KEY env var.
+        source: FIRMS product. Use an ``*_SP`` (Standard Processing / archive)
+                source for historical dates — the paper's events (2019–2021) are
+                NOT in the ``*_NRT`` (near-real-time) feeds, which only hold ~2
+                recent months. Default ``VIIRS_SNPP_SP`` matches the paper.
+        day_range: Days from start_date to fetch (FIRMS area API max = 5).
 
     Returns:
         Path to the downloaded CSV file.
@@ -71,10 +78,12 @@ def download_viirs(
 
     bbox = REGION_BBOXES[region]
     area_str = f"{bbox['min_lon']},{bbox['min_lat']},{bbox['max_lon']},{bbox['max_lat']}"
+    day_range = max(1, min(int(day_range), 5))  # FIRMS area API caps at 5 days
     url = (
         f"https://firms.modaps.eosdis.nasa.gov/usfs/api/area/csv/"
-        f"{api_key}/VIIRS_SNPP_NRT/{area_str}/1/{start_date}"
+        f"{api_key}/{source}/{area_str}/{day_range}/{start_date}"
     )
+    print(f"  FIRMS source={source}, area={area_str}, {day_range}d from {start_date}")
 
     RAW_DIR.mkdir(parents=True, exist_ok=True)
     out_path = RAW_DIR / f"viirs_{region}_{start_date}_{end_date}.csv"
@@ -135,12 +144,16 @@ def _create_synthetic_fallback(region: str) -> Path:
     return out_path
 
 
-def preprocess_viirs(csv_path: Path, grid_size: int = 100) -> Path:
+def preprocess_viirs(csv_path: Path, grid_size: int = 100, out_name: str | None = None) -> Path:
     """Convert VIIRS CSV to a numpy .npz simulation grid.
 
     Args:
         csv_path: Path to the downloaded or synthetic VIIRS CSV.
         grid_size: Target grid side length.
+        out_name: Explicit output filename (e.g. ``viirs_grid_california_2020.npz``).
+            When None, derives ``viirs_grid_<csv-stem>.npz``. Pass the canonical
+            name so the experiment scripts (which look for
+            ``viirs_grid_<region>_<year>.npz``) find the grid.
 
     Returns:
         Path to the output .npz file in data/processed/.
@@ -149,8 +162,7 @@ def preprocess_viirs(csv_path: Path, grid_size: int = 100) -> Path:
     import pandas as pd
 
     PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
-    stem = csv_path.stem
-    out_path = PROCESSED_DIR / f"viirs_grid_{stem}.npz"
+    out_path = PROCESSED_DIR / (out_name or f"viirs_grid_{csv_path.stem}.npz")
 
     df = pd.read_csv(csv_path)
     if df.empty:
@@ -189,10 +201,27 @@ if __name__ == "__main__":
     parser.add_argument("--start_date", default="2020-08-01", help="YYYY-MM-DD")
     parser.add_argument("--end_date", default="2020-10-01", help="YYYY-MM-DD")
     parser.add_argument("--api_key", default=None, help="NASA FIRMS MAP_KEY")
+    parser.add_argument("--source", default="VIIRS_SNPP_SP",
+                        help="FIRMS product; use *_SP (archive) for historical dates "
+                             "(default VIIRS_SNPP_SP matches the paper)")
+    parser.add_argument("--day_range", type=int, default=5,
+                        help="Days from start_date to fetch (FIRMS area API max 5)")
     parser.add_argument("--preprocess", action="store_true",
-                        help="Also preprocess to simulation grid")
+                        help="Also preprocess to the canonical simulation grid")
+    parser.add_argument("--no-preprocess", dest="preprocess", action="store_false",
+                        help="Download the CSV only, skip grid preprocessing")
+    parser.set_defaults(preprocess=True)
     args = parser.parse_args()
 
-    csv_path = download_viirs(args.region, args.start_date, args.end_date, args.api_key)
+    csv_path = download_viirs(args.region, args.start_date, args.end_date, args.api_key,
+                              source=args.source, day_range=args.day_range)
     if args.preprocess:
-        preprocess_viirs(csv_path)
+        # Canonical name the experiment scripts look for:
+        # data/processed/viirs_grid_<region>_<year>.npz
+        year = args.start_date[:4]
+        out_name = f"viirs_grid_{args.region}_{year}.npz"
+        grid_path = preprocess_viirs(csv_path, out_name=out_name)
+        print(f"  Canonical grid ready: {grid_path}")
+        if "synthetic" in csv_path.name:
+            print("  NOTE: this grid is SYNTHETIC fallback (no NASA_FIRMS_KEY set). "
+                  "Set the key and rerun for real VIIRS validation.")

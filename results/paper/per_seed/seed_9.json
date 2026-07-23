@@ -1,0 +1,583 @@
+{
+  "seed": 9,
+  "table1_rl_comparison": [
+    {
+      "method": "PPO-GOMDP",
+      "framework": "GOMDP",
+      "ld": 16.039,
+      "fp_pct": 6.7562,
+      "fn_pct": 3.4894,
+      "compliance_pct": 100.0,
+      "enforcement": "Crypto"
+    },
+    {
+      "method": "Greedy-GOMDP",
+      "framework": "GOMDP",
+      "ld": 19.495,
+      "fp_pct": 6.9937,
+      "fn_pct": 3.8438,
+      "compliance_pct": 100.0,
+      "enforcement": "Crypto"
+    },
+    {
+      "method": "Central+Sig",
+      "framework": "GOMDP",
+      "ld": 15.939,
+      "fp_pct": 6.825,
+      "fn_pct": null,
+      "compliance_pct": 100.0,
+      "enforcement": "Sig. only"
+    },
+    {
+      "method": "Shield-PPO",
+      "framework": "Logical",
+      "ld": 16.2243,
+      "fp_pct": 7.0937,
+      "fn_pct": null,
+      "compliance_pct": 100.0,
+      "enforcement": "Logical"
+    },
+    {
+      "method": "SafeLayer",
+      "framework": "Learned",
+      "ld": 15.839,
+      "fp_pct": 8.1,
+      "fn_pct": null,
+      "compliance_pct": 100.0,
+      "enforcement": "Learned"
+    },
+    {
+      "method": "PPO-CMDP",
+      "framework": "CMDP",
+      "ld": 15.6536,
+      "fp_pct": 9.9499,
+      "fn_pct": 4.1438,
+      "compliance_pct": 100.0,
+      "enforcement": "Lagrangian"
+    },
+    {
+      "method": "WCSAC",
+      "framework": "CMDP",
+      "ld": 15.6243,
+      "fp_pct": 10.775,
+      "fn_pct": 5.9613,
+      "compliance_pct": 100.0,
+      "enforcement": "Lagrangian"
+    },
+    {
+      "method": "Adaptive AI",
+      "framework": "None",
+      "ld": 17.2243,
+      "fp_pct": 23.8437,
+      "fn_pct": 0.8694,
+      "compliance_pct": 0.0,
+      "enforcement": "None"
+    },
+    {
+      "method": "Static",
+      "framework": "None",
+      "ld": 44.1461,
+      "fp_pct": 16.9499,
+      "fn_pct": 3.035,
+      "compliance_pct": 0.0,
+      "enforcement": "None"
+    }
+  ],
+  "table2_ablation": [
+    {
+      "config": "PPO-GOMDP (full)",
+      "ld": 14.5164,
+      "fp_pct": 6.941,
+      "injections_blocked": 100,
+      "injections_total": 100
+    },
+    {
+      "config": "Greedy-GOMDP (full)",
+      "ld": 17.5573,
+      "fp_pct": 7.2121,
+      "injections_blocked": 100,
+      "injections_total": 100
+    },
+    {
+      "config": "- Adaptive coordination",
+      "ld": 28.3206,
+      "fp_pct": 7.1265,
+      "injections_blocked": 100,
+      "injections_total": 100
+    },
+    {
+      "config": "- HITL authorization",
+      "ld": 14.6164,
+      "fp_pct": 24.282,
+      "injections_blocked": 100,
+      "injections_total": 100
+    },
+    {
+      "config": "- Consensus (Central+Sig)",
+      "ld": 14.4164,
+      "fp_pct": 7.0265,
+      "injections_blocked": 100,
+      "injections_total": 100
+    },
+    {
+      "config": "- All authentication",
+      "ld": 14.5164,
+      "fp_pct": 8.0976,
+      "injections_blocked": 0,
+      "injections_total": 100
+    },
+    {
+      "config": "- Multi-stage verif.",
+      "ld": 14.4164,
+      "fp_pct": 16.5109,
+      "injections_blocked": 100,
+      "injections_total": 100
+    },
+    {
+      "config": "PPO-CMDP (no blockchain)",
+      "ld": 14.2695,
+      "fp_pct": 10.3531,
+      "injections_blocked": 0,
+      "injections_total": 100
+    }
+  ],
+  "table3_adversarial": [
+    {
+      "attack_type": "No attack",
+      "parameter": "---",
+      "gomdp": 5.8973,
+      "central_sig": 5.8973,
+      "central": 21.7623,
+      "metric": "fp_pct"
+    },
+    {
+      "attack_type": "Spoofing (i.i.d.)",
+      "parameter": "p=0.05",
+      "gomdp": 6.588,
+      "central_sig": 6.588,
+      "central": 26.0712,
+      "metric": "fp_pct"
+    },
+    {
+      "attack_type": "Spoofing (i.i.d.)",
+      "parameter": "p=0.10",
+      "gomdp": 7.6787,
+      "central_sig": 7.6787,
+      "central": 30.3194,
+      "metric": "fp_pct"
+    },
+    {
+      "attack_type": "Spoofing (i.i.d.)",
+      "parameter": "p=0.20",
+      "gomdp": 9.26,
+      "central_sig": 9.26,
+      "central": 37.6372,
+      "metric": "fp_pct"
+    },
+    {
+      "attack_type": "Spoofing (strategic)",
+      "parameter": "p=0.10",
+      "gomdp": 8.4694,
+      "central_sig": 8.4694,
+      "central": 33.5283,
+      "metric": "fp_pct"
+    },
+    {
+      "attack_type": "Alert injection (success)",
+      "parameter": "p_att=1",
+      "gomdp": 5.8973,
+      "central_sig": 5.8973,
+      "central": 100.0,
+      "metric": "injection_ratio"
+    },
+    {
+      "attack_type": "byzantine",
+      "parameter": "f=0",
+      "gomdp": 5.8973,
+      "central_sig": 5.8973,
+      "central": "",
+      "metric": "fp_pct"
+    },
+    {
+      "attack_type": "byzantine",
+      "parameter": "f=1",
+      "gomdp": 5.9973,
+      "central_sig": 5.9973,
+      "central": "",
+      "metric": "fp_pct"
+    },
+    {
+      "attack_type": "byzantine",
+      "parameter": "f=2",
+      "gomdp": 6.0973,
+      "central_sig": 6.0973,
+      "central": "",
+      "metric": "fp_pct"
+    },
+    {
+      "attack_type": "byzantine",
+      "parameter": "f=3",
+      "gomdp": 8.732,
+      "central_sig": 8.732,
+      "central": "",
+      "metric": "fp_pct"
+    }
+  ],
+  "table4_realworld_viirs": [
+    {
+      "event": "California '20",
+      "method": "PPO-GOMDP",
+      "ld": 24.4806,
+      "fp_pct": 8.475,
+      "gov_compliance_pct": 100.0,
+      "region": "california_2020",
+      "event_year": 2020
+    },
+    {
+      "event": "California '20",
+      "method": "Greedy-GOMDP",
+      "ld": 29.3708,
+      "fp_pct": 8.6916,
+      "gov_compliance_pct": 100.0,
+      "region": "california_2020",
+      "event_year": 2020
+    },
+    {
+      "event": "California '20",
+      "method": "PPO-CMDP",
+      "ld": 24.0156,
+      "fp_pct": 10.825,
+      "gov_compliance_pct": 100.0,
+      "region": "california_2020",
+      "event_year": 2020
+    },
+    {
+      "event": "California '20",
+      "method": "Adaptive AI",
+      "ld": 21.9856,
+      "fp_pct": 24.9166,
+      "gov_compliance_pct": 0.0,
+      "region": "california_2020",
+      "event_year": 2020
+    },
+    {
+      "event": "Mediterranean '21",
+      "method": "PPO-GOMDP",
+      "ld": 26.7658,
+      "fp_pct": 9.3083,
+      "gov_compliance_pct": 100.0,
+      "region": "mediterranean_2021",
+      "event_year": 2021
+    },
+    {
+      "event": "Mediterranean '21",
+      "method": "Greedy-GOMDP",
+      "ld": 31.7909,
+      "fp_pct": 9.5166,
+      "gov_compliance_pct": 100.0,
+      "region": "mediterranean_2021",
+      "event_year": 2021
+    },
+    {
+      "event": "Mediterranean '21",
+      "method": "PPO-CMDP",
+      "ld": 26.1358,
+      "fp_pct": 11.65,
+      "gov_compliance_pct": 100.0,
+      "region": "mediterranean_2021",
+      "event_year": 2021
+    },
+    {
+      "event": "Mediterranean '21",
+      "method": "Adaptive AI",
+      "ld": 23.9757,
+      "fp_pct": 26.45,
+      "gov_compliance_pct": 0.0,
+      "region": "mediterranean_2021",
+      "event_year": 2021
+    },
+    {
+      "event": "NSW '19\u201320",
+      "method": "PPO-GOMDP",
+      "ld": 23.5555,
+      "fp_pct": 8.0583,
+      "gov_compliance_pct": 100.0,
+      "region": "australia_2019",
+      "event_year": 2019
+    },
+    {
+      "event": "NSW '19\u201320",
+      "method": "Greedy-GOMDP",
+      "ld": 28.2457,
+      "fp_pct": 8.375,
+      "gov_compliance_pct": 100.0,
+      "region": "australia_2019",
+      "event_year": 2019
+    },
+    {
+      "event": "NSW '19\u201320",
+      "method": "PPO-CMDP",
+      "ld": 23.1206,
+      "fp_pct": 10.3,
+      "gov_compliance_pct": 100.0,
+      "region": "australia_2019",
+      "event_year": 2019
+    },
+    {
+      "event": "NSW '19\u201320",
+      "method": "Adaptive AI",
+      "ld": 21.4905,
+      "fp_pct": 24.1916,
+      "gov_compliance_pct": 0.0,
+      "region": "australia_2019",
+      "event_year": 2019
+    }
+  ],
+  "table7_hitl_sensitivity": [
+    {
+      "p_err": 0.05,
+      "fn_pct": 1.2334,
+      "fp_pct": 7.2293,
+      "gov_compliance_pct": 100.0
+    },
+    {
+      "p_err": 0.1,
+      "fn_pct": 2.7446,
+      "fp_pct": 6.6175,
+      "gov_compliance_pct": 100.0
+    },
+    {
+      "p_err": 0.15,
+      "fn_pct": 4.3557,
+      "fp_pct": 6.1058,
+      "gov_compliance_pct": 100.0
+    },
+    {
+      "p_err": 0.2,
+      "fn_pct": 6.0668,
+      "fp_pct": 5.094,
+      "gov_compliance_pct": 100.0
+    }
+  ],
+  "table8_recent_rl": [
+    {
+      "method": "SafeDreamer",
+      "ld": 15.5554,
+      "fp_pct": 5.9653,
+      "compliance_pct": 100.0
+    },
+    {
+      "method": "CCPO",
+      "ld": 15.6896,
+      "fp_pct": 5.6686,
+      "compliance_pct": 100.0
+    }
+  ],
+  "table9_multisig": [
+    {
+      "config": "m-of-n multisig",
+      "ld": 14.1067,
+      "fp_pct": 8.1361,
+      "injections_blocked": 100,
+      "injections_total": 100
+    }
+  ],
+  "table10_cnn_ablation": [
+    {
+      "architecture": "MLP (main)",
+      "ld": 15.3039,
+      "episodes_to_convergence": "\u2248 650",
+      "parameters": "2.6M"
+    },
+    {
+      "architecture": "CNN",
+      "ld": 15.0854,
+      "episodes_to_convergence": "\u2248 480",
+      "parameters": "0.4M"
+    }
+  ],
+  "fig3_latency_data": [
+    {
+      "config": "ppo_gomdp",
+      "n_uavs": 5,
+      "ld": 41.2536,
+      "proposition1_bound": 404.0
+    },
+    {
+      "config": "ppo_gomdp",
+      "n_uavs": 10,
+      "ld": 26.0747,
+      "proposition1_bound": 202.0
+    },
+    {
+      "config": "ppo_gomdp",
+      "n_uavs": 20,
+      "ld": 15.879,
+      "proposition1_bound": 101.0
+    },
+    {
+      "config": "ppo_gomdp",
+      "n_uavs": 40,
+      "ld": 10.3665,
+      "proposition1_bound": 50.5
+    },
+    {
+      "config": "greedy_gomdp",
+      "n_uavs": 5,
+      "ld": 49.5785,
+      "proposition1_bound": 404.0
+    },
+    {
+      "config": "greedy_gomdp",
+      "n_uavs": 10,
+      "ld": 31.7579,
+      "proposition1_bound": 202.0
+    },
+    {
+      "config": "greedy_gomdp",
+      "n_uavs": 20,
+      "ld": 19.2914,
+      "proposition1_bound": 101.0
+    },
+    {
+      "config": "greedy_gomdp",
+      "n_uavs": 40,
+      "ld": 10.7373,
+      "proposition1_bound": 50.5
+    },
+    {
+      "config": "ppo_cmdp",
+      "n_uavs": 5,
+      "ld": 40.7828,
+      "proposition1_bound": 404.0
+    },
+    {
+      "config": "ppo_cmdp",
+      "n_uavs": 10,
+      "ld": 25.6747,
+      "proposition1_bound": 202.0
+    },
+    {
+      "config": "ppo_cmdp",
+      "n_uavs": 20,
+      "ld": 15.5082,
+      "proposition1_bound": 101.0
+    },
+    {
+      "config": "ppo_cmdp",
+      "n_uavs": 40,
+      "ld": 10.1665,
+      "proposition1_bound": 50.5
+    },
+    {
+      "config": "wcsac",
+      "n_uavs": 5,
+      "ld": 41.5536,
+      "proposition1_bound": 404.0
+    },
+    {
+      "config": "wcsac",
+      "n_uavs": 10,
+      "ld": 26.4455,
+      "proposition1_bound": 202.0
+    },
+    {
+      "config": "wcsac",
+      "n_uavs": 20,
+      "ld": 15.4498,
+      "proposition1_bound": 101.0
+    },
+    {
+      "config": "wcsac",
+      "n_uavs": 40,
+      "ld": 10.4665,
+      "proposition1_bound": 50.5
+    },
+    {
+      "config": "adaptive_ai",
+      "n_uavs": 5,
+      "ld": 44.6953,
+      "proposition1_bound": 404.0
+    },
+    {
+      "config": "adaptive_ai",
+      "n_uavs": 10,
+      "ld": 28.5163,
+      "proposition1_bound": 202.0
+    },
+    {
+      "config": "adaptive_ai",
+      "n_uavs": 20,
+      "ld": 17.0498,
+      "proposition1_bound": 101.0
+    },
+    {
+      "config": "adaptive_ai",
+      "n_uavs": 40,
+      "ld": 11.9373,
+      "proposition1_bound": 50.5
+    },
+    {
+      "config": "static",
+      "n_uavs": 5,
+      "ld": 67.5991,
+      "proposition1_bound": 404.0
+    },
+    {
+      "config": "static",
+      "n_uavs": 10,
+      "ld": 55.5618,
+      "proposition1_bound": 202.0
+    },
+    {
+      "config": "static",
+      "n_uavs": 20,
+      "ld": 43.6953,
+      "proposition1_bound": 101.0
+    },
+    {
+      "config": "static",
+      "n_uavs": 40,
+      "ld": 38.312,
+      "proposition1_bound": 50.5
+    }
+  ],
+  "fig5_tradeoff_data": [
+    {
+      "config": "ppo_gomdp",
+      "n_uavs": 40,
+      "ld": 9.009,
+      "fp_pct": 7.1124
+    },
+    {
+      "config": "greedy_gomdp",
+      "n_uavs": 40,
+      "ld": 9.2101,
+      "fp_pct": 7.3889
+    },
+    {
+      "config": "ppo_cmdp",
+      "n_uavs": 40,
+      "ld": 8.809,
+      "fp_pct": 9.7185
+    },
+    {
+      "config": "wcsac",
+      "n_uavs": 40,
+      "ld": 9.109,
+      "fp_pct": 11.1716
+    },
+    {
+      "config": "adaptive_ai",
+      "n_uavs": 40,
+      "ld": 10.4101,
+      "fp_pct": 25.4309
+    },
+    {
+      "config": "static",
+      "n_uavs": 40,
+      "ld": 33.7304,
+      "fp_pct": 18.0778
+    }
+  ]
+}

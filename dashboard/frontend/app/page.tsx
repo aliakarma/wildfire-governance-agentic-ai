@@ -6,8 +6,14 @@ import { OnboardingTour } from "@/components/layout/OnboardingTour";
 import { useSim } from "@/components/providers/SimulationProvider";
 import { AdversarialScreen } from "@/components/screens/AdversarialScreen";
 import { BenchmarkScreen } from "@/components/screens/BenchmarkScreen";
+import { AblationScreen } from "@/components/screens/AblationScreen";
+import { CNNScreen } from "@/components/screens/CNNScreen";
 import { CompareScreen } from "@/components/screens/CompareScreen";
+import { ExperimentsScreen } from "@/components/screens/ExperimentsScreen";
 import { GovernanceScreen } from "@/components/screens/GovernanceScreen";
+import { HITLScreen } from "@/components/screens/HITLScreen";
+import { LearningScreen } from "@/components/screens/LearningScreen";
+import { ScalabilityScreen } from "@/components/screens/ScalabilityScreen";
 import { LiveScreen } from "@/components/screens/LiveScreen";
 import { VIIRSScreen } from "@/components/screens/VIIRSScreen";
 
@@ -45,6 +51,12 @@ export default function Page() {
         {view === "compare" && <CompareScreen />}
         {view === "viirs" && <VIIRSScreen />}
         {view === "benchmark" && <BenchmarkScreen />}
+        {view === "experiments" && <ExperimentsScreen />}
+        {view === "ablation" && <AblationScreen />}
+        {view === "scalability" && <ScalabilityScreen />}
+        {view === "learning" && <LearningScreen />}
+        {view === "hitl" && <HITLScreen />}
+        {view === "cnn" && <CNNScreen />}
       </div>
       <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} onOpenTour={() => setTourOpen(true)} />
       <OnboardingTour open={tourOpen} onClose={() => setTourOpen(false)} />

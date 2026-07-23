@@ -37,6 +37,12 @@ wandb
 *.pem
 *.key
 
+# Frontend build artifacts (re-created inside the Docker build)
+dashboard/frontend/node_modules
+dashboard/frontend/.next
+dashboard/frontend/out
+.venv
+
 # IDE
 .vscode
 .idea

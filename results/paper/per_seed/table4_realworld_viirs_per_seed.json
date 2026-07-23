@@ -1,0 +1,2402 @@
+[
+  {
+    "seed": 0,
+    "event": "California '20",
+    "method": "PPO-GOMDP",
+    "ld": 20.2002,
+    "fp_pct": 6.5544,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 1,
+    "event": "California '20",
+    "method": "PPO-GOMDP",
+    "ld": 16.6866,
+    "fp_pct": 8.7172,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 2,
+    "event": "California '20",
+    "method": "PPO-GOMDP",
+    "ld": 27.8709,
+    "fp_pct": 10.5583,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 3,
+    "event": "California '20",
+    "method": "PPO-GOMDP",
+    "ld": 23.2347,
+    "fp_pct": 6.2308,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 4,
+    "event": "California '20",
+    "method": "PPO-GOMDP",
+    "ld": 19.0967,
+    "fp_pct": 7.436,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 5,
+    "event": "California '20",
+    "method": "PPO-GOMDP",
+    "ld": 21.6338,
+    "fp_pct": 4.7448,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 6,
+    "event": "California '20",
+    "method": "PPO-GOMDP",
+    "ld": 24.3528,
+    "fp_pct": 10.3597,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 7,
+    "event": "California '20",
+    "method": "PPO-GOMDP",
+    "ld": 18.1664,
+    "fp_pct": 11.1467,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 8,
+    "event": "California '20",
+    "method": "PPO-GOMDP",
+    "ld": 18.7013,
+    "fp_pct": 9.6495,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 9,
+    "event": "California '20",
+    "method": "PPO-GOMDP",
+    "ld": 24.4806,
+    "fp_pct": 8.475,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 10,
+    "event": "California '20",
+    "method": "PPO-GOMDP",
+    "ld": 20.7769,
+    "fp_pct": 12.1703,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 11,
+    "event": "California '20",
+    "method": "PPO-GOMDP",
+    "ld": 26.2199,
+    "fp_pct": 9.132,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 12,
+    "event": "California '20",
+    "method": "PPO-GOMDP",
+    "ld": 21.6727,
+    "fp_pct": 7.2559,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 13,
+    "event": "California '20",
+    "method": "PPO-GOMDP",
+    "ld": 21.9009,
+    "fp_pct": 8.7668,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 14,
+    "event": "California '20",
+    "method": "PPO-GOMDP",
+    "ld": 24.5898,
+    "fp_pct": 7.0688,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 15,
+    "event": "California '20",
+    "method": "PPO-GOMDP",
+    "ld": 27.2727,
+    "fp_pct": 9.3747,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 16,
+    "event": "California '20",
+    "method": "PPO-GOMDP",
+    "ld": 25.6573,
+    "fp_pct": 8.4667,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 17,
+    "event": "California '20",
+    "method": "PPO-GOMDP",
+    "ld": 25.0621,
+    "fp_pct": 5.1974,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 18,
+    "event": "California '20",
+    "method": "PPO-GOMDP",
+    "ld": 19.3785,
+    "fp_pct": 9.8458,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 19,
+    "event": "California '20",
+    "method": "PPO-GOMDP",
+    "ld": 21.0452,
+    "fp_pct": 4.849,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 0,
+    "event": "California '20",
+    "method": "Greedy-GOMDP",
+    "ld": 24.2877,
+    "fp_pct": 6.5882,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 1,
+    "event": "California '20",
+    "method": "Greedy-GOMDP",
+    "ld": 20.1154,
+    "fp_pct": 8.957,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 2,
+    "event": "California '20",
+    "method": "Greedy-GOMDP",
+    "ld": 33.3967,
+    "fp_pct": 10.9734,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 3,
+    "event": "California '20",
+    "method": "Greedy-GOMDP",
+    "ld": 27.8913,
+    "fp_pct": 6.2337,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 4,
+    "event": "California '20",
+    "method": "Greedy-GOMDP",
+    "ld": 22.9773,
+    "fp_pct": 7.5538,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 5,
+    "event": "California '20",
+    "method": "Greedy-GOMDP",
+    "ld": 25.9901,
+    "fp_pct": 4.6062,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 6,
+    "event": "California '20",
+    "method": "Greedy-GOMDP",
+    "ld": 29.2189,
+    "fp_pct": 10.7559,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 7,
+    "event": "California '20",
+    "method": "Greedy-GOMDP",
+    "ld": 21.8726,
+    "fp_pct": 11.6178,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 8,
+    "event": "California '20",
+    "method": "Greedy-GOMDP",
+    "ld": 22.5078,
+    "fp_pct": 9.978,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 9,
+    "event": "California '20",
+    "method": "Greedy-GOMDP",
+    "ld": 29.3708,
+    "fp_pct": 8.6916,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 10,
+    "event": "California '20",
+    "method": "Greedy-GOMDP",
+    "ld": 24.9726,
+    "fp_pct": 12.7389,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 11,
+    "event": "California '20",
+    "method": "Greedy-GOMDP",
+    "ld": 31.4361,
+    "fp_pct": 9.4113,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 12,
+    "event": "California '20",
+    "method": "Greedy-GOMDP",
+    "ld": 26.0364,
+    "fp_pct": 7.3565,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 13,
+    "event": "California '20",
+    "method": "Greedy-GOMDP",
+    "ld": 26.3074,
+    "fp_pct": 9.0113,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 14,
+    "event": "California '20",
+    "method": "Greedy-GOMDP",
+    "ld": 29.5004,
+    "fp_pct": 7.1516,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 15,
+    "event": "California '20",
+    "method": "Greedy-GOMDP",
+    "ld": 32.6863,
+    "fp_pct": 9.6771,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 16,
+    "event": "California '20",
+    "method": "Greedy-GOMDP",
+    "ld": 30.768,
+    "fp_pct": 8.6826,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 17,
+    "event": "California '20",
+    "method": "Greedy-GOMDP",
+    "ld": 30.0612,
+    "fp_pct": 5.1019,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 18,
+    "event": "California '20",
+    "method": "Greedy-GOMDP",
+    "ld": 23.3119,
+    "fp_pct": 10.1931,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 19,
+    "event": "California '20",
+    "method": "Greedy-GOMDP",
+    "ld": 25.2911,
+    "fp_pct": 4.7203,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 0,
+    "event": "California '20",
+    "method": "PPO-CMDP",
+    "ld": 19.8689,
+    "fp_pct": 8.3557,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 1,
+    "event": "California '20",
+    "method": "PPO-CMDP",
+    "ld": 16.4652,
+    "fp_pct": 11.1364,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 2,
+    "event": "California '20",
+    "method": "PPO-CMDP",
+    "ld": 27.3,
+    "fp_pct": 13.5036,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 3,
+    "event": "California '20",
+    "method": "PPO-CMDP",
+    "ld": 22.8087,
+    "fp_pct": 7.9396,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 4,
+    "event": "California '20",
+    "method": "PPO-CMDP",
+    "ld": 18.7999,
+    "fp_pct": 9.4892,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 5,
+    "event": "California '20",
+    "method": "PPO-CMDP",
+    "ld": 21.2577,
+    "fp_pct": 6.029,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 6,
+    "event": "California '20",
+    "method": "PPO-CMDP",
+    "ld": 23.8918,
+    "fp_pct": 13.2482,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 7,
+    "event": "California '20",
+    "method": "PPO-CMDP",
+    "ld": 17.8987,
+    "fp_pct": 14.26,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 8,
+    "event": "California '20",
+    "method": "PPO-CMDP",
+    "ld": 18.4169,
+    "fp_pct": 12.3351,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 9,
+    "event": "California '20",
+    "method": "PPO-CMDP",
+    "ld": 24.0156,
+    "fp_pct": 10.825,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 10,
+    "event": "California '20",
+    "method": "PPO-CMDP",
+    "ld": 20.4276,
+    "fp_pct": 15.5761,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 11,
+    "event": "California '20",
+    "method": "PPO-CMDP",
+    "ld": 25.7005,
+    "fp_pct": 11.6698,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 12,
+    "event": "California '20",
+    "method": "PPO-CMDP",
+    "ld": 21.2955,
+    "fp_pct": 9.2576,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 13,
+    "event": "California '20",
+    "method": "PPO-CMDP",
+    "ld": 21.5165,
+    "fp_pct": 11.2002,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 14,
+    "event": "California '20",
+    "method": "PPO-CMDP",
+    "ld": 24.1214,
+    "fp_pct": 9.0171,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 15,
+    "event": "California '20",
+    "method": "PPO-CMDP",
+    "ld": 26.7204,
+    "fp_pct": 11.9818,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 16,
+    "event": "California '20",
+    "method": "PPO-CMDP",
+    "ld": 25.1555,
+    "fp_pct": 10.8144,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 17,
+    "event": "California '20",
+    "method": "PPO-CMDP",
+    "ld": 24.5789,
+    "fp_pct": 6.6109,
+    "gov_compliance_pct": 100.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 18,
+    "event": "California '20",
+    "method": "PPO-CMDP",
+    "ld": 19.0729,
+    "fp_pct": 12.5875,
+    "gov_compliance_pct": 62.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 19,
+    "event": "California '20",
+    "method": "PPO-CMDP",
+    "ld": 20.6875,
+    "fp_pct": 6.163,
+    "gov_compliance_pct": 62.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 0,
+    "event": "California '20",
+    "method": "Adaptive AI",
+    "ld": 18.1064,
+    "fp_pct": 21.4413,
+    "gov_compliance_pct": 0.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 1,
+    "event": "California '20",
+    "method": "Adaptive AI",
+    "ld": 14.9222,
+    "fp_pct": 25.355,
+    "gov_compliance_pct": 0.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 2,
+    "event": "California '20",
+    "method": "Adaptive AI",
+    "ld": 25.058,
+    "fp_pct": 28.6865,
+    "gov_compliance_pct": 0.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 3,
+    "event": "California '20",
+    "method": "Adaptive AI",
+    "ld": 20.8565,
+    "fp_pct": 20.8557,
+    "gov_compliance_pct": 0.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 4,
+    "event": "California '20",
+    "method": "Adaptive AI",
+    "ld": 17.1063,
+    "fp_pct": 23.0366,
+    "gov_compliance_pct": 0.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 5,
+    "event": "California '20",
+    "method": "Adaptive AI",
+    "ld": 19.4056,
+    "fp_pct": 18.1668,
+    "gov_compliance_pct": 0.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 6,
+    "event": "California '20",
+    "method": "Adaptive AI",
+    "ld": 21.8697,
+    "fp_pct": 28.3271,
+    "gov_compliance_pct": 0.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 7,
+    "event": "California '20",
+    "method": "Adaptive AI",
+    "ld": 16.2633,
+    "fp_pct": 29.7511,
+    "gov_compliance_pct": 0.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 8,
+    "event": "California '20",
+    "method": "Adaptive AI",
+    "ld": 16.748,
+    "fp_pct": 27.0419,
+    "gov_compliance_pct": 0.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 9,
+    "event": "California '20",
+    "method": "Adaptive AI",
+    "ld": 21.9856,
+    "fp_pct": 24.9166,
+    "gov_compliance_pct": 0.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 10,
+    "event": "California '20",
+    "method": "Adaptive AI",
+    "ld": 18.6291,
+    "fp_pct": 31.6033,
+    "gov_compliance_pct": 0.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 11,
+    "event": "California '20",
+    "method": "Adaptive AI",
+    "ld": 23.5618,
+    "fp_pct": 26.1056,
+    "gov_compliance_pct": 0.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 12,
+    "event": "California '20",
+    "method": "Adaptive AI",
+    "ld": 19.4409,
+    "fp_pct": 22.7107,
+    "gov_compliance_pct": 0.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 13,
+    "event": "California '20",
+    "method": "Adaptive AI",
+    "ld": 19.6477,
+    "fp_pct": 25.4448,
+    "gov_compliance_pct": 0.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 14,
+    "event": "California '20",
+    "method": "Adaptive AI",
+    "ld": 22.0845,
+    "fp_pct": 22.3722,
+    "gov_compliance_pct": 0.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 15,
+    "event": "California '20",
+    "method": "Adaptive AI",
+    "ld": 24.5159,
+    "fp_pct": 26.5448,
+    "gov_compliance_pct": 0.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 16,
+    "event": "California '20",
+    "method": "Adaptive AI",
+    "ld": 23.0519,
+    "fp_pct": 24.9017,
+    "gov_compliance_pct": 0.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 17,
+    "event": "California '20",
+    "method": "Adaptive AI",
+    "ld": 22.5125,
+    "fp_pct": 18.9857,
+    "gov_compliance_pct": 0.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 18,
+    "event": "California '20",
+    "method": "Adaptive AI",
+    "ld": 17.3617,
+    "fp_pct": 27.3972,
+    "gov_compliance_pct": 0.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 19,
+    "event": "California '20",
+    "method": "Adaptive AI",
+    "ld": 18.8722,
+    "fp_pct": 18.3553,
+    "gov_compliance_pct": 0.0,
+    "region": "california_2020",
+    "event_year": 2020
+  },
+  {
+    "seed": 0,
+    "event": "Mediterranean '21",
+    "method": "PPO-GOMDP",
+    "ld": 21.2815,
+    "fp_pct": 7.0219,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 1,
+    "event": "Mediterranean '21",
+    "method": "PPO-GOMDP",
+    "ld": 16.7797,
+    "fp_pct": 9.5967,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 2,
+    "event": "Mediterranean '21",
+    "method": "PPO-GOMDP",
+    "ld": 31.1096,
+    "fp_pct": 11.7885,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 3,
+    "event": "Mediterranean '21",
+    "method": "PPO-GOMDP",
+    "ld": 25.1695,
+    "fp_pct": 6.6366,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 4,
+    "event": "Mediterranean '21",
+    "method": "PPO-GOMDP",
+    "ld": 19.8676,
+    "fp_pct": 8.0715,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 5,
+    "event": "Mediterranean '21",
+    "method": "PPO-GOMDP",
+    "ld": 23.1183,
+    "fp_pct": 4.8676,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 6,
+    "event": "Mediterranean '21",
+    "method": "PPO-GOMDP",
+    "ld": 26.602,
+    "fp_pct": 11.552,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 7,
+    "event": "Mediterranean '21",
+    "method": "PPO-GOMDP",
+    "ld": 18.6757,
+    "fp_pct": 12.4889,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 8,
+    "event": "Mediterranean '21",
+    "method": "PPO-GOMDP",
+    "ld": 19.361,
+    "fp_pct": 10.7065,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 9,
+    "event": "Mediterranean '21",
+    "method": "PPO-GOMDP",
+    "ld": 26.7658,
+    "fp_pct": 9.3083,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 10,
+    "event": "Mediterranean '21",
+    "method": "PPO-GOMDP",
+    "ld": 22.0204,
+    "fp_pct": 13.7075,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 11,
+    "event": "Mediterranean '21",
+    "method": "PPO-GOMDP",
+    "ld": 28.9943,
+    "fp_pct": 10.0905,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 12,
+    "event": "Mediterranean '21",
+    "method": "PPO-GOMDP",
+    "ld": 23.1682,
+    "fp_pct": 7.857,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 13,
+    "event": "Mediterranean '21",
+    "method": "PPO-GOMDP",
+    "ld": 23.4606,
+    "fp_pct": 9.6558,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 14,
+    "event": "Mediterranean '21",
+    "method": "PPO-GOMDP",
+    "ld": 26.9057,
+    "fp_pct": 7.6343,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 15,
+    "event": "Mediterranean '21",
+    "method": "PPO-GOMDP",
+    "ld": 30.3431,
+    "fp_pct": 10.3795,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 16,
+    "event": "Mediterranean '21",
+    "method": "PPO-GOMDP",
+    "ld": 28.2734,
+    "fp_pct": 9.2985,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 17,
+    "event": "Mediterranean '21",
+    "method": "PPO-GOMDP",
+    "ld": 27.5108,
+    "fp_pct": 5.4064,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 18,
+    "event": "Mediterranean '21",
+    "method": "PPO-GOMDP",
+    "ld": 20.2287,
+    "fp_pct": 10.9403,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 19,
+    "event": "Mediterranean '21",
+    "method": "PPO-GOMDP",
+    "ld": 22.3641,
+    "fp_pct": 4.9916,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 0,
+    "event": "Mediterranean '21",
+    "method": "Greedy-GOMDP",
+    "ld": 25.6377,
+    "fp_pct": 7.1388,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 1,
+    "event": "Mediterranean '21",
+    "method": "Greedy-GOMDP",
+    "ld": 20.587,
+    "fp_pct": 9.8166,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 2,
+    "event": "Mediterranean '21",
+    "method": "Greedy-GOMDP",
+    "ld": 36.6645,
+    "fp_pct": 12.096,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 3,
+    "event": "Mediterranean '21",
+    "method": "Greedy-GOMDP",
+    "ld": 29.9999,
+    "fp_pct": 6.7381,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 4,
+    "event": "Mediterranean '21",
+    "method": "Greedy-GOMDP",
+    "ld": 24.0514,
+    "fp_pct": 8.2303,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 5,
+    "event": "Mediterranean '21",
+    "method": "Greedy-GOMDP",
+    "ld": 27.6985,
+    "fp_pct": 4.8983,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 6,
+    "event": "Mediterranean '21",
+    "method": "Greedy-GOMDP",
+    "ld": 31.6071,
+    "fp_pct": 11.8501,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 7,
+    "event": "Mediterranean '21",
+    "method": "Greedy-GOMDP",
+    "ld": 22.7142,
+    "fp_pct": 12.8244,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 8,
+    "event": "Mediterranean '21",
+    "method": "Greedy-GOMDP",
+    "ld": 23.4831,
+    "fp_pct": 10.9708,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 9,
+    "event": "Mediterranean '21",
+    "method": "Greedy-GOMDP",
+    "ld": 31.7909,
+    "fp_pct": 9.5166,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 10,
+    "event": "Mediterranean '21",
+    "method": "Greedy-GOMDP",
+    "ld": 26.4668,
+    "fp_pct": 14.0918,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 11,
+    "event": "Mediterranean '21",
+    "method": "Greedy-GOMDP",
+    "ld": 34.2911,
+    "fp_pct": 10.3301,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 12,
+    "event": "Mediterranean '21",
+    "method": "Greedy-GOMDP",
+    "ld": 27.7546,
+    "fp_pct": 8.0073,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 13,
+    "event": "Mediterranean '21",
+    "method": "Greedy-GOMDP",
+    "ld": 28.0826,
+    "fp_pct": 9.878,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 14,
+    "event": "Mediterranean '21",
+    "method": "Greedy-GOMDP",
+    "ld": 31.9479,
+    "fp_pct": 7.7757,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 15,
+    "event": "Mediterranean '21",
+    "method": "Greedy-GOMDP",
+    "ld": 35.8045,
+    "fp_pct": 10.6306,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 16,
+    "event": "Mediterranean '21",
+    "method": "Greedy-GOMDP",
+    "ld": 33.4824,
+    "fp_pct": 9.5064,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 17,
+    "event": "Mediterranean '21",
+    "method": "Greedy-GOMDP",
+    "ld": 32.6267,
+    "fp_pct": 5.4586,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 18,
+    "event": "Mediterranean '21",
+    "method": "Greedy-GOMDP",
+    "ld": 24.4566,
+    "fp_pct": 11.2139,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 19,
+    "event": "Mediterranean '21",
+    "method": "Greedy-GOMDP",
+    "ld": 26.8524,
+    "fp_pct": 5.0273,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 0,
+    "event": "Mediterranean '21",
+    "method": "PPO-CMDP",
+    "ld": 20.919,
+    "fp_pct": 8.9063,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 1,
+    "event": "Mediterranean '21",
+    "method": "PPO-CMDP",
+    "ld": 16.6368,
+    "fp_pct": 11.996,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 2,
+    "event": "Mediterranean '21",
+    "method": "PPO-CMDP",
+    "ld": 30.2677,
+    "fp_pct": 14.6262,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 3,
+    "event": "Mediterranean '21",
+    "method": "PPO-CMDP",
+    "ld": 24.6173,
+    "fp_pct": 8.444,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 4,
+    "event": "Mediterranean '21",
+    "method": "PPO-CMDP",
+    "ld": 19.5741,
+    "fp_pct": 10.1658,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 5,
+    "event": "Mediterranean '21",
+    "method": "PPO-CMDP",
+    "ld": 22.6661,
+    "fp_pct": 6.3212,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 6,
+    "event": "Mediterranean '21",
+    "method": "PPO-CMDP",
+    "ld": 25.98,
+    "fp_pct": 14.3424,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 7,
+    "event": "Mediterranean '21",
+    "method": "PPO-CMDP",
+    "ld": 18.4403,
+    "fp_pct": 15.4667,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 8,
+    "event": "Mediterranean '21",
+    "method": "PPO-CMDP",
+    "ld": 19.0922,
+    "fp_pct": 13.3278,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 9,
+    "event": "Mediterranean '21",
+    "method": "PPO-CMDP",
+    "ld": 26.1358,
+    "fp_pct": 11.65,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 10,
+    "event": "Mediterranean '21",
+    "method": "PPO-CMDP",
+    "ld": 21.6219,
+    "fp_pct": 16.929,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 11,
+    "event": "Mediterranean '21",
+    "method": "PPO-CMDP",
+    "ld": 28.2555,
+    "fp_pct": 12.5886,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 12,
+    "event": "Mediterranean '21",
+    "method": "PPO-CMDP",
+    "ld": 22.7136,
+    "fp_pct": 9.9084,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 13,
+    "event": "Mediterranean '21",
+    "method": "PPO-CMDP",
+    "ld": 22.9918,
+    "fp_pct": 12.0669,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 14,
+    "event": "Mediterranean '21",
+    "method": "PPO-CMDP",
+    "ld": 26.2689,
+    "fp_pct": 9.6412,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 15,
+    "event": "Mediterranean '21",
+    "method": "PPO-CMDP",
+    "ld": 29.5386,
+    "fp_pct": 12.9353,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 16,
+    "event": "Mediterranean '21",
+    "method": "PPO-CMDP",
+    "ld": 27.5698,
+    "fp_pct": 11.6382,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 17,
+    "event": "Mediterranean '21",
+    "method": "PPO-CMDP",
+    "ld": 26.8444,
+    "fp_pct": 6.9677,
+    "gov_compliance_pct": 100.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 18,
+    "event": "Mediterranean '21",
+    "method": "PPO-CMDP",
+    "ld": 19.9175,
+    "fp_pct": 13.6084,
+    "gov_compliance_pct": 48.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 19,
+    "event": "Mediterranean '21",
+    "method": "PPO-CMDP",
+    "ld": 21.9488,
+    "fp_pct": 6.47,
+    "gov_compliance_pct": 48.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 0,
+    "event": "Mediterranean '21",
+    "method": "Adaptive AI",
+    "ld": 19.2939,
+    "fp_pct": 22.6088,
+    "gov_compliance_pct": 0.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 1,
+    "event": "Mediterranean '21",
+    "method": "Adaptive AI",
+    "ld": 15.451,
+    "fp_pct": 26.9345,
+    "gov_compliance_pct": 0.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 2,
+    "event": "Mediterranean '21",
+    "method": "Adaptive AI",
+    "ld": 27.6838,
+    "fp_pct": 30.6167,
+    "gov_compliance_pct": 0.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 3,
+    "event": "Mediterranean '21",
+    "method": "Adaptive AI",
+    "ld": 22.613,
+    "fp_pct": 21.9615,
+    "gov_compliance_pct": 0.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 4,
+    "event": "Mediterranean '21",
+    "method": "Adaptive AI",
+    "ld": 18.087,
+    "fp_pct": 24.3721,
+    "gov_compliance_pct": 0.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 5,
+    "event": "Mediterranean '21",
+    "method": "Adaptive AI",
+    "ld": 20.8619,
+    "fp_pct": 18.9896,
+    "gov_compliance_pct": 0.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 6,
+    "event": "Mediterranean '21",
+    "method": "Adaptive AI",
+    "ld": 23.8359,
+    "fp_pct": 30.2194,
+    "gov_compliance_pct": 0.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 7,
+    "event": "Mediterranean '21",
+    "method": "Adaptive AI",
+    "ld": 17.0695,
+    "fp_pct": 31.7933,
+    "gov_compliance_pct": 0.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 8,
+    "event": "Mediterranean '21",
+    "method": "Adaptive AI",
+    "ld": 17.6545,
+    "fp_pct": 28.799,
+    "gov_compliance_pct": 0.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 9,
+    "event": "Mediterranean '21",
+    "method": "Adaptive AI",
+    "ld": 23.9757,
+    "fp_pct": 26.45,
+    "gov_compliance_pct": 0.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 10,
+    "event": "Mediterranean '21",
+    "method": "Adaptive AI",
+    "ld": 19.9248,
+    "fp_pct": 33.8405,
+    "gov_compliance_pct": 0.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 11,
+    "event": "Mediterranean '21",
+    "method": "Adaptive AI",
+    "ld": 25.878,
+    "fp_pct": 27.7641,
+    "gov_compliance_pct": 0.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 12,
+    "event": "Mediterranean '21",
+    "method": "Adaptive AI",
+    "ld": 20.9046,
+    "fp_pct": 24.0118,
+    "gov_compliance_pct": 0.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 13,
+    "event": "Mediterranean '21",
+    "method": "Adaptive AI",
+    "ld": 21.1541,
+    "fp_pct": 27.0337,
+    "gov_compliance_pct": 0.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 14,
+    "event": "Mediterranean '21",
+    "method": "Adaptive AI",
+    "ld": 24.0951,
+    "fp_pct": 23.6377,
+    "gov_compliance_pct": 0.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 15,
+    "event": "Mediterranean '21",
+    "method": "Adaptive AI",
+    "ld": 27.0295,
+    "fp_pct": 28.2495,
+    "gov_compliance_pct": 0.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 16,
+    "event": "Mediterranean '21",
+    "method": "Adaptive AI",
+    "ld": 25.2627,
+    "fp_pct": 26.4335,
+    "gov_compliance_pct": 0.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 17,
+    "event": "Mediterranean '21",
+    "method": "Adaptive AI",
+    "ld": 24.6116,
+    "fp_pct": 19.8947,
+    "gov_compliance_pct": 0.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 18,
+    "event": "Mediterranean '21",
+    "method": "Adaptive AI",
+    "ld": 18.3952,
+    "fp_pct": 29.1917,
+    "gov_compliance_pct": 0.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 19,
+    "event": "Mediterranean '21",
+    "method": "Adaptive AI",
+    "ld": 20.2182,
+    "fp_pct": 19.1979,
+    "gov_compliance_pct": 0.0,
+    "region": "mediterranean_2021",
+    "event_year": 2021
+  },
+  {
+    "seed": 0,
+    "event": "NSW '19\u201320",
+    "method": "PPO-GOMDP",
+    "ld": 19.9439,
+    "fp_pct": 6.3207,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 1,
+    "event": "NSW '19\u201320",
+    "method": "PPO-GOMDP",
+    "ld": 16.9793,
+    "fp_pct": 8.2775,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 2,
+    "event": "NSW '19\u201320",
+    "method": "PPO-GOMDP",
+    "ld": 26.4161,
+    "fp_pct": 9.9433,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 3,
+    "event": "NSW '19\u201320",
+    "method": "PPO-GOMDP",
+    "ld": 22.5043,
+    "fp_pct": 6.0278,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 4,
+    "event": "NSW '19\u201320",
+    "method": "PPO-GOMDP",
+    "ld": 19.0128,
+    "fp_pct": 7.1183,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 5,
+    "event": "NSW '19\u201320",
+    "method": "PPO-GOMDP",
+    "ld": 21.1535,
+    "fp_pct": 4.6834,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 6,
+    "event": "NSW '19\u201320",
+    "method": "PPO-GOMDP",
+    "ld": 23.4477,
+    "fp_pct": 9.7635,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 7,
+    "event": "NSW '19\u201320",
+    "method": "PPO-GOMDP",
+    "ld": 18.2279,
+    "fp_pct": 10.4755,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 8,
+    "event": "NSW '19\u201320",
+    "method": "PPO-GOMDP",
+    "ld": 18.6792,
+    "fp_pct": 9.121,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 9,
+    "event": "NSW '19\u201320",
+    "method": "PPO-GOMDP",
+    "ld": 23.5555,
+    "fp_pct": 8.0583,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 10,
+    "event": "NSW '19\u201320",
+    "method": "PPO-GOMDP",
+    "ld": 20.4305,
+    "fp_pct": 11.4017,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 11,
+    "event": "NSW '19\u201320",
+    "method": "PPO-GOMDP",
+    "ld": 25.023,
+    "fp_pct": 8.6528,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 12,
+    "event": "NSW '19\u201320",
+    "method": "PPO-GOMDP",
+    "ld": 21.1864,
+    "fp_pct": 6.9553,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 13,
+    "event": "NSW '19\u201320",
+    "method": "PPO-GOMDP",
+    "ld": 21.3789,
+    "fp_pct": 8.3224,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 14,
+    "event": "NSW '19\u201320",
+    "method": "PPO-GOMDP",
+    "ld": 23.6477,
+    "fp_pct": 6.7861,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 15,
+    "event": "NSW '19\u201320",
+    "method": "PPO-GOMDP",
+    "ld": 25.9113,
+    "fp_pct": 8.8724,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 16,
+    "event": "NSW '19\u201320",
+    "method": "PPO-GOMDP",
+    "ld": 24.5483,
+    "fp_pct": 8.0509,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 17,
+    "event": "NSW '19\u201320",
+    "method": "PPO-GOMDP",
+    "ld": 24.0461,
+    "fp_pct": 5.0929,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 18,
+    "event": "NSW '19\u201320",
+    "method": "PPO-GOMDP",
+    "ld": 19.2506,
+    "fp_pct": 9.2986,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 19,
+    "event": "NSW '19\u201320",
+    "method": "PPO-GOMDP",
+    "ld": 20.6569,
+    "fp_pct": 4.7776,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 0,
+    "event": "NSW '19\u201320",
+    "method": "Greedy-GOMDP",
+    "ld": 23.8314,
+    "fp_pct": 6.4544,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 1,
+    "event": "NSW '19\u201320",
+    "method": "Greedy-GOMDP",
+    "ld": 20.2081,
+    "fp_pct": 8.6172,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 2,
+    "event": "NSW '19\u201320",
+    "method": "Greedy-GOMDP",
+    "ld": 31.7419,
+    "fp_pct": 10.4583,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 3,
+    "event": "NSW '19\u201320",
+    "method": "Greedy-GOMDP",
+    "ld": 26.9608,
+    "fp_pct": 6.1308,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 4,
+    "event": "NSW '19\u201320",
+    "method": "Greedy-GOMDP",
+    "ld": 22.6934,
+    "fp_pct": 7.336,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 5,
+    "event": "NSW '19\u201320",
+    "method": "Greedy-GOMDP",
+    "ld": 25.3098,
+    "fp_pct": 4.6448,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 6,
+    "event": "NSW '19\u201320",
+    "method": "Greedy-GOMDP",
+    "ld": 28.1138,
+    "fp_pct": 10.2597,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 7,
+    "event": "NSW '19\u201320",
+    "method": "Greedy-GOMDP",
+    "ld": 21.7341,
+    "fp_pct": 11.0467,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 8,
+    "event": "NSW '19\u201320",
+    "method": "Greedy-GOMDP",
+    "ld": 22.2857,
+    "fp_pct": 9.5495,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 9,
+    "event": "NSW '19\u201320",
+    "method": "Greedy-GOMDP",
+    "ld": 28.2457,
+    "fp_pct": 8.375,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 10,
+    "event": "NSW '19\u201320",
+    "method": "Greedy-GOMDP",
+    "ld": 24.4262,
+    "fp_pct": 12.0703,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 11,
+    "event": "NSW '19\u201320",
+    "method": "Greedy-GOMDP",
+    "ld": 30.0393,
+    "fp_pct": 9.032,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 12,
+    "event": "NSW '19\u201320",
+    "method": "Greedy-GOMDP",
+    "ld": 25.35,
+    "fp_pct": 7.1559,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 13,
+    "event": "NSW '19\u201320",
+    "method": "Greedy-GOMDP",
+    "ld": 25.5853,
+    "fp_pct": 8.6668,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 14,
+    "event": "NSW '19\u201320",
+    "method": "Greedy-GOMDP",
+    "ld": 28.3583,
+    "fp_pct": 6.9688,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 15,
+    "event": "NSW '19\u201320",
+    "method": "Greedy-GOMDP",
+    "ld": 31.125,
+    "fp_pct": 9.2747,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 16,
+    "event": "NSW '19\u201320",
+    "method": "Greedy-GOMDP",
+    "ld": 29.4591,
+    "fp_pct": 8.3667,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 17,
+    "event": "NSW '19\u201320",
+    "method": "Greedy-GOMDP",
+    "ld": 28.8452,
+    "fp_pct": 5.0974,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 18,
+    "event": "NSW '19\u201320",
+    "method": "Greedy-GOMDP",
+    "ld": 22.9841,
+    "fp_pct": 9.7458,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 19,
+    "event": "NSW '19\u201320",
+    "method": "Greedy-GOMDP",
+    "ld": 24.7028,
+    "fp_pct": 4.749,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 0,
+    "event": "NSW '19\u201320",
+    "method": "PPO-CMDP",
+    "ld": 19.3751,
+    "fp_pct": 8.105,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 1,
+    "event": "NSW '19\u201320",
+    "method": "PPO-CMDP",
+    "ld": 16.3008,
+    "fp_pct": 10.5768,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 2,
+    "event": "NSW '19\u201320",
+    "method": "PPO-CMDP",
+    "ld": 26.0871,
+    "fp_pct": 12.681,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 3,
+    "event": "NSW '19\u201320",
+    "method": "PPO-CMDP",
+    "ld": 22.0304,
+    "fp_pct": 7.7352,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 4,
+    "event": "NSW '19\u201320",
+    "method": "PPO-CMDP",
+    "ld": 18.4096,
+    "fp_pct": 9.1126,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 5,
+    "event": "NSW '19\u201320",
+    "method": "PPO-CMDP",
+    "ld": 20.6295,
+    "fp_pct": 6.0369,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 6,
+    "event": "NSW '19\u201320",
+    "method": "PPO-CMDP",
+    "ld": 23.0087,
+    "fp_pct": 12.4539,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 7,
+    "event": "NSW '19\u201320",
+    "method": "PPO-CMDP",
+    "ld": 17.5956,
+    "fp_pct": 13.3533,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 8,
+    "event": "NSW '19\u201320",
+    "method": "PPO-CMDP",
+    "ld": 18.0636,
+    "fp_pct": 11.6423,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 9,
+    "event": "NSW '19\u201320",
+    "method": "PPO-CMDP",
+    "ld": 23.1206,
+    "fp_pct": 10.3,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 10,
+    "event": "NSW '19\u201320",
+    "method": "PPO-CMDP",
+    "ld": 19.8798,
+    "fp_pct": 14.5232,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 11,
+    "event": "NSW '19\u201320",
+    "method": "PPO-CMDP",
+    "ld": 24.6424,
+    "fp_pct": 11.0509,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 12,
+    "event": "NSW '19\u201320",
+    "method": "PPO-CMDP",
+    "ld": 20.6636,
+    "fp_pct": 8.9067,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 13,
+    "event": "NSW '19\u201320",
+    "method": "PPO-CMDP",
+    "ld": 20.8633,
+    "fp_pct": 10.6335,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 14,
+    "event": "NSW '19\u201320",
+    "method": "PPO-CMDP",
+    "ld": 23.2161,
+    "fp_pct": 8.693,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 15,
+    "event": "NSW '19\u201320",
+    "method": "PPO-CMDP",
+    "ld": 25.5636,
+    "fp_pct": 11.3283,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 16,
+    "event": "NSW '19\u201320",
+    "method": "PPO-CMDP",
+    "ld": 24.1501,
+    "fp_pct": 10.2906,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 17,
+    "event": "NSW '19\u201320",
+    "method": "PPO-CMDP",
+    "ld": 23.6293,
+    "fp_pct": 6.5541,
+    "gov_compliance_pct": 100.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 18,
+    "event": "NSW '19\u201320",
+    "method": "PPO-CMDP",
+    "ld": 18.6562,
+    "fp_pct": 11.8667,
+    "gov_compliance_pct": 72.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 19,
+    "event": "NSW '19\u201320",
+    "method": "PPO-CMDP",
+    "ld": 20.1145,
+    "fp_pct": 6.156,
+    "gov_compliance_pct": 72.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 0,
+    "event": "NSW '19\u201320",
+    "method": "Adaptive AI",
+    "ld": 18.0126,
+    "fp_pct": 20.9907,
+    "gov_compliance_pct": 0.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 1,
+    "event": "NSW '19\u201320",
+    "method": "Adaptive AI",
+    "ld": 15.1579,
+    "fp_pct": 24.5954,
+    "gov_compliance_pct": 0.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 2,
+    "event": "NSW '19\u201320",
+    "method": "Adaptive AI",
+    "ld": 24.2451,
+    "fp_pct": 27.6639,
+    "gov_compliance_pct": 0.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 3,
+    "event": "NSW '19\u201320",
+    "method": "Adaptive AI",
+    "ld": 20.4782,
+    "fp_pct": 20.4513,
+    "gov_compliance_pct": 0.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 4,
+    "event": "NSW '19\u201320",
+    "method": "Adaptive AI",
+    "ld": 17.116,
+    "fp_pct": 22.4601,
+    "gov_compliance_pct": 0.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 5,
+    "event": "NSW '19\u201320",
+    "method": "Adaptive AI",
+    "ld": 19.1774,
+    "fp_pct": 17.9747,
+    "gov_compliance_pct": 0.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 6,
+    "event": "NSW '19\u201320",
+    "method": "Adaptive AI",
+    "ld": 21.3866,
+    "fp_pct": 27.3328,
+    "gov_compliance_pct": 0.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 7,
+    "event": "NSW '19\u201320",
+    "method": "Adaptive AI",
+    "ld": 16.3602,
+    "fp_pct": 28.6444,
+    "gov_compliance_pct": 0.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 8,
+    "event": "NSW '19\u201320",
+    "method": "Adaptive AI",
+    "ld": 16.7948,
+    "fp_pct": 26.1491,
+    "gov_compliance_pct": 0.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 9,
+    "event": "NSW '19\u201320",
+    "method": "Adaptive AI",
+    "ld": 21.4905,
+    "fp_pct": 24.1916,
+    "gov_compliance_pct": 0.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 10,
+    "event": "NSW '19\u201320",
+    "method": "Adaptive AI",
+    "ld": 18.4813,
+    "fp_pct": 30.3505,
+    "gov_compliance_pct": 0.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 11,
+    "event": "NSW '19\u201320",
+    "method": "Adaptive AI",
+    "ld": 22.9037,
+    "fp_pct": 25.2867,
+    "gov_compliance_pct": 0.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 12,
+    "event": "NSW '19\u201320",
+    "method": "Adaptive AI",
+    "ld": 19.2091,
+    "fp_pct": 22.1598,
+    "gov_compliance_pct": 0.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 13,
+    "event": "NSW '19\u201320",
+    "method": "Adaptive AI",
+    "ld": 19.3945,
+    "fp_pct": 24.6781,
+    "gov_compliance_pct": 0.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 14,
+    "event": "NSW '19\u201320",
+    "method": "Adaptive AI",
+    "ld": 21.5792,
+    "fp_pct": 21.8481,
+    "gov_compliance_pct": 0.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 15,
+    "event": "NSW '19\u201320",
+    "method": "Adaptive AI",
+    "ld": 23.7591,
+    "fp_pct": 25.6912,
+    "gov_compliance_pct": 0.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 16,
+    "event": "NSW '19\u201320",
+    "method": "Adaptive AI",
+    "ld": 22.4465,
+    "fp_pct": 24.1779,
+    "gov_compliance_pct": 0.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 17,
+    "event": "NSW '19\u201320",
+    "method": "Adaptive AI",
+    "ld": 21.9629,
+    "fp_pct": 18.7289,
+    "gov_compliance_pct": 0.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 18,
+    "event": "NSW '19\u201320",
+    "method": "Adaptive AI",
+    "ld": 17.345,
+    "fp_pct": 26.4764,
+    "gov_compliance_pct": 0.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  },
+  {
+    "seed": 19,
+    "event": "NSW '19\u201320",
+    "method": "Adaptive AI",
+    "ld": 18.6992,
+    "fp_pct": 18.1483,
+    "gov_compliance_pct": 0.0,
+    "region": "australia_2019",
+    "event_year": 2019
+  }
+]

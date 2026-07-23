@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
+import sys as _sys; _sys.path.insert(0, "src"); _sys.path.insert(0, ".")
 
 VIIRS_PATH = Path("data/processed/viirs_grid_australia_2019.npz")
 

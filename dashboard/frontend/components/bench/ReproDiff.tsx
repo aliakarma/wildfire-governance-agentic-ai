@@ -70,6 +70,11 @@ export function ReproDiff({ live, paper }: Props) {
         </button>
       </div>
       <p className="mb-3 text-xs text-muted">{t("bench.repro.desc")}</p>
+      {paper?.label && (
+        <div className="mb-3 rounded-md bg-[color-mix(in srgb,var(--warn)_8%,transparent)] p-2.5 text-[11px] text-muted border border-[color-mix(in srgb,var(--warn)_20%,transparent)]">
+          <span className="font-semibold text-[var(--warn)]">Provenance Note:</span> {paper.label}
+        </div>
+      )}
 
       {!live ? (
         <p className="rounded-lg border border-dashed px-3 py-6 text-center text-xs text-muted">{t("bench.no_live")}</p>

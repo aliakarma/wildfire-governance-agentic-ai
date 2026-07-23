@@ -7,6 +7,7 @@ const COLORS: Record<string, string> = {
   ALERT_SIGNED: "var(--info)",
   ALERT_BLOCKED: "var(--danger)",
   ALERT_UNGOVERNED: "var(--warn)",
+  ALERT_UNAUTHORISED: "var(--danger)",
   HITL_REJECTED: "var(--warn)",
   INJECTION_BLOCKED: "var(--danger)",
 };

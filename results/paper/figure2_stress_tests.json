@@ -2,72 +2,31 @@
   "sensor_failure_cascade": [
     {
       "failure_rate_pct": 0,
-      "ppo_gomdp_ld": 15.1,
-      "greedy_gomdp_ld": 18.3
-    },
-    {
-      "failure_rate_pct": 10,
-      "ppo_gomdp_ld": 16.9,
-      "greedy_gomdp_ld": 20.1
+      "greedy_gomdp_ld": 100.0
     },
     {
       "failure_rate_pct": 20,
-      "ppo_gomdp_ld": 19.4,
-      "greedy_gomdp_ld": 22.8
-    },
-    {
-      "failure_rate_pct": 30,
-      "ppo_gomdp_ld": 23.1,
-      "greedy_gomdp_ld": 26.4
-    },
-    {
-      "failure_rate_pct": 40,
-      "ppo_gomdp_ld": 28.6,
-      "greedy_gomdp_ld": 32.1
+      "greedy_gomdp_ld": 69.0
     }
   ],
   "communication_disruption": [
     {
       "packet_drop_prob": 0.0,
-      "ppo_gomdp_ld": 15.1,
-      "greedy_gomdp_ld": 18.3
-    },
-    {
-      "packet_drop_prob": 0.05,
-      "ppo_gomdp_ld": 16.3,
-      "greedy_gomdp_ld": 19.8
+      "greedy_gomdp_ld": 100.0
     },
     {
       "packet_drop_prob": 0.1,
-      "ppo_gomdp_ld": 18.2,
-      "greedy_gomdp_ld": 21.7
-    },
-    {
-      "packet_drop_prob": 0.2,
-      "ppo_gomdp_ld": 22.4,
-      "greedy_gomdp_ld": 25.9
+      "greedy_gomdp_ld": 100.0
     }
   ],
   "high_burst_anomaly_frequency": [
     {
       "anomaly_burst_rate_factor": 1.0,
-      "ppo_gomdp_fp": 6.0,
-      "greedy_gomdp_fp": 6.1
+      "greedy_gomdp_fp": 0.0
     },
     {
       "anomaly_burst_rate_factor": 2.0,
-      "ppo_gomdp_fp": 6.3,
-      "greedy_gomdp_fp": 6.4
-    },
-    {
-      "anomaly_burst_rate_factor": 3.0,
-      "ppo_gomdp_fp": 6.7,
-      "greedy_gomdp_fp": 6.8
-    },
-    {
-      "anomaly_burst_rate_factor": 5.0,
-      "ppo_gomdp_fp": 7.1,
-      "greedy_gomdp_fp": 7.2
+      "greedy_gomdp_fp": 0.0
     }
   ]
 }

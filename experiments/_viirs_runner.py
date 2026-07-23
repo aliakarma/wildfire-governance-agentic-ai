@@ -45,9 +45,9 @@ def run_viirs_region(
             f"Experiment '{region}' skipped.\n"
         )
         print(msg)
-        paper_table6 = Path("results/paper/table6_realworld_viirs.csv")
-        if paper_table6.exists():
-            pd.read_csv(paper_table6).to_csv(out_dir / "table6_realworld_viirs.csv", index=False)
+        paper_viirs = Path("results/paper/table4_realworld_viirs.csv")
+        if paper_viirs.exists():
+            pd.read_csv(paper_viirs).to_csv(out_dir / "table4_realworld_viirs.csv", index=False)
         pd.DataFrame([{"region": region, "status": "data_not_found"}]).to_csv(
             out_dir / f"{output_stem}_skipped.csv", index=False
         )

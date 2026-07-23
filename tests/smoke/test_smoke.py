@@ -93,10 +93,10 @@ def test_smoke_results_paper_csvs_exist() -> None:
     """Pre-committed paper result CSVs must all be present."""
     paper_dir = Path("results/paper")
     required = [
-        "table2_rl_comparison.csv",
-        "table3_main_comparison.csv",
-        "table4_ablation.csv",
-        "table5_adversarial.csv",
+        "table1_rl_comparison.csv",
+        "table1_rl_comparison_main.csv",
+        "table2_ablation.csv",
+        "table3_adversarial.csv",
     ]
     for filename in required:
         path = paper_dir / filename

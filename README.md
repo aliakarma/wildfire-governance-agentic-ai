@@ -105,6 +105,46 @@ Set-Location wildfire-governance-agentic-ai
 docker-compose up wildfire-gov
 ```
 
+### Option D — Interactive Dashboard
+
+A live web dashboard that runs the **real** simulation one timestep at a time and
+streams it to an animated UI — watch the UAV swarm search, communicate, verify a
+detection, and encircle a slowly spreading wildfire, alongside the governance
+ledger, adversarial lab, and live benchmarks. Requires the repo's Python
+environment (Option A or B) plus **Node.js 18+**.
+
+```bash
+# Bash (Linux/macOS) — one command; auto-builds the UI on first run
+pip install -r dashboard/backend/requirements.txt   # backend extras (FastAPI, uvicorn, …)
+python dashboard/run_dashboard.py --port 8123
+# → open http://127.0.0.1:8123/
+```
+
+```powershell
+# PowerShell (Windows) — one command; auto-builds the UI on first run
+pip install -r dashboard/backend/requirements.txt
+python dashboard/run_dashboard.py --port 8123
+# → open http://127.0.0.1:8123/
+```
+
+<details><summary>Manual build + run (equivalent to the launcher)</summary>
+
+```bash
+pip install -r dashboard/backend/requirements.txt
+cd dashboard/frontend && npm install && npm run build && cd ../..   # builds dashboard/frontend/out/
+python -m uvicorn dashboard.backend.main:app --host 127.0.0.1 --port 8123
+```
+</details>
+
+> The frontend build (`dashboard/frontend/out/`) is git-ignored, so a fresh clone
+> has no UI. `run_dashboard.py` builds it automatically; if you run `uvicorn`
+> directly without building, the server shows a "FRONTEND NOT BUILT" page at `/`
+> with the exact commands. Node.js 18+ is required for the build.
+>
+> On Windows, some reserved port ranges (e.g. 8000) may be blocked; pick another
+> port such as 8123. For hot-reload dev mode (API + Next.js dev server in two
+> terminals) or a one-command Docker run, see [`dashboard/README.md`](dashboard/README.md).
+
 ---
 
 ## Reproduce All Paper Results
@@ -157,7 +197,19 @@ See [`data/README.md`](data/README.md) for full instructions, API key setup, and
 
 ## Results Summary
 
-All quantitative results and data plots presented in the paper are fully detailed in the [results/paper](results/paper) directory. Below is a summary of the final paper results.
+All quantitative results and data plots presented in the paper are fully detailed in the [results/paper](results/paper) directory. For details on the exact scripts, configurations, and seeds that generated each result, see [PROVENANCE.md](PROVENANCE.md). Below is a summary of the final paper results.
+
+> **Paper = code = dashboard.** Every manuscript table and figure is (a) produced
+> by a runnable, seeded script, (b) committed as a frozen CSV under
+> [results/paper/](results/paper/), and (c) viewable live in the [dashboard](dashboard/).
+> The single canonical map — with each artifact's script, CSV, dashboard view, and
+> **provenance class** (`exact` closed-form · `calibration` sim-core · `reference`
+> training-derived · `supplementary` not-in-paper) — is [PROVENANCE.md](PROVENANCE.md)
+> / [results/paper/MANIFEST.yaml](results/paper/MANIFEST.yaml). The paper numbers are
+> **frozen**; the simulation is calibrated to reproduce them, with any residual
+> magnitude gaps documented in [results/paper/CALIBRATION.md](results/paper/CALIBRATION.md)
+> and enforced by [scripts/check_reproducibility.py](scripts/check_reproducibility.py)
+> (exact columns fatal at 2%, calibration at 5%).
 
 ### Table 1 — Policy Comparison ($N=20$ UAVs, 20 seeds)
 *File paths*: [results/paper/table1_rl_comparison.csv](results/paper/table1_rl_comparison.csv) / [results/paper/table1_rl_comparison.json](results/paper/table1_rl_comparison.json)
@@ -236,11 +288,12 @@ Additional experimental data points and detailed configurations can be found dir
 ```
 wildfire-governance-agentic-ai/
 ├── configs/               YAML experiment configurations
+├── dashboard/             Interactive FastAPI + Next.js dashboard (a view per artifact)
 ├── data/                  Data download scripts + synthetic data
-├── experiments/           Reproducible experiment scripts (01–12)
+├── experiments/           Reproducible experiment scripts (01–17 + calibrate)
 ├── notebooks/             Interactive demos and analysis
-├── results/paper/         Pre-committed paper result CSVs
-├── scripts/               Utility shell scripts
+├── results/paper/         Frozen paper result CSVs + MANIFEST.yaml + CALIBRATION.md
+├── scripts/               Utility + reproducibility-check scripts
 ├── src/wildfire_governance/
 │   ├── gomdp/             GOMDP framework (Definition 1, Theorems 1–2)
 │   ├── simulation/        Wildfire grid environment + fire propagation
@@ -258,21 +311,6 @@ wildfire-governance-agentic-ai/
 
 ---
 
-## Citation
-
-```bibtex
-@article{akarma2025gomdp,
-  title     = {Governance-Constrained Agentic {AI}: A Governance-Invariant {MDP} Framework
-               with Blockchain-Enforced Human Oversight for Safety-Critical Wildfire Monitoring},
-  author    = {Akarma, Ali and Syed, Toqeer Ali and Jan, Salman and
-               Muneer, Hammad and Jilani, Abdul Khadar},
-  journal   = {},
-  year      = {2026},
-  doi       = {}
-}
-```
-
----
 
 ## Acknowledgements
 

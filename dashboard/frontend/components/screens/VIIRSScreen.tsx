@@ -89,7 +89,7 @@ export function VIIRSScreen() {
             showSectors={false}
             showComms={s.layers.comms}
             nSectors={s.params.n_sectors}
-            trail={s.frames.slice(Math.max(0, s.index - 5), s.index).map((f) => f.uavs)}
+            trail={s.frames.slice(Math.max(0, s.index - 14), s.index).map((f) => f.uavs)}
           />
           <PlaybackControls
             total={s.frames.length}
@@ -110,6 +110,11 @@ export function VIIRSScreen() {
           <span className="mb-3 inline-flex w-fit items-center gap-1.5 rounded-full border border-[var(--warn)] px-2 py-0.5 text-[10px] font-semibold text-[var(--warn)]">
             {t("bench.paper_badge")}
           </span>
+          {paper?.label && (
+            <p className="mb-3 text-[11px] text-muted border-l-2 border-[var(--warn)] pl-2 italic">
+              {paper.label}
+            </p>
+          )}
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>

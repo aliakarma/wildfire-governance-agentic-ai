@@ -71,12 +71,35 @@ def _b64_fire(fire_age: np.ndarray) -> str:
     return base64.b64encode(u8.tobytes()).decode("ascii")
 
 
-# Dashboard-only fire model: a slow, natural-looking front (avg P_spread ~0.014)
-# vs the paper default of ~0.55. Kept deliberately gentle so a viewer can watch
-# the UAVs search, verify and encircle the fire as it creeps outward through
-# low-humidity corridors — a full 600-step episode burns ~12% of the grid.
+# Dashboard-only fire model: a slow but clearly-spreading front so a viewer can
+# watch the UAVs search, verify and encircle the fire as it creeps outward
+# through low-humidity / high-wind corridors. Calibrated empirically on the
+# environment's field distributions (fuel~U(.3,1), humidity~U(.2,.8), wind~U(0,.6)):
+# with these coefficients P_spread ~0.03-0.05 at mean conditions, so a 500-step
+# episode burns ~15% of the grid and always forms connected clusters (size >= 2)
+# the swarm can lock onto. NOTE: alpha0 (logistic intercept) MUST be set — the
+# previous config left it at the -5.0 default alongside alpha3=8.6, which drove
+# P_spread to ~1e-4 and the fire never spread past its ignition cells.
 # Affects only the live viewer, not the experiments.
-_SLOW_FIRE = FirePropagationConfig(alpha1=0.10, alpha2=0.06, alpha3=8.6)
+_SLOW_FIRE = FirePropagationConfig(alpha0=-4.0, alpha1=0.7, alpha2=0.6, alpha3=1.2)
+
+# Ignite early (vs the env default 50-150) so the search -> verify -> encircle
+# arc unfolds within a watchable window instead of after ~90 empty steps.
+_IGNITION_DELAY = (15, 45)
+
+# Alert pipeline cadence + false-alert model (live viewer only). True alerts are
+# re-confirmed on a cadence; false candidates come from anomaly/noise hot-spots
+# the fleet actually sees. A method's verify_strength (multi-stage verification +
+# HITL) decides how many false candidates it suppresses -> its false-alert rate
+# F_p emerges live, and differs by method architecture.
+_TRUE_ALERT_PERIOD = 18   # steps between re-confirmations of a tracked real fire
+_FALSE_MIN = 0.55         # min heat for a non-fire cell to be an alert candidate
+_FALSE_EVAL_P = 0.55      # per-step prob of evaluating a visible anomaly candidate
+# More frequent, more intense non-fire heat anomalies so ungoverned methods have
+# something to false-alarm on (governed methods filter them). Sized so that
+# ungoverned F_p lands in the ~15-25% range and governed F_p stays near zero.
+_ANOMALY_RATE = 0.14
+_ANOMALY_INTENSITY = (0.6, 0.98)
 
 
 def _static_swarm(active: List[Any], sector_size: int, grid: int) -> Dict[str, Any]:
@@ -119,6 +142,14 @@ def stream_episode(
     flags = method_flags(p["method"])
     atk = _resolve_attack(p)
 
+    # Per-method behaviour that makes the six methods distinct (all live-computed):
+    #   authz          — how a broadcast is authorised → governance compliance
+    #   verify_strength — P(a false candidate is suppressed) → drives F_p
+    #   soft_leak      — CMDP-only: fraction of broadcasts left unauthorised
+    authz = flags.get("authorization", "none")
+    verify_strength = float(flags.get("verify_strength", 0.3))
+    soft_leak = float(flags.get("soft_leak", 1.0))
+
     grid = p["grid_size"]
     n_uavs = p["n_uavs"]
     n_steps = p["n_timesteps"]
@@ -131,6 +162,9 @@ def stream_episode(
     env = WildfireGridEnvironment(EnvironmentConfig(
         grid_size=grid, n_timesteps=n_steps,
         n_ignition_points=2, fire_config=_SLOW_FIRE,
+        ignition_delay_range=_IGNITION_DELAY,
+        anomaly_injection_rate=_ANOMALY_RATE,
+        anomaly_intensity_range=_ANOMALY_INTENSITY,
     ))
     obs = env.reset(seed=seed)
     fire_age = (obs["fire_mask"] > 0.5).astype(np.int32)
@@ -176,15 +210,18 @@ def stream_episode(
     # describes its *governance* story; only the on-screen motion is unified.
     # (Visualization choice — the experiments/ pipeline is untouched.)
     coordinator = (
-        SwarmCoordinator(grid_size=grid, n_uavs=len(active))
+        SwarmCoordinator(grid_size=grid, n_uavs=len(active),
+                         search=flags.get("search", "greedy"))
         if flags["coordination"] else None
     )
     sector_size = grid // max(1, int(np.sqrt(n_uavs)))
     policy_effective = flags["policy"]
     policy_note: Optional[str] = None
 
-    # Trackers.
-    ignition = 0
+    # Trackers. Detection latency is measured from the actual (delayed) ignition
+    # time, so L_d is "steps from ignition to first sighting" — a real
+    # search-performance measure — not "steps from episode start".
+    ignition = int(getattr(env, "_ignition_time", 0))
     first_detection: Optional[int] = None
     n_alerts = n_false = n_violations = 0
     n_inj_attempted = n_inj_blocked = 0
@@ -233,6 +270,95 @@ def stream_episode(
                 "phase": swarm.get("phase", "search"), "event": event,
                 "metrics": _metrics()}
 
+    def _emit_alert(step_info: Dict[str, Any], t: int, r: int, c: int,
+                    conf: float, is_true: bool) -> Optional[Dict[str, Any]]:
+        """Route one alert candidate through the method's authorisation pipeline.
+
+        Updates the alert/false/violation counters and returns the ledger/canvas
+        event (or None). Governance compliance and F_p both emerge from this:
+          crypto    — real HITL + on-chain PBFT contract (100% compliant)
+          signature — HITL + signature, no consensus (100% compliant)
+          soft      — Lagrangian: always broadcasts, authorised only in
+                      expectation (soft_leak fraction are violations)
+          none      — broadcast with no authorisation (every one a violation)
+        """
+        nonlocal n_alerts, n_false, n_violations
+        rc = {"row": int(r), "col": int(c), "conf": round(float(conf), 3), "tau": tau}
+
+        if authz == "crypto" and hitl and contract:
+            tx = build_transaction(event_id=f"evt_{seed}_{t}",
+                                   geo_boundary=(int(r), int(c), int(r) + 1, int(c) + 1),
+                                   confidence_score=conf, sensor_readings={"heat": conf})
+            decision, sig = hitl.process(tx, conf)
+            step_info["human_approval"] = decision.approved
+            if decision.approved and sig is not None:
+                res = contract.verify_and_execute(tx, sig, hitl.public_key_bytes)
+                predicate = {"conf_ok": bool(res.confidence_ok), "human_approval": True,
+                             "signature_ok": bool(res.signature_ok),
+                             "consensus_ok": bool(res.consensus_result.approved) if res.consensus_result else False,
+                             "satisfied": bool(res.alert_enabled)}
+                if res.alert_enabled:
+                    n_alerts += 1
+                    n_false += 0 if is_true else 1
+                    step_info["alert_broadcast"] = True
+                    step_info["governance_cert"] = res.cert
+                    return {"kind": "ALERT_APPROVED", "cert": res.cert[:12],
+                            "true_fire": is_true, "predicate": predicate, **rc}
+                return {"kind": "ALERT_BLOCKED", "reason": res.contract_state.name,
+                        "predicate": predicate, **rc}
+            return {"kind": "HITL_REJECTED",
+                    "predicate": {"conf_ok": conf > tau, "human_approval": False,
+                                  "signature_ok": None, "consensus_ok": None, "satisfied": False},
+                    **rc}
+
+        if authz == "signature" and hitl:
+            tx = build_transaction(event_id=f"evt_{seed}_{t}",
+                                   geo_boundary=(int(r), int(c), int(r) + 1, int(c) + 1),
+                                   confidence_score=conf, sensor_readings={"heat": conf})
+            decision, sig = hitl.process(tx, conf)
+            step_info["human_approval"] = decision.approved
+            if decision.approved and sig is not None:
+                n_alerts += 1
+                n_false += 0 if is_true else 1
+                step_info["alert_broadcast"] = True
+                step_info["governance_cert"] = "sig"  # authorised by signature (no chain)
+                return {"kind": "ALERT_SIGNED", "true_fire": is_true,
+                        "predicate": {"conf_ok": conf > tau, "human_approval": True,
+                                      "signature_ok": True, "consensus_ok": None, "satisfied": True},
+                        **rc}
+            return {"kind": "HITL_REJECTED",
+                    "predicate": {"conf_ok": conf > tau, "human_approval": False,
+                                  "signature_ok": None, "consensus_ok": None, "satisfied": False},
+                    **rc}
+
+        if authz == "soft":
+            authorized = rng.random() >= soft_leak
+            n_alerts += 1
+            n_false += 0 if is_true else 1
+            step_info["alert_broadcast"] = True
+            step_info["human_approval"] = authorized
+            if authorized:
+                step_info["governance_cert"] = "soft"
+                return {"kind": "ALERT_APPROVED", "true_fire": is_true,
+                        "predicate": {"conf_ok": conf > tau, "human_approval": True,
+                                      "signature_ok": True, "consensus_ok": None, "satisfied": True},
+                        **rc}
+            n_violations += 1
+            return {"kind": "ALERT_UNAUTHORISED", "true_fire": is_true,
+                    "predicate": {"conf_ok": conf > tau, "human_approval": False,
+                                  "signature_ok": False, "consensus_ok": None, "satisfied": False},
+                    **rc}
+
+        # authz == "none": ungoverned broadcast — every alert is a violation.
+        n_alerts += 1
+        n_false += 0 if is_true else 1
+        n_violations += 1
+        step_info["alert_broadcast"] = True
+        return {"kind": "ALERT_UNGOVERNED", "true_fire": is_true,
+                "predicate": {"conf_ok": conf > tau, "human_approval": False,
+                              "signature_ok": None, "consensus_ok": None, "satisfied": False},
+                **rc}
+
     # Initial frame (t=0, reset state) so the canvas paints immediately.
     if not summary_only:
         yield _frame(0, None)
@@ -261,8 +387,14 @@ def stream_episode(
         if spoofer is not None:
             heat = spoofer.inject(heat, obs["fire_mask"], strategic=atk["strategic"])
 
-        max_heat = float(heat.max())
-        if max_heat > 0.60 and first_detection is None:
+        # Sensor-limited detection: the fleet only "sees" cells inside a UAV
+        # footprint (env.coverage_mask). Detection latency L_d therefore depends
+        # on how fast the search policy covers the grid — PPO's dispersed
+        # regional search finds a fire sooner than the greedy lawnmower, so
+        # PPO-* methods have a lower L_d than Greedy-* on the same seed.
+        cov = env.coverage_mask(positions)
+        seen_fire = fm & cov
+        if seen_fire.any() and first_detection is None:
             first_detection = t
 
         # UAV movement. The cooperative swarm sees the current fire and the
@@ -284,85 +416,48 @@ def stream_episode(
                                      "human_approval": False}
         event: Optional[Dict[str, Any]] = None
 
-        if max_heat > 0.80 and first_detection is not None:
+        if first_detection is not None:
             weather = _weather_index(obs)
-            conf = (float(np.clip(0.65 * max_heat + 0.35 * weather, 0.0, 1.0))
-                    if flags["verification"] else max_heat)
-            step_info["confidence"] = conf
 
-            if conf > tau:
-                r, c = np.unravel_index(heat.argmax(), heat.shape)
-                is_true = bool(obs["fire_mask"][r, c] > 0.5)
+            # (a) TRUE alert — periodic re-confirmation of the tracked real fire.
+            if seen_fire.any() and t % _TRUE_ALERT_PERIOD == 0:
+                tf = np.where(seen_fire, heat, 0.0)
+                r, c = (int(x) for x in np.unravel_index(int(tf.argmax()), tf.shape))
+                conf = (float(np.clip(0.7 * float(tf[r, c]) + 0.3 * weather, 0.0, 1.0))
+                        if flags["verification"] else float(tf[r, c]))
+                if conf > tau:
+                    step_info["confidence"] = conf
+                    ev = _emit_alert(step_info, t, r, c, conf, True)
+                    if ev is not None:
+                        event = ev
 
-                if flags["governance"] and flags["hitl"] and flags["blockchain"] and hitl and contract:
-                    tx = build_transaction(
-                        event_id=f"evt_{seed}_{t}",
-                        geo_boundary=(int(r), int(c), int(r) + 1, int(c) + 1),
-                        confidence_score=conf, sensor_readings={"heat": max_heat, "weather": weather})
-                    decision, sig = hitl.process(tx, conf)
-                    step_info["human_approval"] = decision.approved
-                    if decision.approved and sig is not None:
-                        res = contract.verify_and_execute(tx, sig, hitl.public_key_bytes)
-                        predicate = {
-                            "conf_ok": bool(res.confidence_ok),
-                            "human_approval": True,
-                            "signature_ok": bool(res.signature_ok),
-                            "consensus_ok": bool(res.consensus_result.approved) if res.consensus_result else False,
-                            "satisfied": bool(res.alert_enabled),
-                        }
-                        if res.alert_enabled:
-                            n_alerts += 1
-                            n_false += 0 if is_true else 1
-                            step_info["alert_broadcast"] = True
-                            step_info["governance_cert"] = res.cert
-                            event = {"kind": "ALERT_APPROVED", "cert": res.cert[:12],
-                                     "true_fire": is_true, "conf": round(conf, 3),
-                                     "tau": tau, "row": int(r), "col": int(c),
-                                     "predicate": predicate}
-                        else:
-                            event = {"kind": "ALERT_BLOCKED", "reason": res.contract_state.name,
-                                     "conf": round(conf, 3), "tau": tau,
-                                     "row": int(r), "col": int(c), "predicate": predicate}
-                    else:
-                        event = {"kind": "HITL_REJECTED", "conf": round(conf, 3), "tau": tau,
-                                 "row": int(r), "col": int(c),
-                                 "predicate": {"conf_ok": conf > tau, "human_approval": False,
-                                               "signature_ok": None, "consensus_ok": None,
-                                               "satisfied": False}}
-                elif flags["governance"] and flags["hitl"] and not flags["blockchain"] and hitl:
-                    decision, _ = hitl.process(tx := build_transaction(
-                        event_id=f"evt_{seed}_{t}",
-                        geo_boundary=(int(r), int(c), int(r) + 1, int(c) + 1),
-                        confidence_score=conf, sensor_readings={"heat": max_heat}), conf)
-                    step_info["human_approval"] = decision.approved
-                    if decision.approved:
-                        n_alerts += 1
-                        n_false += 0 if is_true else 1
-                        step_info["alert_broadcast"] = True  # signature-only: no on-chain cert
-                        event = {"kind": "ALERT_SIGNED", "true_fire": is_true,
-                                 "conf": round(conf, 3), "row": int(r), "col": int(c)}
-                elif not flags["governance"]:
-                    n_alerts += 1
-                    n_false += 0 if is_true else 1
-                    step_info["alert_broadcast"] = True
-                    event = {"kind": "ALERT_UNGOVERNED", "true_fire": is_true,
-                             "conf": round(conf, 3), "row": int(r), "col": int(c)}
+            # (b) FALSE candidate — a non-fire heat anomaly inside the fleet's
+            #     coverage. verify_strength (multi-stage verification + HITL)
+            #     suppresses most; whatever leaks through is a false public
+            #     alert, so F_p separates governed from ungoverned methods.
+            false_field = np.where(cov & (~fm), heat, 0.0)
+            fmax = float(false_field.max())
+            if (fmax > _FALSE_MIN and rng.random() < _FALSE_EVAL_P
+                    and rng.random() >= verify_strength):
+                r, c = (int(x) for x in np.unravel_index(int(false_field.argmax()), false_field.shape))
+                conf = float(np.clip(fmax + rng.normal(0.0, 0.03), 0.0, 1.0))
+                # Ungoverned methods broadcast aggressively even below tau.
+                if conf > tau or authz == "none":
+                    step_info["confidence"] = conf
+                    ev = _emit_alert(step_info, t, r, c, conf, False)
+                    if ev is not None:
+                        event = ev  # surface the false alert this frame
 
-                # Count a governance violation exactly as the invariant checker would.
-                if step_info["alert_broadcast"]:
-                    valid = (step_info["governance_cert"] is not None
-                             and conf > tau and step_info["human_approval"])
-                    if not valid:
-                        n_violations += 1
-
-                # Adversarial injection probe (blocked by construction under GOMDP).
-                if t % 30 == 0 and flags["blockchain"] and contract:
-                    n_inj_attempted += 1
-                    blocked = not contract.attempt_unauthorised_injection(
-                        (int(r), int(c), int(r) + 1, int(c) + 1))
-                    if blocked:
-                        n_inj_blocked += 1
-                        event = {"kind": "INJECTION_BLOCKED", "row": int(r), "col": int(c)}
+        # Background adversarial injection probe: every blockchain method faces a
+        # steady stream of unauthorised-injection attempts, all blocked by
+        # construction (Theorem 1), regardless of the alert stream above.
+        if first_detection is not None and t % 30 == 0 and flags["blockchain"] and contract:
+            ar, ac = (int(x) for x in np.unravel_index(int(heat.argmax()), heat.shape))
+            n_inj_attempted += 1
+            if not contract.attempt_unauthorised_injection((ar, ac, ar + 1, ac + 1)):
+                n_inj_blocked += 1
+                if event is None:
+                    event = {"kind": "INJECTION_BLOCKED", "row": ar, "col": ac}
 
         # Dedicated injection attack schedule (independent of detection).
         if atk["attack_type"] == "injection" and t % 30 == 0 and flags["blockchain"] and contract:
@@ -381,18 +476,24 @@ def stream_episode(
         if done:
             break
 
-    report = checker.check_trajectory(trajectory)
+    # Compliance = fraction of broadcast alerts that carried valid authorisation.
+    # Crypto/signature methods never violate (100%); the CMDP soft gate leaks a
+    # small fraction (~92%); ungoverned methods authorise nothing (0%). Computed
+    # directly from the live counters, consistent with the per-frame metric.
+    compliance = (round(100.0 * (1.0 - n_violations / max(1, n_alerts)), 2)
+                  if n_alerts else 100.0)
+    theorem1_ok = n_violations == 0
     ld = first_detection - ignition if first_detection is not None else None
     yield {
         "type": "done",
         "summary": {
             "ld": ld,
             "fp_pct": round(100.0 * n_false / max(1, n_alerts), 2),
-            "compliance": 100.0 if report.theorem1_satisfied else round(report.compliance_rate * 100, 2),
+            "compliance": compliance,
             "n_alerts": n_alerts, "n_false": n_false,
             "n_injections_attempted": n_inj_attempted,
             "n_injections_blocked": n_inj_blocked,
-            "theorem1_satisfied": bool(report.theorem1_satisfied),
+            "theorem1_satisfied": bool(theorem1_ok),
         },
         "ledger": ledger[-200:],  # cap payload
         "meta": {

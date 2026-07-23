@@ -77,13 +77,36 @@ python experiments/11b_rl_comparison.py \
     --config configs/experiments/paper_main_results.yaml $SMOKE
 
 # ── Adversarial and stress tests ─────────────────────────────────────────
-echo "[8a/8] Adversarial robustness (Table V)..."
+echo "[8a/9] Adversarial robustness (Table V)..."
 python experiments/09_adversarial_robustness.py \
     --config configs/experiments/adversarial_robustness.yaml $SMOKE
 
-echo "[8b/8] Stress testing (Figure 6)..."
+echo "[8b/9] Stress testing (Figure 6, supplementary — not in paper)..."
 python experiments/10_stress_testing.py \
     --config configs/experiments/stress_testing.yaml $SMOKE
+
+# ── Theorem-2 closed form, sensitivity, and recent baselines ─────────────
+# These emit canonical CSVs directly (see results/paper/MANIFEST.yaml).
+# 13/14 are closed-form and reproduce the paper EXACTLY; the rest run on the
+# shared simulation core and are calibration-pending until the engine is
+# calibrated (WS1).
+echo "[9a/9] Byzantine validator compromise (tab:byzantine, closed form)..."
+python experiments/13_byzantine_compromise.py --no-fp
+
+echo "[9b/9] Validator-count sweep (tab:ksweep, closed form)..."
+python experiments/14_ksweep.py
+
+echo "[9c/9] m-of-n multisig (tab:multisig, injection-blocking exact)..."
+python experiments/16_multisig.py $SMOKE
+
+echo "[9d/9] HITL operator-error sensitivity (tab:hitl_sensitivity)..."
+python experiments/06b_hitl_sensitivity.py $SMOKE
+
+echo "[9e/9] Recent constrained-RL baselines (tab:recent_rl)..."
+python experiments/15_recent_rl.py $SMOKE
+
+echo "[9f/9] False-alert rate vs fleet size (Figure 2)..."
+python experiments/04b_false_alert_scaling.py $SMOKE
 
 # ── Real-world VIIRS (gracefully skipped if data not present) ───────────
 echo ""
@@ -92,9 +115,7 @@ python experiments/08_viirs_california.py \
     --config configs/experiments/realworld_viirs.yaml $SMOKE \
     || echo "   -> Skipped (run 'make download-viirs' to enable)"
 
-# Ensure all paper results (including JSON and new table files) are copied to the runs directory
-echo "Copying finalized paper results to results/runs/${GOMDP_RUN_HASH}..."
-cp -R results/paper/* "results/runs/${GOMDP_RUN_HASH}/"
+
 
 echo ""
 echo "=============================================="

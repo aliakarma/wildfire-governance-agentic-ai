@@ -6,7 +6,7 @@ Loads preprocessed VIIRS hotspot data for the California August Complex fire
 against NIFC ground-truth fire perimeters.
 
 Paper reference: Table VI, Section VI-C (Real-World Validation).
-Output: results/runs/<hash>/table6_realworld_viirs.csv
+Output: results/runs/<hash>/table4_realworld_viirs.csv (canonical VIIRS aggregate)
 
 DATA REQUIREMENT:
     data/processed/viirs_grid_california_2020.npz
@@ -47,14 +47,14 @@ def main(config_path: str, smoke: bool = False) -> None:
             "  Bash:       make download-viirs\n"
             "  PowerShell: python data/scripts/download_viirs.py --region california "
             "--start_date 2020-08-01 --end_date 2020-10-01\n"
-            "Experiment skipped. Synthetic fallback results are in results/paper/table6_realworld_viirs.csv\n"
+            "Experiment skipped. Synthetic fallback results are in results/paper/table4_realworld_viirs.csv\n"
         )
         print(msg)
         logger.info("viirs_data_not_found", path=str(VIIRS_PATH))
         # Write the paper fallback results so out_dir contains all target tables
-        paper_table6 = Path("results/paper/table6_realworld_viirs.csv")
-        if paper_table6.exists():
-            pd.read_csv(paper_table6).to_csv(out_dir / "table6_realworld_viirs.csv", index=False)
+        paper_viirs = Path("results/paper/table4_realworld_viirs.csv")
+        if paper_viirs.exists():
+            pd.read_csv(paper_viirs).to_csv(out_dir / "table4_realworld_viirs.csv", index=False)
         pd.DataFrame([{
             "region": "california_2020", "status": "data_not_found",
             "ld_mean": None, "fp_mean": None, "governance_compliance_pct": None,

@@ -88,7 +88,7 @@ export function LiveScreen() {
           showSectors={s.layers.sectors}
           showComms={s.layers.comms}
           nSectors={s.params.n_sectors}
-          trail={s.frames.slice(Math.max(0, s.index - 5), s.index).map((f) => f.uavs)}
+          trail={s.frames.slice(Math.max(0, s.index - 14), s.index).map((f) => f.uavs)}
         />
 
         <PlaybackControls
@@ -134,7 +134,7 @@ export function LiveScreen() {
       <aside className="flex flex-col gap-3">
         <SwarmStatus frame={s.currentFrame} />
         <div className="h-[420px] lg:min-h-[420px] lg:flex-1">
-          <EventFeed frames={s.frames} />
+          <EventFeed frames={s.frames} index={s.index} />
         </div>
       </aside>
     </div>

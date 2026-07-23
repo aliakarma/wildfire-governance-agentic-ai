@@ -1,0 +1,210 @@
+# Canonical paper-artifact manifest — the single source of truth mapping every
+# manuscript table/figure to (1) its paper reference, (2) the committed CSV that
+# holds the FROZEN paper values, (3) the experiment script that regenerates it,
+# (4) the dashboard route that shows it, and (5) the key metrics + reproduction
+# tolerance. Used by scripts/check_reproducibility.py and the coverage audit.
+#
+# Decisions in force:
+#   * paper numbers are FROZEN; live runs must reproduce them within `tolerance`.
+#   * the paper is the FIGURE SPEC; items marked supplementary are NOT in the
+#     paper and must be badged "Supplementary" in the dashboard.
+#
+# status legend:  ok = script+csv+dashboard all present & reproducing
+#                 csv_only = frozen csv present, script/dashboard pending
+#                 needs_script | needs_dashboard | needs_calibration | pending
+#
+# NOTE: a few committed files keep a legacy basename where the checker and
+# aggregator already agree on it (e.g. fig3_latency_data.csv == Fig 4). `csv` is
+# the authoritative current filename; `canonical` (where present) is a cosmetic
+# target only. Every experiment script now writes its canonical basename to
+# results/runs/ so check_reproducibility.py discovers the live run.
+
+meta:
+  n_uavs_default: 20
+  n_seeds_default: 20
+  tolerance_default: 0.05          # 5% relative, per calibrate-to-frozen-paper
+  paper: Paper/AAAI/Wildfire.tex
+  provenance_finding: |
+    VERIFIED (WS0): results/paper/per_seed/table1_rl_comparison_per_seed.csv
+    (180 rows = 9 methods x 20 seeds) aggregates to EXACTLY the paper Table 1
+    means/stds for all 9 methods (to 2 decimals). This means the per-seed data
+    was back-filled to match the manuscript (sampled from paper mean +/- std),
+    NOT produced by the actual simulation. Consequence: WS1 calibration of the
+    real engine to reproduce Table 1 within 5% is genuine work, not verification.
+    The closed-form Theorem-2 tables (byzantine, ksweep) are the exception: they
+    reproduce the paper exactly from real computation (scripts 13, 14).
+
+tables:
+  - id: table1_rl_comparison
+    paper_ref: "Table 1 (tab:rl_comparison)"
+    csv: table1_rl_comparison.csv
+    per_seed: per_seed/table1_rl_comparison_per_seed.csv
+    script: experiments/11b_rl_comparison.py
+    dashboard: Benchmark
+    methods: [PPO-GOMDP, Greedy-GOMDP, Central+Sig, Shield-PPO, SafeLayer, PPO-CMDP, WCSAC, Adaptive AI, Static]
+    metrics: [ld_mean, fp_mean, fn_mean, compliance_pct]
+    status: needs_calibration        # dashboard has only 6/9 methods
+
+  - id: table_main_comparison
+    paper_ref: "Table 5 (tab:main_comparison, full metric)"
+    csv: table1_rl_comparison_main.csv
+    per_seed: per_seed/table3_main_comparison_per_seed.csv
+    script: experiments/01_main_comparison.py
+    dashboard: Benchmark (full-metric toggle)
+    metrics: [ld_mean, fp_mean, fn_mean, compliance_pct, bc_delay, human_review, gov_overhead]
+    status: needs_dashboard
+
+  - id: table2_ablation
+    paper_ref: "Table 2 (tab:ablation)"
+    csv: table2_ablation.csv
+    per_seed: per_seed/table2_ablation_per_seed.csv
+    script: experiments/02_ablation_study.py
+    dashboard: Ablation (NEW)
+    metrics: [ld_mean, fp_mean, injections_blocked]
+    status: needs_dashboard
+
+  - id: table3_adversarial
+    paper_ref: "Table 6 (tab:adversarial)"
+    csv: table3_adversarial.csv
+    per_seed: per_seed/table3_adversarial_per_seed.csv
+    script: experiments/09_adversarial_robustness.py
+    dashboard: Adversarial Lab
+    metrics: [gomdp_fp, centsig_fp, central_fp, injection_success]
+    status: needs_calibration
+
+  - id: table4_realworld_viirs
+    paper_ref: "Table (tab:realworld) — VIIRS, 3 events"
+    csv: table4_realworld_viirs.csv
+    per_seed: per_seed/table4_realworld_viirs_per_seed.csv
+    script: [experiments/08_viirs_california.py, experiments/08b_viirs_mediterranean.py, experiments/08c_viirs_australia.py]
+    dashboard: VIIRS
+    metrics: [ld_mean, fp_mean, compliance_pct]
+    status: needs_calibration
+
+  - id: table5_byzantine
+    paper_ref: "Table (tab:byzantine) — validator compromise, k=7 f=2"
+    csv: [table5_byzantine_theory.csv, table5_byzantine_empirical.csv]
+    script: experiments/13_byzantine_compromise.py    # DONE (closed form + breach)
+    dashboard: Adversarial (breach chart)
+    metrics: [pbreach_gomdp, pbreach_sig, fp_pct]
+    tolerance: 0.02                   # closed form -> near exact
+    status: reproduces_exact          # theory+breach exact; F_p col calibration-pending
+
+  - id: table6_ksweep
+    paper_ref: "Table (tab:ksweep) — validator-count sweep, p_c=0.10"
+    csv: table6_ksweep.csv
+    script: experiments/14_ksweep.py                  # DONE — reproduces exactly
+    dashboard: Adversarial (k selector)
+    metrics: [pbreach_theory, pbreach_empirical]
+    tolerance: 0.02
+    status: reproduces_exact
+
+  - id: table7_hitl_sensitivity
+    paper_ref: "Table (tab:hitl_sensitivity) — p_err sweep, PPO-GOMDP"
+    csv: table7_hitl_sensitivity.csv
+    per_seed: per_seed/table7_hitl_sensitivity_per_seed.csv
+    script: experiments/06b_hitl_sensitivity.py   # DONE — p_err sweep via shared core
+    dashboard: HITL Sensitivity (NEW)
+    metrics: [fn_pct, fp_pct, compliance_pct]
+    exact_cols: [gov_compliance_pct]   # compliance pinned 100% by Theorem 1 (exact)
+    status: needs_dashboard            # script done; FN/FP magnitude calibration-pending
+
+  - id: table8_recent_rl
+    paper_ref: "Table (tab:recent_rl) — SafeDreamer, CCPO"
+    csv: table8_recent_rl.csv
+    per_seed: per_seed/table8_recent_rl_per_seed.csv
+    script: experiments/15_recent_rl.py               # DONE — calibrated stand-ins via shared core
+    dashboard: Benchmark (recent-RL toggle)
+    metrics: [ld_mean, fp_mean, compliance_pct]
+    status: needs_dashboard           # script done; magnitudes calibration-pending (WS1 registry)
+
+  - id: table9_multisig
+    paper_ref: "Table (tab:multisig) — m-of-n multisig"
+    csv: table9_multisig.csv
+    per_seed: per_seed/table9_multisig_per_seed.csv
+    script: experiments/16_multisig.py                # DONE — injection-blocking exact
+    dashboard: Adversarial (multisig row)
+    metrics: [ld_mean, fp_mean, injections_blocked]
+    exact_cols: [injections_blocked, injections_total]   # forged alert has 0 sigs -> always blocked
+    status: needs_dashboard           # blocking exact; L_d/F_p calibration-pending
+
+  - id: table10_cnn_ablation
+    paper_ref: "Table (tab:cnn_ablation) — MLP vs CNN"
+    csv: table10_cnn_ablation.csv
+    per_seed: per_seed/table10_cnn_ablation_per_seed.csv
+    script: experiments/17_cnn_ablation.py            # training-derived reference (not recomputed live)
+    dashboard: CNN Ablation (NEW small view)
+    metrics: [ld_converged, episodes_to_conv, params]
+    provenance: reference             # params/convergence come from PPO training runs
+    status: needs_dashboard           # surfaced as a labeled reference table
+
+  - id: table_fabric_microbench
+    paper_ref: "Appendix (app:fabric) — Fabric consensus-latency microbenchmark"
+    csv: table_fabric_microbench.csv
+    script: experiments/07_blockchain_throughput.py   # models the simulated Δ_BC delay
+    dashboard: All Experiments (route Governance)
+    metrics: [latency_mean_s, latency_std_s, budget_s]
+    provenance: reference             # real Fabric 2.5 number is external + reported;
+    status: reference                 # the simulated Δ_BC row is reproducible via exp 07
+    note: |
+      Two labeled rows. fabric_2.5_real (2.3±0.7 s over 1000 tx) is the paper's
+      REPORTED real 7-peer Fabric 2.5 measurement — external, not reproduced here.
+      simulation_pbft (12 s budget from Δ_BC~N(1.2,0.3) steps) is the conservative
+      consensus-delay assumption exp 07 models. NOTE: the paper's architecture
+      caption states "no blockchain was deployed", which is in tension with the
+      app:fabric "real Fabric deployment" claim — flagged for author resolution.
+
+figures:
+  - id: fig2_false_alerts
+    paper_ref: "Fig 2 (fig:falsealerts) — F_p vs N"
+    csv: fig2_false_alerts.csv          # created WS0 from frozen paper
+    canonical: fig2_false_alerts.csv
+    script: experiments/04b_false_alert_scaling.py   # DONE — 6-series N sweep via shared core
+    dashboard: Scalability (NEW)
+    series: [PPO-GOMDP, Greedy-GOMDP, PPO-CMDP, WCSAC, Adaptive AI, Static]
+    status: needs_dashboard           # script done; F_p magnitude calibration-pending
+
+  - id: fig3_learning
+    paper_ref: "Fig 3 (fig:learning) — PPO-GOMDP learning curve"
+    csv: fig3_learning_curve.csv        # created WS0 from frozen paper
+    canonical: fig3_learning_curve.csv
+    script: experiments/11_ppo_training.py
+    dashboard: Learning (NEW)
+    series: [validation_ld, greedy_baseline]
+    status: needs_dashboard
+
+  - id: fig4_latency
+    paper_ref: "Fig 4 (fig:latency) — L_d vs N"
+    csv: fig3_latency_data.csv          # legacy name
+    canonical: fig4_latency.csv         # rename in WS2
+    script: experiments/03_scalability.py
+    dashboard: Scalability (NEW)
+    series: [PPO-GOMDP, Greedy-GOMDP, PPO-CMDP, WCSAC, Adaptive AI, Static]
+    status: needs_dashboard
+
+supplementary:                          # NOT in the paper — badge "Supplementary"
+  - id: tradeoff_frontier
+    csv: [figure3_tradeoff_frontier.csv, fig5_tradeoff_data.csv]
+    script: experiments/05_tradeoff_frontier.py
+    dashboard: Benchmark (badged Supplementary)
+  - id: stress_tests
+    csv: figure2_stress_tests.csv
+    script: experiments/10_stress_testing.py
+    dashboard: (badged Supplementary)
+
+# Orphan / dangling-reference cleanup — status after WS4:
+resolved:
+  - "table1_rl_comparison_main.csv: kept (full-metric main_comparison; not a dup of table1)."
+  - "01_main_comparison.py: no longer references deleted table3_main_comparison.csv (WS0)."
+  - "08_viirs_california.py + _viirs_runner.py: fallback repointed from deleted results/paper/table6_realworld_viirs.csv -> table4_realworld_viirs.csv (WS4)."
+  - "notebooks/02_results_analysis.ipynb: repointed table2_rl_comparison.csv -> table1_rl_comparison.csv and table5_adversarial.csv -> table3_adversarial.csv (WS4)."
+  - "Deleted legacy CSVs (table2_rl_comparison, table3_main_comparison, table4_ablation, table5_adversarial, table6_realworld_viirs) staged for removal; no code path reads them."
+known_cosmetic:
+  - "10_stress_testing.py writes fig6_stress_test_data.csv; committed supplementary file is figure2_stress_tests.csv. Supplementary (not in paper), outside the reproducibility checker — left as-is."
+
+# Live-vs-paper alignment gaps surfaced by check_reproducibility.py (all reported
+# [KNOWN], never fatal; the checker prints the precise reason for each):
+known_gaps:
+  - "02_ablation_study.py: REWORKED (WS4) to emit the canonical schema (config + injections_blocked/injections_total, all 8 paper rows). The injection-blocking column is now verified EXACTLY (2%) through its own live injection run (100/100 enforced, 0/100 no-auth). L_d/F_p magnitudes remain the universal documented calibration deviation."
+  - "01_main_comparison.py: REWORKED (WS4) to emit the canonical schema (config = method id, all 6 paper rows + bc_delay/human_review/le2e/ld_reduction/n_seeds). bc_delay (1.2), human_review (3.0) and n_seeds reproduce exactly; L_d/F_p and the L_d-derived columns remain documented calibration deviations."
+  - "04b_false_alert_scaling.py sweeps perfect-square fleet sizes {4,8,16,...} (required by the coordination tiling) while Fig 2 uses {5,10,20,40}; the monotone F_p-vs-N decrease is reproduced but join keys are disjoint, so the diff is reported [KNOWN]. Closing this needs the tiling to support non-square N."

@@ -77,3 +77,20 @@ export async function fetchPaperResults(table: string) {
   if (!res.ok) throw new Error("paper results fetch failed");
   return res.json();
 }
+
+export interface ArtifactMeta {
+  id: string;
+  title: string;
+  kind: "table" | "figure";
+  paper_ref: string;
+  route: string;
+  provenance: "exact" | "calibration" | "reference" | "supplementary";
+  metrics: string[];
+  csv_present: boolean;
+}
+
+export async function fetchArtifacts(): Promise<{ artifacts: ArtifactMeta[]; note: string }> {
+  const res = await fetch(`${API_BASE}/api/artifacts`);
+  if (!res.ok) throw new Error("artifacts fetch failed");
+  return res.json();
+}

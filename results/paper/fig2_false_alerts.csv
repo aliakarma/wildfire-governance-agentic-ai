@@ -1,0 +1,25 @@
+config,n_uavs,fp_mean
+PPO-GOMDP,5,6.9
+PPO-GOMDP,10,6.4
+PPO-GOMDP,20,6.0
+PPO-GOMDP,40,5.7
+Greedy-GOMDP,5,7.0
+Greedy-GOMDP,10,6.5
+Greedy-GOMDP,20,6.1
+Greedy-GOMDP,40,5.8
+PPO-CMDP,5,9.8
+PPO-CMDP,10,9.1
+PPO-CMDP,20,8.3
+PPO-CMDP,40,7.6
+WCSAC,5,10.2
+WCSAC,10,9.6
+WCSAC,20,9.4
+WCSAC,40,8.7
+Adaptive AI,5,23.8
+Adaptive AI,10,23.1
+Adaptive AI,20,22.4
+Adaptive AI,40,21.9
+Static,5,16.1
+Static,10,15.7
+Static,20,15.3
+Static,40,14.9

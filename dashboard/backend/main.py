@@ -41,6 +41,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.on_event("startup")
+def startup_event():
+    print("\n" + "="*80)
+    print("  SECURITY WARNING: Wildfire Governance Dashboard Backend is running.")
+    print("  This API has NO AUTHENTICATION and should only be run on localhost.")
+    print("  DO NOT EXPOSE THIS SERVICE TO THE PUBLIC INTERNET.")
+    print("="*80 + "\n")
+
 _PAPER_DIR = _REPO_ROOT / "results" / "paper"
 
 
@@ -136,6 +144,48 @@ def breach_probability(n_validators: int = 7, max_byzantine: int = 2) -> Dict[st
     }
 
 
+# Canonical catalog of every paper artifact — the single list the frontend uses
+# to surface all experiments. Mirrors results/paper/MANIFEST.yaml and
+# scripts/check_reproducibility.py. provenance: exact | calibration | reference |
+# supplementary (supplementary = NOT in the paper; badge accordingly).
+_ARTIFACT_CATALOG: List[Dict[str, Any]] = [
+    {"id": "table1_rl_comparison", "title": "RL policy comparison (9 methods)", "kind": "table", "paper_ref": "Table 1", "route": "Benchmark", "provenance": "calibration", "metrics": ["ld_mean", "fp_mean", "fn_mean", "compliance_pct"]},
+    {"id": "table1_rl_comparison_main", "title": "Full-metric main comparison", "kind": "table", "paper_ref": "Table 5 (appendix)", "route": "Benchmark", "provenance": "calibration", "metrics": ["ld_mean", "fp_mean", "bc_delay_mean"]},
+    {"id": "table2_ablation", "title": "Component ablation", "kind": "table", "paper_ref": "Table 2", "route": "Ablation", "provenance": "calibration", "metrics": ["ld_mean", "fp_mean", "injections_blocked"]},
+    {"id": "table3_adversarial", "title": "Adversarial robustness", "kind": "table", "paper_ref": "Table 6", "route": "Adversarial", "provenance": "calibration", "metrics": ["gomdp", "central_sig", "central"]},
+    {"id": "table4_realworld_viirs", "title": "Real-world VIIRS events", "kind": "table", "paper_ref": "Table (realworld)", "route": "VIIRS", "provenance": "calibration", "metrics": ["ld_mean", "fp_mean", "gov_compliance_pct"]},
+    {"id": "table5_byzantine_theory", "title": "Byzantine compromise (theory)", "kind": "table", "paper_ref": "Table (byzantine)", "route": "Adversarial", "provenance": "exact", "metrics": ["p_break_gomdp", "p_break_sig"]},
+    {"id": "table5_byzantine_empirical", "title": "Byzantine compromise (empirical)", "kind": "table", "paper_ref": "Table (byzantine)", "route": "Adversarial", "provenance": "exact", "metrics": ["breach", "fp_pct"]},
+    {"id": "table6_ksweep", "title": "Validator-count sweep", "kind": "table", "paper_ref": "Table (ksweep)", "route": "Adversarial", "provenance": "exact", "metrics": ["p_break_gomdp_theory", "empirical"]},
+    {"id": "table7_hitl_sensitivity", "title": "HITL operator-error sensitivity", "kind": "table", "paper_ref": "Table (hitl)", "route": "HITL", "provenance": "calibration", "metrics": ["fn_mean", "fp_mean", "gov_compliance_pct"]},
+    {"id": "table8_recent_rl", "title": "Recent constrained-RL baselines", "kind": "table", "paper_ref": "Table 8", "route": "Benchmark", "provenance": "calibration", "metrics": ["ld_mean", "fp_mean", "compliance_pct"]},
+    {"id": "table9_multisig", "title": "m-of-n multisig", "kind": "table", "paper_ref": "Table (multisig)", "route": "Adversarial", "provenance": "exact", "metrics": ["ld_mean", "fp_mean", "injections_blocked"]},
+    {"id": "table10_cnn_ablation", "title": "MLP vs CNN ablation", "kind": "table", "paper_ref": "Table (cnn)", "route": "CNN", "provenance": "reference", "metrics": ["ld_mean", "episodes_to_convergence", "parameters"]},
+    {"id": "table_fabric_microbench", "title": "Fabric consensus-latency microbenchmark", "kind": "table", "paper_ref": "Appendix (app:fabric)", "route": "Governance", "provenance": "reference", "metrics": ["latency_mean_s", "latency_std_s", "budget_s"]},
+    {"id": "fig2_false_alerts", "title": "False-alert rate vs fleet size", "kind": "figure", "paper_ref": "Figure 2", "route": "Scalability", "provenance": "calibration", "metrics": ["fp_mean"]},
+    {"id": "fig3_learning_curve", "title": "PPO-GOMDP learning curve", "kind": "figure", "paper_ref": "Figure 3", "route": "Learning", "provenance": "reference", "metrics": ["ld_mean"]},
+    {"id": "fig3_latency_data", "title": "Detection latency vs fleet size", "kind": "figure", "paper_ref": "Figure 4", "route": "Scalability", "provenance": "calibration", "metrics": ["ld_mean", "proposition1_bound"]},
+    {"id": "figure3_tradeoff_frontier", "title": "Latency-false-alert tradeoff", "kind": "figure", "paper_ref": "SUPPLEMENTARY (not in paper)", "route": "Benchmark", "provenance": "supplementary", "metrics": ["ld_mean", "fp_mean"]},
+    {"id": "figure2_stress_tests", "title": "Stress tests", "kind": "figure", "paper_ref": "SUPPLEMENTARY (not in paper)", "route": "Supplementary", "provenance": "supplementary", "metrics": ["y_val"]},
+]
+
+
+@app.get("/api/artifacts")
+def artifacts() -> Dict[str, Any]:
+    """Enumerate every paper table/figure the dashboard can surface, with the
+    committed CSV present-check and provenance tag. The frontend uses this to
+    render a view for every experiment (see /api/paper-results/{id} for data)."""
+    out = []
+    for a in _ARTIFACT_CATALOG:
+        csv_present = (_PAPER_DIR / f"{a['id']}.csv").exists()
+        out.append({**a, "csv_present": csv_present})
+    return {"artifacts": out,
+            "note": "provenance: exact=closed-form reproduces paper; "
+                    "calibration=qualitative match, magnitudes are documented "
+                    "deviations (see results/paper/CALIBRATION.md); "
+                    "reference=training-derived; supplementary=NOT in the paper."}
+
+
 @app.get("/api/paper-results/{table}")
 def paper_results(table: str) -> Dict[str, Any]:
     """Serve a committed paper CSV, EXPLICITLY labeled as a reference value.
@@ -191,7 +241,81 @@ async def ws_simulate(ws: WebSocket) -> None:
 
 # --------------------------------------------------------------------------- #
 # Static frontend (production): serve the exported Next.js build if present.
+#
+# The build lives in dashboard/frontend/out/, which is git-ignored — so a fresh
+# clone has no UI. Rather than let the mount silently disappear and return a bare
+# {"detail":"Not Found"} at "/", we detect a missing/partial build and serve a
+# clear "how to build" page. This is the #1 "nothing works" trap for a reviewer
+# who runs uvicorn without first building the frontend.
 # --------------------------------------------------------------------------- #
 _FRONTEND_OUT = _REPO_ROOT / "dashboard" / "frontend" / "out"
-if _FRONTEND_OUT.exists():
+_FRONTEND_INDEX = _FRONTEND_OUT / "index.html"
+
+_BUILD_HELP_HTML = """<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wildfire GOMDP Dashboard — frontend not built</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin:0; font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+         background:#0B0E14; color:#E8EDF4; line-height:1.6; }
+  main { max-width:760px; margin:0 auto; padding:56px 24px; }
+  h1 { font-size:24px; margin:0 0 4px; }
+  .tag { display:inline-block; font-size:12px; font-weight:600; color:#FFB067;
+         border:1px solid #F2B455; border-radius:999px; padding:2px 10px; margin-bottom:20px; }
+  p { color:#9AA6B8; }
+  code, pre { font-family:IBM Plex Mono,ui-monospace,SFMono-Regular,Menlo,monospace; }
+  pre { background:#12161F; border:1px solid #263041; border-radius:12px;
+        padding:16px 18px; overflow-x:auto; color:#E8EDF4; font-size:13.5px; }
+  .ok { color:#35D0A5; } .step { margin-top:28px; }
+  a { color:#6FB1FF; }
+</style></head><body><main>
+  <div class="tag">FRONTEND NOT BUILT</div>
+  <h1>🔥 Wildfire GOMDP Dashboard</h1>
+  <p>The backend API is running, but the Next.js frontend has not been built yet, so
+     there is no UI to serve. The build output (<code>dashboard/frontend/out/</code>)
+     is git-ignored and is not present in this checkout.</p>
+
+  <div class="step"><strong>Build the UI once (needs Node.js 18+):</strong></div>
+  <pre>cd dashboard/frontend
+npm install
+npm run build
+cd ../..</pre>
+
+  <div class="step"><strong>Then restart this server and reload:</strong></div>
+  <pre>python -m uvicorn dashboard.backend.main:app --host 127.0.0.1 --port 8123</pre>
+
+  <p class="step">Or use the one-command launcher, which builds the UI automatically
+     if it is missing:</p>
+  <pre>python dashboard/run_dashboard.py --port 8123</pre>
+
+  <p class="step ok">The API itself is healthy — try
+     <a href="/api/health">/api/health</a> or <a href="/docs">/docs</a>.</p>
+</main></body></html>"""
+
+
+def _frontend_is_built() -> bool:
+    return _FRONTEND_INDEX.is_file()
+
+
+if _frontend_is_built():
     app.mount("/", StaticFiles(directory=str(_FRONTEND_OUT), html=True), name="frontend")
+else:
+    from fastapi.responses import HTMLResponse
+
+    print(
+        "\n  NOTE: frontend build not found at "
+        f"{_FRONTEND_OUT} — serving build instructions at '/'.\n"
+        "        Build it with:  cd dashboard/frontend && npm install && npm run build\n"
+        "        or run:          python dashboard/run_dashboard.py\n"
+    )
+
+    @app.get("/", response_class=HTMLResponse)
+    def _frontend_not_built() -> HTMLResponse:
+        return HTMLResponse(_BUILD_HELP_HTML, status_code=503)
+
+    # Catch every other non-API path (e.g. a deep-linked screen) with the same
+    # help page. Registered last, so the /api/* and /ws/* routes above win.
+    @app.get("/{_path:path}", response_class=HTMLResponse)
+    def _frontend_not_built_catchall(_path: str) -> HTMLResponse:
+        return HTMLResponse(_BUILD_HELP_HTML, status_code=503)

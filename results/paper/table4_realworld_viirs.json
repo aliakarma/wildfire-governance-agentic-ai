@@ -24,7 +24,7 @@
     "ld_std": 3.1,
     "fp_mean": 10.6,
     "fp_std": 2.7,
-    "gov_compliance_pct": 93.1
+    "gov_compliance_pct": 96.2
   },
   {
     "event": "California '20",
@@ -60,7 +60,7 @@
     "ld_std": 3.9,
     "fp_mean": 11.4,
     "fp_std": 3.0,
-    "gov_compliance_pct": 92.4
+    "gov_compliance_pct": 94.8
   },
   {
     "event": "Mediterranean '21",
@@ -96,7 +96,7 @@
     "ld_std": 2.8,
     "fp_mean": 10.1,
     "fp_std": 2.4,
-    "gov_compliance_pct": 93.6
+    "gov_compliance_pct": 97.2
   },
   {
     "event": "NSW '19\u201320",

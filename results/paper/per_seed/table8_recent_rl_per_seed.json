@@ -1,0 +1,282 @@
+[
+  {
+    "seed": 0,
+    "method": "SafeDreamer",
+    "ld": 14.4561,
+    "fp_pct": 9.7652,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 1,
+    "method": "SafeDreamer",
+    "ld": 14.9127,
+    "fp_pct": 7.7282,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 2,
+    "method": "SafeDreamer",
+    "ld": 14.0094,
+    "fp_pct": 9.2421,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 3,
+    "method": "SafeDreamer",
+    "ld": 14.8814,
+    "fp_pct": 8.8006,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 4,
+    "method": "SafeDreamer",
+    "ld": 12.7857,
+    "fp_pct": 7.7259,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 5,
+    "method": "SafeDreamer",
+    "ld": 13.802,
+    "fp_pct": 3.9843,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 6,
+    "method": "SafeDreamer",
+    "ld": 14.9028,
+    "fp_pct": 10.6904,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 7,
+    "method": "SafeDreamer",
+    "ld": 17.2682,
+    "fp_pct": 8.9648,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 8,
+    "method": "SafeDreamer",
+    "ld": 16.1981,
+    "fp_pct": 6.1917,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 9,
+    "method": "SafeDreamer",
+    "ld": 15.5554,
+    "fp_pct": 5.9653,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 10,
+    "method": "SafeDreamer",
+    "ld": 15.0681,
+    "fp_pct": 11.3275,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 11,
+    "method": "SafeDreamer",
+    "ld": 15.0569,
+    "fp_pct": 11.664,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 12,
+    "method": "SafeDreamer",
+    "ld": 14.3576,
+    "fp_pct": 8.0211,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 13,
+    "method": "SafeDreamer",
+    "ld": 15.2626,
+    "fp_pct": 8.6382,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 14,
+    "method": "SafeDreamer",
+    "ld": 11.3013,
+    "fp_pct": 8.832,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 15,
+    "method": "SafeDreamer",
+    "ld": 16.1093,
+    "fp_pct": 5.7137,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 16,
+    "method": "SafeDreamer",
+    "ld": 14.2279,
+    "fp_pct": 6.9618,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 17,
+    "method": "SafeDreamer",
+    "ld": 15.76,
+    "fp_pct": 7.3728,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 18,
+    "method": "SafeDreamer",
+    "ld": 13.3471,
+    "fp_pct": 9.7818,
+    "compliance_pct": 45.0
+  },
+  {
+    "seed": 19,
+    "method": "SafeDreamer",
+    "ld": 14.7373,
+    "fp_pct": 4.6287,
+    "compliance_pct": 45.0
+  },
+  {
+    "seed": 0,
+    "method": "CCPO",
+    "ld": 14.6749,
+    "fp_pct": 9.1066,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 1,
+    "method": "CCPO",
+    "ld": 15.0963,
+    "fp_pct": 7.2636,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 2,
+    "method": "CCPO",
+    "ld": 14.2625,
+    "fp_pct": 8.6334,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 3,
+    "method": "CCPO",
+    "ld": 15.0675,
+    "fp_pct": 8.2339,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 4,
+    "method": "CCPO",
+    "ld": 13.133,
+    "fp_pct": 7.2615,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 5,
+    "method": "CCPO",
+    "ld": 14.0711,
+    "fp_pct": 3.8762,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 6,
+    "method": "CCPO",
+    "ld": 15.0872,
+    "fp_pct": 9.9437,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 7,
+    "method": "CCPO",
+    "ld": 17.2706,
+    "fp_pct": 8.3824,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 8,
+    "method": "CCPO",
+    "ld": 16.2829,
+    "fp_pct": 5.8734,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 9,
+    "method": "CCPO",
+    "ld": 15.6896,
+    "fp_pct": 5.6686,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 10,
+    "method": "CCPO",
+    "ld": 15.2397,
+    "fp_pct": 10.5201,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 11,
+    "method": "CCPO",
+    "ld": 15.2295,
+    "fp_pct": 10.8245,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 12,
+    "method": "CCPO",
+    "ld": 14.584,
+    "fp_pct": 7.5286,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 13,
+    "method": "CCPO",
+    "ld": 15.4193,
+    "fp_pct": 8.0869,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 14,
+    "method": "CCPO",
+    "ld": 11.7627,
+    "fp_pct": 8.2623,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 15,
+    "method": "CCPO",
+    "ld": 16.2009,
+    "fp_pct": 5.441,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 16,
+    "method": "CCPO",
+    "ld": 14.4642,
+    "fp_pct": 6.5702,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 17,
+    "method": "CCPO",
+    "ld": 15.8785,
+    "fp_pct": 6.942,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 18,
+    "method": "CCPO",
+    "ld": 13.6512,
+    "fp_pct": 9.1217,
+    "compliance_pct": 100.0
+  },
+  {
+    "seed": 19,
+    "method": "CCPO",
+    "ld": 14.9345,
+    "fp_pct": 4.4593,
+    "compliance_pct": 5.7
+  }
+]

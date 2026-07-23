@@ -85,7 +85,7 @@
   },
   {
     "method": "Adaptive AI",
-    "framework": "None",
+    "framework": NaN,
     "ld_mean": 16.2,
     "ld_std": 1.2,
     "fp_mean": 22.4,
@@ -93,11 +93,11 @@
     "fn_mean": 0.9,
     "fn_std": 0.5,
     "compliance_pct": 0.0,
-    "enforcement": "None"
+    "enforcement": NaN
   },
   {
     "method": "Static",
-    "framework": "None",
+    "framework": NaN,
     "ld_mean": 41.5,
     "ld_std": 3.1,
     "fp_mean": 15.3,
@@ -105,6 +105,6 @@
     "fn_mean": 1.8,
     "fn_std": 0.8,
     "compliance_pct": 0.0,
-    "enforcement": "None"
+    "enforcement": NaN
   }
 ]

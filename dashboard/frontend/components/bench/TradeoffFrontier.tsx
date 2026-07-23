@@ -56,7 +56,12 @@ export function TradeoffFrontier() {
 
   return (
     <div className="card p-4">
-      <div className="mb-1 text-sm font-semibold">{t("bench.frontier")}</div>
+      <div className="mb-1 flex items-center gap-2">
+        <span className="text-sm font-semibold">{t("bench.frontier")}</span>
+        <span className="rounded-full border border-fuchsia-500/40 bg-fuchsia-500/10 px-2 py-0.5 text-[10px] font-medium text-fuchsia-300">
+          Supplementary — not in the paper
+        </span>
+      </div>
       <p className="mb-2 text-[11px] text-muted">↙ lower-left is better (fast detection, few false alerts)</p>
       <div dir="ltr">
         <svg width="100%" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Latency vs false-alert tradeoff">

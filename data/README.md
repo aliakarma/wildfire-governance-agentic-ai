@@ -64,8 +64,18 @@ python data/scripts/download_viirs.py --region mediterranean --start_date 2021-0
 python data/scripts/download_viirs.py --region australia --start_date 2019-11-01 --end_date 2020-02-28
 ```
 
-**Without API key:** The download script automatically creates a small synthetic VIIRS fallback
-CSV so that the preprocessing pipeline can still be tested.
+Each download now **auto-preprocesses** to the canonical simulation grid the
+experiment scripts expect — `data/processed/viirs_grid_<region>_<year>.npz`
+(e.g. `viirs_grid_california_2020.npz`) — so `experiments/08_viirs_california.py`,
+`08b`, and `08c` run the real simulation on the VIIRS grid rather than the CSV
+fallback. Pass `--no-preprocess` to download the raw CSV only. These grids are
+git-ignored.
+
+**Without API key:** the download script writes a small synthetic VIIRS fallback
+CSV and preprocesses it to the same canonical grid names, so the whole
+download → preprocess → experiment pipeline is exercised end-to-end. The grid is
+labeled SYNTHETIC in the console output; set `NASA_FIRMS_KEY` and rerun for real
+VIIRS validation (the only step that needs the key — everything else is wired).
 
 ---
 

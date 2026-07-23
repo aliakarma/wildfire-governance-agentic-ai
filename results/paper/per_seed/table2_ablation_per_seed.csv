@@ -1,0 +1,161 @@
+seed,config,ld,fp_pct,injections_blocked,injections_total
+0,PPO-GOMDP (full),15.6625,7.8203,100,100
+1,PPO-GOMDP (full),14.7781,5.4148,100,100
+2,PPO-GOMDP (full),14.6855,4.0265,100,100
+3,PPO-GOMDP (full),15.6208,5.2315,100,100
+4,PPO-GOMDP (full),16.4963,7.6287,100,100
+5,PPO-GOMDP (full),15.7405,6.2589,100,100
+6,PPO-GOMDP (full),14.9439,5.724,100,100
+7,PPO-GOMDP (full),13.5174,6.1694,100,100
+8,PPO-GOMDP (full),14.3625,6.2855,100,100
+9,PPO-GOMDP (full),14.5164,6.941,100,100
+10,PPO-GOMDP (full),16.6623,6.0955,100,100
+11,PPO-GOMDP (full),12.7492,7.2388,100,100
+12,PPO-GOMDP (full),15.9374,5.4877,100,100
+13,PPO-GOMDP (full),14.7015,5.9412,100,100
+14,PPO-GOMDP (full),15.8769,5.4686,100,100
+15,PPO-GOMDP (full),12.9992,6.0527,100,100
+16,PPO-GOMDP (full),15.0524,7.947,100,100
+17,PPO-GOMDP (full),15.964,4.3969,100,100
+18,PPO-GOMDP (full),15.3258,4.5261,100,100
+19,PPO-GOMDP (full),16.4074,5.345,100,100
+0,Greedy-GOMDP (full),19.0159,8.2513,100,100
+1,Greedy-GOMDP (full),17.8903,5.4084,100,100
+2,Greedy-GOMDP (full),17.7724,3.7677,100,100
+3,Greedy-GOMDP (full),18.9629,5.1917,100,100
+4,Greedy-GOMDP (full),20.0771,8.0249,100,100
+5,Greedy-GOMDP (full),19.1152,6.406,100,100
+6,Greedy-GOMDP (full),18.1013,5.7738,100,100
+7,Greedy-GOMDP (full),16.2858,6.3002,100,100
+8,Greedy-GOMDP (full),17.3614,6.4374,100,100
+9,Greedy-GOMDP (full),17.5573,7.2121,100,100
+10,Greedy-GOMDP (full),20.2884,6.2129,100,100
+11,Greedy-GOMDP (full),15.308,7.564,100,100
+12,Greedy-GOMDP (full),19.3658,5.4945,100,100
+13,Greedy-GOMDP (full),17.7928,6.0305,100,100
+14,Greedy-GOMDP (full),19.2888,5.4719,100,100
+15,Greedy-GOMDP (full),15.6262,6.1622,100,100
+16,Greedy-GOMDP (full),18.2394,8.401,100,100
+17,Greedy-GOMDP (full),19.3997,4.2054,100,100
+18,Greedy-GOMDP (full),18.5873,4.3581,100,100
+19,Greedy-GOMDP (full),19.9639,5.3259,100,100
+0,- Adaptive coordination,31.0296,8.0858,100,100
+1,- Adaptive coordination,28.9391,5.4616,100,100
+2,- Adaptive coordination,28.7202,3.9471,100,100
+3,- Adaptive coordination,30.9311,5.2616,100,100
+4,- Adaptive coordination,33.0003,7.8768,100,100
+5,- Adaptive coordination,31.2139,6.3824,100,100
+6,- Adaptive coordination,29.331,5.7989,100,100
+7,- Adaptive coordination,25.9594,6.2848,100,100
+8,- Adaptive coordination,27.9568,6.4114,100,100
+9,- Adaptive coordination,28.3206,7.1265,100,100
+10,- Adaptive coordination,33.3928,6.2042,100,100
+11,- Adaptive coordination,24.1435,7.4514,100,100
+12,- Adaptive coordination,31.6794,5.5411,100,100
+13,- Adaptive coordination,28.7581,6.0359,100,100
+14,- Adaptive coordination,31.5364,5.5202,100,100
+15,- Adaptive coordination,24.7344,6.1574,100,100
+16,- Adaptive coordination,29.5874,8.224,100,100
+17,- Adaptive coordination,31.7423,4.3512,100,100
+18,- Adaptive coordination,30.2336,4.4921,100,100
+19,- Adaptive coordination,32.7902,5.3855,100,100
+0,- HITL authorization,15.7625,26.0407,100,100
+1,- HITL authorization,14.8781,21.2296,100,100
+2,- HITL authorization,14.7855,18.4529,100,100
+3,- HITL authorization,15.7208,20.863,100,100
+4,- HITL authorization,16.5963,25.6574,100,100
+5,- HITL authorization,15.8405,22.9178,100,100
+6,- HITL authorization,15.0439,21.848,100,100
+7,- HITL authorization,13.6174,22.7387,100,100
+8,- HITL authorization,14.4625,22.9709,100,100
+9,- HITL authorization,14.6164,24.282,100,100
+10,- HITL authorization,16.7623,22.591,100,100
+11,- HITL authorization,12.8492,24.8775,100,100
+12,- HITL authorization,16.0374,21.3753,100,100
+13,- HITL authorization,14.8015,22.2824,100,100
+14,- HITL authorization,15.9769,21.3371,100,100
+15,- HITL authorization,13.0992,22.5053,100,100
+16,- HITL authorization,15.1524,26.2941,100,100
+17,- HITL authorization,16.064,19.1938,100,100
+18,- HITL authorization,15.4258,19.4522,100,100
+19,- HITL authorization,16.5074,21.0901,100,100
+0,- Consensus (Central+Sig),15.5625,7.9858,100,100
+1,- Consensus (Central+Sig),14.6781,5.3616,100,100
+2,- Consensus (Central+Sig),14.5855,3.8471,100,100
+3,- Consensus (Central+Sig),15.5208,5.1616,100,100
+4,- Consensus (Central+Sig),16.3963,7.7768,100,100
+5,- Consensus (Central+Sig),15.6405,6.2824,100,100
+6,- Consensus (Central+Sig),14.8439,5.6989,100,100
+7,- Consensus (Central+Sig),13.4174,6.1848,100,100
+8,- Consensus (Central+Sig),14.2625,6.3114,100,100
+9,- Consensus (Central+Sig),14.4164,7.0265,100,100
+10,- Consensus (Central+Sig),16.5623,6.1042,100,100
+11,- Consensus (Central+Sig),12.6492,7.3514,100,100
+12,- Consensus (Central+Sig),15.8374,5.4411,100,100
+13,- Consensus (Central+Sig),14.6015,5.9359,100,100
+14,- Consensus (Central+Sig),15.7769,5.4202,100,100
+15,- Consensus (Central+Sig),12.8992,6.0574,100,100
+16,- Consensus (Central+Sig),14.9524,8.124,100,100
+17,- Consensus (Central+Sig),15.864,4.2512,100,100
+18,- Consensus (Central+Sig),15.2258,4.3921,100,100
+19,- Consensus (Central+Sig),16.3074,5.2855,100,100
+0,- All authentication,15.6625,9.2168,0,100
+1,- All authentication,14.7781,6.1552,0,100
+2,- All authentication,14.6855,4.3882,0,100
+3,- All authentication,15.6208,5.9219,0,100
+4,- All authentication,16.4963,8.9729,0,100
+5,- All authentication,15.7405,7.2295,0,100
+6,- All authentication,14.9439,6.5487,0,100
+7,- All authentication,13.5174,7.1156,0,100
+8,- All authentication,14.3625,7.2633,0,100
+9,- All authentication,14.5164,8.0976,0,100
+10,- All authentication,16.6623,7.0215,0,100
+11,- All authentication,12.7492,8.4766,0,100
+12,- All authentication,15.9374,6.2479,0,100
+13,- All authentication,14.7015,6.8252,0,100
+14,- All authentication,15.8769,6.2236,0,100
+15,- All authentication,12.9992,6.967,0,100
+16,- All authentication,15.0524,9.378,0,100
+17,- All authentication,15.964,4.8597,0,100
+18,- All authentication,15.3258,5.0242,0,100
+19,- All authentication,16.4074,6.0664,0,100
+0,- Multi-stage verif.,15.5625,18.1097,100,100
+1,- Multi-stage verif.,14.6781,13.736,100,100
+2,- Multi-stage verif.,14.5855,11.2118,100,100
+3,- Multi-stage verif.,15.5208,13.4027,100,100
+4,- Multi-stage verif.,16.3963,17.7613,100,100
+5,- Multi-stage verif.,15.6405,15.2707,100,100
+6,- Multi-stage verif.,14.8439,14.2982,100,100
+7,- Multi-stage verif.,13.4174,15.108,100,100
+8,- Multi-stage verif.,14.2625,15.319,100,100
+9,- Multi-stage verif.,14.4164,16.5109,100,100
+10,- Multi-stage verif.,16.5623,14.9736,100,100
+11,- Multi-stage verif.,12.6492,17.0523,100,100
+12,- Multi-stage verif.,15.8374,13.8685,100,100
+13,- Multi-stage verif.,14.6015,14.6931,100,100
+14,- Multi-stage verif.,15.7769,13.8337,100,100
+15,- Multi-stage verif.,12.8992,14.8957,100,100
+16,- Multi-stage verif.,14.9524,18.3401,100,100
+17,- Multi-stage verif.,15.864,11.8853,100,100
+18,- Multi-stage verif.,15.2258,12.1202,100,100
+19,- Multi-stage verif.,16.3074,13.6091,100,100
+0,PPO-CMDP (no blockchain),15.3114,12.2716,0,100
+1,PPO-CMDP (no blockchain),14.5073,7.0232,0,100
+2,PPO-CMDP (no blockchain),14.4231,3.9941,0,100
+3,PPO-CMDP (no blockchain),15.2735,6.6232,0,100
+4,PPO-CMDP (no blockchain),16.0694,11.8536,0,100
+5,PPO-CMDP (no blockchain),15.3823,8.8649,0,100
+6,PPO-CMDP (no blockchain),14.6581,7.6978,0,100
+7,PPO-CMDP (no blockchain),13.3613,8.6695,0,100
+8,PPO-CMDP (no blockchain),14.1295,8.9228,0,100
+9,PPO-CMDP (no blockchain),14.2695,10.3531,0,100
+10,PPO-CMDP (no blockchain),16.2203,8.5083,0,100
+11,PPO-CMDP (no blockchain),12.6629,11.0027,0,100
+12,PPO-CMDP (no blockchain),15.5613,7.1822,0,100
+13,PPO-CMDP (no blockchain),14.4377,8.1717,0,100
+14,PPO-CMDP (no blockchain),15.5063,7.1405,0,100
+15,PPO-CMDP (no blockchain),12.8902,8.4149,0,100
+16,PPO-CMDP (no blockchain),14.7567,12.5481,0,100
+17,PPO-CMDP (no blockchain),15.5855,4.8023,0,100
+18,PPO-CMDP (no blockchain),15.0052,5.0843,0,100
+19,PPO-CMDP (no blockchain),15.9885,6.871,0,100

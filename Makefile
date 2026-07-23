@@ -66,10 +66,13 @@ download-data: download-viirs
 	python data/scripts/download_goes16.py --region california --start_datetime 2020-08-01T00:00:00 --end_datetime 2020-08-07T00:00:00
 	python data/scripts/validate_datasets.py
 
+# Dates are each event's PEAK-activity window (VIIRS_SNPP_SP archive, 10-day pull)
+# so the grids carry rich fire pixels. Year in the date sets the canonical grid
+# filename (viirs_grid_<region>_<year>.npz), which the experiments load.
 download-viirs:
-	python data/scripts/download_viirs.py --region california --start_date 2020-08-01 --end_date 2020-10-01
-	python data/scripts/download_viirs.py --region mediterranean --start_date 2021-08-01 --end_date 2021-09-30
-	python data/scripts/download_viirs.py --region australia --start_date 2019-11-01 --end_date 2020-02-28
+	python data/scripts/download_viirs.py --region california --start_date 2020-09-07 --end_date 2020-09-17
+	python data/scripts/download_viirs.py --region mediterranean --start_date 2021-08-03 --end_date 2021-08-13
+	python data/scripts/download_viirs.py --region australia --start_date 2019-12-30 --end_date 2020-01-09
 
 download-checkpoint:
 	python scripts/download_checkpoint.py

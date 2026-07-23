@@ -24,7 +24,7 @@ interface LayerState {
   comms: boolean;
 }
 
-export type View = "live" | "adversarial" | "governance" | "benchmark" | "compare" | "viirs";
+export type View = "live" | "adversarial" | "governance" | "benchmark" | "compare" | "viirs" | "experiments" | "ablation" | "scalability" | "learning" | "hitl" | "cnn";
 
 interface SimCtx {
   view: View;
@@ -121,14 +121,25 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
     [params, start],
   );
 
-  // Follow the live edge while streaming.
+  // Keep the latest frame count in a ref so the playback loop can read it
+  // without re-subscribing (and thus restarting the rAF) on every frame batch.
+  const framesLenRef = useRef(0);
   useEffect(() => {
-    if (status === "running" && frames.length > 0) setIndex(frames.length - 1);
-  }, [frames.length, status]);
+    framesLenRef.current = frames.length;
+  }, [frames.length]);
+  const statusRef = useRef(status);
+  useEffect(() => {
+    statusRef.current = status;
+  }, [status]);
 
-  // Replay loop after completion.
+  // Single playback loop that advances the view at a steady BASE_FPS × speed —
+  // used both while the episode is still streaming AND on replay afterwards. It
+  // never snaps to the newest frame (that made the UAVs look like they were
+  // teleporting/bouncing during a fast live stream). Instead it plays smoothly
+  // from t=0; if it reaches the live edge while frames are still arriving it
+  // waits there for more, and only stops once the stream is finished.
   useEffect(() => {
-    if (!playing || status === "running" || frames.length <= 1) {
+    if (!playing) {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
       return;
@@ -144,10 +155,15 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
         const adv = Math.floor(accRef.current);
         accRef.current -= adv;
         setIndex((i) => {
+          const liveEdge = framesLenRef.current - 1;
           const next = i + adv;
-          if (next >= frames.length - 1) {
-            setPlaying(false);
-            return frames.length - 1;
+          if (next >= liveEdge) {
+            // At the newest available frame. If the stream is done, stop here;
+            // otherwise hold at the edge and wait for more frames to arrive.
+            if (statusRef.current !== "running" && statusRef.current !== "connecting") {
+              setPlaying(false);
+            }
+            return Math.max(0, liveEdge);
           }
           return next;
         });
@@ -158,7 +174,7 @@ export function SimulationProvider({ children }: { children: React.ReactNode }) 
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [playing, speed, status, frames.length]);
+  }, [playing, speed]);
 
   const currentFrame = frames[Math.min(index, frames.length - 1)] ?? null;
 

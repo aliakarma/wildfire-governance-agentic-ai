@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Experiment 09 — Adversarial robustness evaluation (Table V in paper).
+"""Experiment 09 — Adversarial robustness evaluation (Table 3 in paper).
 
-Tests all attack types: sensor spoofing, alert injection, Byzantine faults.
-Compares GOMDP vs. centralized (no blockchain) for each attack.
+Tests all attack types: sensor spoofing, alert injection, strategic spoofing.
+Compares GOMDP vs. Central+Sig vs. Central for each attack.
 
-Paper reference: Table V, Section VI-D (Adversarial Robustness).
-Output: results/runs/<hash>/table5_adversarial.csv
+Paper reference: Table 3, Section VI-D (Adversarial Robustness).
+Output: results/runs/<hash>/table3_adversarial.csv
 """
 from __future__ import annotations
 
@@ -17,10 +17,6 @@ import numpy as np
 import pandas as pd
 
 from experiments.utils.runner import run_episode
-from wildfire_governance.gomdp.breach_probability import (
-    compute_breach_probability_gomdp,
-    compute_breach_probability_centralized,
-)
 from wildfire_governance.utils.config import load_config
 from wildfire_governance.utils.logging import get_structured_logger
 from wildfire_governance.utils.reproducibility import generate_run_hash
@@ -29,15 +25,12 @@ logger = get_structured_logger(__name__)
 RESULTS_BASE = Path("results/runs")
 
 ATTACK_CONFIGS = [
-    {"attack_type": "no_attack",  "p_spoof": 0.0, "n_byzantine": 0},
-    {"attack_type": "spoofing",   "parameter": "p=0.05", "p_spoof": 0.05, "n_byzantine": 0},
-    {"attack_type": "spoofing",   "parameter": "p=0.10", "p_spoof": 0.10, "n_byzantine": 0},
-    {"attack_type": "spoofing",   "parameter": "p=0.20", "p_spoof": 0.20, "n_byzantine": 0},
-    {"attack_type": "injection",  "parameter": "p_att=1.0", "p_spoof": 0.0, "n_byzantine": 0},
-    {"attack_type": "byzantine",  "parameter": "f=0", "p_spoof": 0.0, "n_byzantine": 0},
-    {"attack_type": "byzantine",  "parameter": "f=1", "p_spoof": 0.0, "n_byzantine": 1},
-    {"attack_type": "byzantine",  "parameter": "f=2", "p_spoof": 0.0, "n_byzantine": 2},
-    {"attack_type": "byzantine",  "parameter": "f=3", "p_spoof": 0.0, "n_byzantine": 3},
+    {"attack_type": "no_attack",  "parameter": "---", "p_spoof": 0.0, "strategic": False, "metric": "fp_pct", "display_attack": "No attack"},
+    {"attack_type": "spoofing",   "parameter": "p=0.05", "p_spoof": 0.05, "strategic": False, "metric": "fp_pct", "display_attack": "Spoofing (i.i.d.)"},
+    {"attack_type": "spoofing",   "parameter": "p=0.10", "p_spoof": 0.10, "strategic": False, "metric": "fp_pct", "display_attack": "Spoofing (i.i.d.)"},
+    {"attack_type": "spoofing",   "parameter": "p=0.20", "p_spoof": 0.20, "strategic": False, "metric": "fp_pct", "display_attack": "Spoofing (i.i.d.)"},
+    {"attack_type": "spoofing_strategic", "parameter": "p=0.10", "p_spoof": 0.10, "strategic": True, "metric": "fp_pct", "display_attack": "Spoofing (strategic)"},
+    {"attack_type": "injection",  "parameter": "p_att=1", "p_spoof": 0.0, "strategic": False, "metric": "injection_ratio", "display_attack": "Alert injection (success)"},
 ]
 
 
@@ -61,81 +54,81 @@ def main(config_path: str, smoke: bool = False) -> None:
 
     for atk in ATTACK_CONFIGS:
         attack_type = atk["attack_type"]
-        parameter = atk.get("parameter", "")
+        parameter = atk["parameter"]
         p_spoof = atk["p_spoof"]
-        n_byzantine = atk["n_byzantine"]
+        strategic = atk["strategic"]
+        metric = atk["metric"]
+        display_attack = atk["display_attack"]
 
-        # GOMDP runs
-        gomdp_fps, central_fps, gomdp_results = [], [], []
+        # Run GOMDP, Central+Sig, Central
+        gomdp_vals, sig_vals, central_vals = [], [], []
         for seed in range(n_seeds):
-            # GOMDP
+            # 1. GOMDP
             r_gomdp = run_episode(
                 seed=seed, config_name="gomdp",
                 n_uavs=n_uavs, n_timesteps=n_timesteps,
                 enable_governance=True, enable_hitl=True,
                 enable_blockchain=True, enable_verification=True,
                 enable_coordination=True,
-                p_spoof=p_spoof, n_byzantine=n_byzantine,
-                attack_type=attack_type,
+                p_spoof=p_spoof, n_byzantine=0,
+                attack_type="spoofing_strategic" if strategic else ("none" if attack_type == "no_attack" else attack_type),
             )
-            gomdp_fps.append(r_gomdp.fp_pct)
-            gomdp_results.append(r_gomdp)
+            # 2. Central+Sig
+            r_sig = run_episode(
+                seed=seed, config_name="central_sig",
+                n_uavs=n_uavs, n_timesteps=n_timesteps,
+                enable_governance=False, enable_hitl=False,
+                enable_blockchain=False, enable_verification=True,
+                enable_coordination=True,
+                p_spoof=p_spoof, n_byzantine=0,
+                attack_type="spoofing_strategic" if strategic else ("none" if attack_type == "no_attack" else attack_type),
+            )
+            # 3. Central
+            r_central = run_episode(
+                seed=seed, config_name="central",
+                n_uavs=n_uavs, n_timesteps=n_timesteps,
+                enable_governance=False, enable_hitl=False,
+                enable_blockchain=False, enable_verification=False,
+                enable_coordination=True,
+                p_spoof=p_spoof, n_byzantine=0,
+                attack_type="spoofing_strategic" if strategic else ("none" if attack_type == "no_attack" else attack_type),
+            )
 
-            # Centralized (no blockchain)
-            if attack_type != "byzantine":
-                r_central = run_episode(
-                    seed=seed, config_name="central",
-                    n_uavs=n_uavs, n_timesteps=n_timesteps,
-                    enable_governance=False, enable_hitl=False,
-                    enable_blockchain=False, enable_verification=False,
-                    enable_coordination=True,
-                    p_spoof=p_spoof,
-                )
-                central_fps.append(r_central.fp_pct)
-
-        # Theoretical breach probability from Theorem 2
-        if attack_type == "injection":
-            breaches = sum(int(getattr(result, "injection_success", 0)) for result in gomdp_results)
-            total = len(gomdp_results)
-            p_breach_gomdp = breaches / max(1, total)
-            p_breach_central = compute_breach_probability_centralized(1.0)
-        elif attack_type == "byzantine":
-            p_c = 0.3
-            f_actual = n_byzantine
-
-            if f_actual <= (7 - 1) // 3:
-                p_breach_gomdp = compute_breach_probability_gomdp(7, f_actual, p_c)
+            if metric == "injection_ratio":
+                gomdp_vals.append(int(getattr(r_gomdp, "injection_success", 0)))
+                sig_vals.append(int(getattr(r_sig, "injection_success", 0)))
+                central_vals.append(int(getattr(r_central, "injection_success", 0)))
             else:
-                p_breach_gomdp = 1.0
-            p_breach_central = None
+                gomdp_vals.append(r_gomdp.fp_pct)
+                sig_vals.append(r_sig.fp_pct)
+                central_vals.append(r_central.fp_pct)
+
+        if metric == "injection_ratio":
+            # Ratio string representation e.g. "X/N"
+            gomdp_str = f"{sum(gomdp_vals)}/{n_seeds}"
+            sig_str = f"{sum(sig_vals)}/{n_seeds}"
+            central_str = f"{sum(central_vals)}/{n_seeds}"
         else:
-            breaches = sum(int(getattr(result, "injection_success", 0)) for result in gomdp_results)
-            total = len(gomdp_results)
-            p_breach_gomdp = breaches / max(1, total)
-            p_breach_central = None
+            gomdp_str = round(float(np.mean(gomdp_vals)), 1)
+            sig_str = round(float(np.mean(sig_vals)), 1)
+            central_str = round(float(np.mean(central_vals)), 1)
 
         rows.append({
-            "attack_type": attack_type,
+            "attack_type": display_attack,
             "parameter": parameter,
-            "gomdp_fp": round(float(np.mean(gomdp_fps)), 2),
-            "gomdp_fp_std": round(float(np.std(gomdp_fps)), 2),
-            "central_fp": round(float(np.mean(central_fps)), 2) if central_fps else None,
-            "central_fp_std": round(float(np.std(central_fps)), 2) if central_fps else None,
-            "p_breach_gomdp": round(float(p_breach_gomdp), 3) if p_breach_gomdp is not None else None,
-            "p_breach_central": round(float(p_breach_central), 3) if p_breach_central is not None else None,
+            "gomdp": gomdp_str,
+            "central_sig": sig_str,
+            "central": central_str,
+            "metric": metric
         })
         logger.info("attack_evaluated", attack=attack_type, param=parameter,
-                    gomdp_fp=round(float(np.mean(gomdp_fps)), 2))
+                    gomdp_val=gomdp_str)
 
-    paper_path = Path("results/paper/table5_adversarial.csv")
-    if paper_path.exists():
-        out_df = pd.read_csv(paper_path)
-    else:
-        out_df = pd.DataFrame(rows)
-    out_path = out_dir / "table5_adversarial.csv"
+    out_df = pd.DataFrame(rows)
+    out_path = out_dir / "table3_adversarial.csv"
     out_df.to_csv(out_path, index=False)
     logger.info("experiment_complete", output=str(out_path))
-    print(f"\n=== Table V Adversarial Robustness ===\n{out_df.to_string(index=False)}\n")
+    print(f"\n=== Table 3 Adversarial Robustness ===\n{out_df.to_string(index=False)}\n")
 
 
 if __name__ == "__main__":

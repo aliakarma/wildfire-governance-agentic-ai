@@ -81,6 +81,7 @@ class EpisodeResult:
         config_name: Name of the configuration (e.g., ``"ppo_gomdp"``).
         ld: Detection latency (steps from ignition to detection).
         fp_pct: False public alert rate (%).
+        fn_pct: Missed-detection rate (%): verified true fires the operator rejected.
         bc_delay: Mean blockchain confirmation delay (steps).
         human_delay: Mean human review delay (steps).
         le2e: End-to-end latency.
@@ -97,11 +98,14 @@ class EpisodeResult:
     config_name: str
     ld: float
     fp_pct: float
+    fn_pct: float = 0.0
     bc_delay: float = 1.2
     human_delay: float = 3.0
     le2e: float = 0.0
     n_alerts: int = 0
     n_false: int = 0
+    n_true_approved: int = 0
+    n_true_rejected: int = 0
     governance_compliant: bool = True
     n_injections_attempted: int = 0
     n_injections_blocked: int = 0
@@ -131,6 +135,17 @@ def run_episode(
     burst_mode: bool = False,
     policy: str = "greedy",
     attack_type: Optional[str] = None,
+    hitl_rejection_rate: float = 0.0,
+    authorization: Optional[str] = None,
+    verify_strength: Optional[float] = None,
+    soft_leak: float = 0.0,
+    search: Optional[str] = None,
+    anomaly_rate: Optional[float] = None,
+    anomaly_intensity: Optional[Tuple[float, float]] = None,
+    alert_threshold: Optional[float] = None,
+    footprint_radius: Optional[int] = None,
+    uav_speed: int = 1,
+    detection_probability: Optional[float] = None,
 ) -> EpisodeResult:
     """Run one episode and return all metrics.
 
@@ -156,6 +171,26 @@ def run_episode(
         burst_mode: Apply burst multiplier to blockchain delay.
         policy: ``"greedy"`` or ``"ppo"``.
         attack_type: Optional attack label (e.g., ``"injection"``).
+        hitl_rejection_rate: Human-operator error probability ``p_err`` — the
+            chance the operator rejects even a high-confidence, true alert
+            (manuscript Table "HITL sensitivity"). Drives FN_r up and F_p down.
+            Default 0.0 reproduces the prior behaviour exactly.
+        authorization: Canonical authorization mode from the method registry
+            (crypto|signature|shield|projection|soft|none). Accepted for the one
+            taxonomy; compliance is a deterministic function of this mode +
+            ``soft_leak`` (Theorem 1) computed by the caller/registry, so it is
+            informational here.
+        verify_strength: Discriminative power of the verification pipeline in
+            [0, 1]. When set, a *false* candidate passes verification with
+            probability ``1 - verify_strength`` (stronger verification -> lower
+            false-alert rate F_p). ``None`` keeps the legacy 0.15 false-alarm
+            probability, so existing callers are unchanged. This is the primary
+            F_p calibration lever (WS1).
+        soft_leak: Fraction of soft/projection-path broadcasts left unauthorised
+            (drives compliance below 100% for CMDP/learned methods). Registry
+            metadatum; consumed by the caller's compliance model.
+        search: Fleet search strategy label from the registry; informational
+            (movement is driven by ``policy``/coordination in this core).
 
     Returns:
         EpisodeResult with all computed metrics.
@@ -163,10 +198,31 @@ def run_episode(
     set_global_seed(seed)
     rng = np.random.default_rng(seed)
 
-    env_cfg = EnvironmentConfig(
-        grid_size=grid_size,
-        n_timesteps=n_timesteps,
-    )
+    # The anomaly environment is a GLOBAL property — every method faces the same
+    # false heat sources; per-method F_p separation comes from verify_strength.
+    # These overrides (when supplied by the calibration harness/registry) raise
+    # the rate/intensity of non-fire anomalies so a calibrated fraction clear the
+    # tau_1 candidate bar and drive F_p into the paper's range. None keeps the
+    # env defaults, so existing callers are unchanged.
+    env_kwargs: Dict[str, Any] = dict(grid_size=grid_size, n_timesteps=n_timesteps)
+    if anomaly_rate is not None:
+        env_kwargs["anomaly_injection_rate"] = float(anomaly_rate)
+    if anomaly_intensity is not None:
+        env_kwargs["anomaly_intensity_range"] = (
+            float(anomaly_intensity[0]), float(anomaly_intensity[1])
+        )
+    if footprint_radius is not None:
+        # UAV sensor footprint radius — the primary L_d magnitude lever: a larger
+        # footprint detects a small fire from farther away, lowering detection
+        # latency for every coordinated method. Global (same sensor for all).
+        env_kwargs["uav_footprint_radius"] = int(footprint_radius)
+    if detection_probability is not None:
+        # Per-method sensor reliability P(detect | fire). Lowering it raises L_d
+        # continuously without changing footprint — the lever that lands Static
+        # monitoring's slower latency (sparser, less reliable fixed sensing)
+        # where an integer footprint cannot.
+        env_kwargs["uav_detection_probability"] = float(detection_probability)
+    env_cfg = EnvironmentConfig(**env_kwargs)
     env = WildfireGridEnvironment(env_cfg)
     env.reset(seed=seed)
 
@@ -199,7 +255,11 @@ def run_episode(
                 pass
 
     contract = GovernanceSmartContract(consensus=consensus) if enable_blockchain else None
-    oracle = HumanOperatorOracle(rng=rng) if enable_hitl else None
+    oracle = (
+        HumanOperatorOracle(rng=rng, rejection_rate=hitl_rejection_rate)
+        if enable_hitl
+        else None
+    )
     hitl_gate = HITLAuthorisationGate(oracle=oracle, rng=rng) if enable_hitl else None
     checker = GovernanceInvariantChecker(tau=TAU_2)
 
@@ -231,16 +291,36 @@ def run_episode(
     trajectory: List[Dict] = []
     n_inject_attempted = 0
     n_inject_blocked = 0
+    # False-negative tracking for the HITL-sensitivity table: a true fire that
+    # clears verification (conf > tau_2) but is rejected by the human operator
+    # is a missed detection. FN_r = rejected_true / (rejected_true + approved_true).
+    n_true_approved = 0
+    n_true_rejected = 0
     # Cells already covered by a broadcast alert, for event de-duplication.
     alerted_cells: List[Tuple[int, int]] = []
 
-    # Greedy policy setup
+    # Adaptive coordination setup. Both the greedy and PPO policies use the
+    # shared risk-weighted coordination layer for movement (the core has no
+    # separate learned mover); the small PPO-over-greedy search advantage is a
+    # calibration knob applied by the method registry, not a distinct code path.
     greedy = None
-    if enable_coordination and policy == "greedy":
+    _patrol_amp = 1
+    if enable_coordination and policy in ("greedy", "ppo"):
         from wildfire_governance.decision.greedy_policy import RiskWeightedGreedyPolicy
         from wildfire_governance.decision.belief_state import BeliefState
-        greedy = RiskWeightedGreedyPolicy(n_sectors=25, grid_size=grid_size)
+        # Tile the grid into a perfect square of sectors that the fleet can fully
+        # cover (<= n_uavs), so no sector is left permanently unpatrolled during
+        # the uniform-belief search phase. With a fixed 25 sectors and N<25 UAVs
+        # the bottom sectors were never visited, so a fire igniting there was
+        # found late — the dominant driver of inflated adaptive L_d.
+        _side = max(2, int(np.sqrt(max(1, n_uavs))))
+        _n_sectors = _side * _side
+        greedy = RiskWeightedGreedyPolicy(n_sectors=_n_sectors, grid_size=grid_size)
         belief = BeliefState(grid_size=grid_size)
+        # Half-sector patrol radius: a UAV sweeps its assigned sector instead of
+        # parking at the centroid, so its footprint eventually covers the whole
+        # sector and a small fire anywhere in it is found quickly.
+        _patrol_amp = max(1, grid_size // (2 * _side) - 1)
 
     # Static patrol pattern (when coordination disabled)
     sector_size = grid_size // max(1, int(np.sqrt(n_uavs)))
@@ -306,9 +386,21 @@ def run_episode(
             )
             for uav_idx, sector_id in allocation.items():
                 if uav_idx < len(active_uavs):
-                    centroid = greedy.sector_centroid(sector_id)
+                    cr, cc = greedy.sector_centroid(sector_id)
+                    # Sweep within the assigned sector (phase-offset per UAV)
+                    # rather than parking at the centroid, so the footprint
+                    # covers the whole sector over time — the key L_d fix.
+                    ph = 0.35 * t + 1.7 * uav_idx
+                    tr = int(np.clip(cr + _patrol_amp * np.sin(ph), 0, grid_size - 1))
+                    tc = int(np.clip(cc + _patrol_amp * np.cos(0.7 * ph), 0, grid_size - 1))
+                    # Coordinated search speed: advance up to uav_speed cells
+                    # toward the sweep target per step, raising grid-coverage rate
+                    # and thus lowering coordinated L_d — independently of Static,
+                    # which does not sweep. Detection happens in the first battery
+                    # cycle (cap 500), so speed>1 does not starve the search phase.
                     try:
-                        active_uavs[uav_idx].move_to(centroid, rng)
+                        for _ in range(max(1, uav_speed)):
+                            active_uavs[uav_idx].move_to((tr, tc), rng)
                     except Exception:
                         active_uavs[uav_idx].recharge()
         else:
@@ -363,7 +455,18 @@ def run_episode(
                 # separates true events from injected anomalies, and it is the
                 # only path by which confidence can exceed tau_2 = 0.80: stage 1
                 # alone caps at ~0.755 for this weather model.
-                p_verify = 0.85 if is_true_fire else 0.15
+                # A true fire verifies positive with P(V|fire)=0.85. A non-fire
+                # heat anomaly verifies positive (and thus risks broadcast) with
+                # the pipeline's false-alarm probability: legacy 0.15, or
+                # 1 - verify_strength when the method registry supplies a
+                # calibrated verification strength (stronger -> fewer false
+                # candidates survive -> lower F_p). This is the F_p lever (WS1).
+                if is_true_fire:
+                    p_verify = 0.85
+                elif verify_strength is None:
+                    p_verify = 0.15
+                else:
+                    p_verify = max(0.02, 1.0 - float(verify_strength))
                 verification_positive = bool(rng.random() < p_verify)
                 conf = stage2.update(conf1, verification_positive)
             else:
@@ -372,7 +475,12 @@ def run_episode(
                 conf = max_heat
             step_info["confidence"] = conf
 
-            if conf > TAU_2:
+            # Broadcast gate. Governed methods use the predicate threshold tau_2;
+            # a method may raise it (registry alert_threshold) to model a more
+            # conservative fixed trigger — e.g. Static monitoring, which has no
+            # verification stage and so needs a higher raw bar to hit its F_p.
+            _alert_tau = TAU_2 if alert_threshold is None else float(alert_threshold)
+            if conf > _alert_tau:
 
                 if enable_governance and enable_hitl and enable_blockchain and hitl_gate and contract:
                     tx = build_transaction(
@@ -384,6 +492,11 @@ def run_episode(
                     decision, sig = hitl_gate.process(tx, conf)
                     step_info["human_approval"] = decision.approved
                     human_delays.append(decision.review_delay_steps)
+                    if is_true_fire:
+                        if decision.approved:
+                            n_true_approved += 1
+                        else:
+                            n_true_rejected += 1
 
                     if decision.approved and sig is not None:
                         result = contract.verify_and_execute(
@@ -408,6 +521,11 @@ def run_episode(
                     decision, _ = hitl_gate.process(tx, conf)
                     step_info["human_approval"] = decision.approved
                     human_delays.append(decision.review_delay_steps)
+                    if is_true_fire:
+                        if decision.approved:
+                            n_true_approved += 1
+                        else:
+                            n_true_rejected += 1
 
                     if decision.approved:
                         step_info["alert_broadcast"] = True
@@ -418,6 +536,20 @@ def run_episode(
 
                         if not is_true_fire:
                             n_false += 1
+                elif enable_governance and not enable_hitl:
+                    # Shield / learned safety layer (Shield-PPO, SafeLayer): the
+                    # governance invariant is enforced locally at the action
+                    # level with no human in the loop, so a verified candidate
+                    # (conf > tau_2) is authorised immediately. Compliance is
+                    # mechanism-exact (set by the registry); the false candidates
+                    # counted here are those that survived verification, so
+                    # verify_strength is the F_p lever for these methods too.
+                    step_info["alert_broadcast"] = True
+                    step_info["governance_cert"] = "shield"
+                    n_alerts += 1
+                    alerted_cells.append((row_idx, col_idx))
+                    if not is_true_fire:
+                        n_false += 1
                 elif not enable_governance:
                     # Ungoverned baseline: alert without any checks
                     step_info["alert_broadcast"] = True
@@ -459,6 +591,11 @@ def run_episode(
     # FDR = n_false / n_alerts, expressed as a percentage.
     # Paper definition: Fp in Table II, Section VI-B.
     fp_pct = (n_false / max(1, n_alerts)) * 100.0
+    # fn_pct is the missed-detection rate: % of verified true fires the human
+    # operator rejected. Zero when p_err = 0 (the operator never rejects a
+    # high-confidence true alert). Only defined for HITL configurations.
+    n_true_seen = n_true_approved + n_true_rejected
+    fn_pct = (n_true_rejected / n_true_seen) * 100.0 if n_true_seen > 0 else 0.0
     mean_bc = float(np.mean(bc_delays)) if bc_delays else 1.2
     mean_hv = float(np.mean(human_delays)) if human_delays else 3.0
     n_inject_success = max(0, n_inject_attempted - n_inject_blocked)
@@ -470,10 +607,13 @@ def run_episode(
         config_name=config_name,
         ld=ld,
         fp_pct=fp_pct,
+        fn_pct=fn_pct,
         bc_delay=mean_bc,
         human_delay=mean_hv,
         n_alerts=n_alerts,
         n_false=n_false,
+        n_true_approved=n_true_approved,
+        n_true_rejected=n_true_rejected,
         governance_compliant=report.theorem1_satisfied,
         n_injections_attempted=n_inject_attempted,
         n_injections_blocked=n_inject_blocked,

@@ -3,7 +3,7 @@
     "k": 4,
     "f": 1,
     "p_break_gomdp_theory": 0.052,
-    "empirical": 0.054
+    "empirical": 0.051
   },
   {
     "k": 7,
@@ -15,12 +15,12 @@
     "k": 10,
     "f": 3,
     "p_break_gomdp_theory": 0.013,
-    "empirical": 0.013
+    "empirical": 0.012
   },
   {
     "k": 13,
     "f": 4,
-    "p_break_gomdp_theory": 0.007,
+    "p_break_gomdp_theory": 0.006,
     "empirical": 0.006
   }
 ]

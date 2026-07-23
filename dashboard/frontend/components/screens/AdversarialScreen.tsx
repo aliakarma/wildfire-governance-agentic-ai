@@ -1,6 +1,7 @@
 "use client";
 import { AttackConsole } from "@/components/adv/AttackConsole";
 import { BreachMeter } from "@/components/adv/BreachMeter";
+import { ConsensusReference } from "@/components/adv/ConsensusReference";
 import { SafetyVerdict } from "@/components/adv/SafetyVerdict";
 import { useSim } from "@/components/providers/SimulationProvider";
 import { EventFeed } from "@/components/sim/EventFeed";
@@ -34,7 +35,7 @@ export function AdversarialScreen() {
             showSectors={s.layers.sectors}
             showComms={s.layers.comms}
             nSectors={s.params.n_sectors}
-            trail={s.frames.slice(Math.max(0, s.index - 5), s.index).map((f) => f.uavs)}
+            trail={s.frames.slice(Math.max(0, s.index - 14), s.index).map((f) => f.uavs)}
           />
           <PlaybackControls
             total={s.frames.length}
@@ -55,8 +56,9 @@ export function AdversarialScreen() {
           <SwarmStatus frame={s.currentFrame} />
           <SafetyVerdict />
           <BreachMeter nValidators={nVal} nByzantine={nByz} />
+          <ConsensusReference />
           <div className="h-[280px]">
-            <EventFeed frames={s.frames} />
+            <EventFeed frames={s.frames} index={s.index} />
           </div>
         </aside>
       </div>

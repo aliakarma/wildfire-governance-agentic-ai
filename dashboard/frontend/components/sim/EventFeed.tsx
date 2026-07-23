@@ -7,13 +7,17 @@ const COLORS: Record<string, string> = {
   ALERT_SIGNED: "var(--info)",
   ALERT_BLOCKED: "var(--danger)",
   ALERT_UNGOVERNED: "var(--warn)",
+  ALERT_UNAUTHORISED: "var(--danger)",
   HITL_REJECTED: "var(--warn)",
   INJECTION_BLOCKED: "var(--danger)",
 };
 
-export function EventFeed({ frames }: { frames: Frame[] }) {
+export function EventFeed({ frames, index }: { frames: Frame[]; index?: number }) {
   const { t } = useLang();
-  const events = frames
+  // Reveal events in step with playback: only frames up to the current index.
+  // Without an index we fall back to the full list (backward-compatible).
+  const visible = index == null ? frames : frames.slice(0, index + 1);
+  const events = visible
     .filter((f) => f.event)
     .slice(-80)
     .reverse();

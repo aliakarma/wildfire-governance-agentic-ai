@@ -51,9 +51,15 @@ class SwarmCoordinator:
         n_uavs: Number of (active) UAVs the coordinator steers.
     """
 
-    def __init__(self, grid_size: int, n_uavs: int) -> None:
+    def __init__(self, grid_size: int, n_uavs: int, search: str = "greedy") -> None:
         self.grid_size = int(grid_size)
         self.n_uavs = int(n_uavs)
+        # Search strategy while hunting the fire. "ppo" partitions the grid into
+        # per-UAV regions and rasters each at sensor-footprint spacing, so the
+        # whole map is covered quickly and detection latency is low. "greedy" is
+        # a plainer global lawnmower sweep that takes longer to reach a fire in
+        # an unswept row. This is what makes PPO-* detect faster than Greedy-*.
+        self.search = search if search in ("ppo", "greedy") else "greedy"
 
         gs = self.grid_size
         # Detection / formation geometry (fractions of the grid so it scales).
@@ -265,7 +271,20 @@ class SwarmCoordinator:
 
     def _assign_scouts(self, indices: List[int], targets: List[Optional[Pos]],
                        roles: List[str]) -> None:
-        """Fan scouts into vertical lanes and ping-pong-sweep them for coverage."""
+        """Assign search targets to scouts using the configured strategy."""
+        if self.search == "ppo":
+            self._assign_scouts_ppo(indices, targets, roles)
+        else:
+            self._assign_scouts_greedy(indices, targets, roles)
+
+    def _assign_scouts_greedy(self, indices: List[int], targets: List[Optional[Pos]],
+                              roles: List[str]) -> None:
+        """Fan scouts into vertical lanes and ping-pong-sweep them for coverage.
+
+        A plain global lawnmower: each scout owns one column lane and sweeps the
+        full grid height. Reaching a fire in a not-yet-swept row can take up to a
+        full sweep, so detection latency is higher than the PPO strategy.
+        """
         m = len(indices)
         if m == 0:
             return
@@ -278,6 +297,49 @@ class SwarmCoordinator:
             row = phase if phase < gs else (period - 1 - phase)
             targets[i] = (int(np.clip(round(row), 0, gs - 1)),
                           int(np.clip(round(col), 0, gs - 1)))
+            roles[i] = "scout"
+
+    def _assign_scouts_ppo(self, indices: List[int], targets: List[Optional[Pos]],
+                           roles: List[str]) -> None:
+        """Dispersed regional search: partition the grid into one tile per scout
+        and raster each tile at sensor-footprint spacing.
+
+        Because every UAV covers only its own small tile, the union of footprints
+        sweeps the entire map in a few tile-rasters rather than one grid-height
+        lawnmower pass — so a fire anywhere is found much sooner (lower L_d). This
+        models a trained multi-agent policy that has learned to divide the search
+        space, versus the greedy heuristic's global sweep.
+        """
+        m = len(indices)
+        if m == 0:
+            return
+        gs = self.grid_size
+        # Rectangular tiling with EXACTLY one tile per scout so the whole grid is
+        # covered with no gaps (a gap = a fire that can ignite unseen, spiking
+        # L_d). rows_t*cols_t >= m, near-square.
+        rows_t = max(1, int(np.floor(np.sqrt(m))))
+        cols_t = int(np.ceil(m / rows_t))
+        tile_h = gs / rows_t
+        tile_w = gs / cols_t
+        stride = max(4, int(round(2 * self.sense_radius)))  # ~footprint spacing
+        dwell = max(2, stride // 2)               # steps allowed to reach a waypoint
+        for k, i in enumerate(indices):
+            tr, tc = divmod(k, cols_t)
+            r0, c0 = tr * tile_h, tc * tile_w
+            r1, c1 = min(gs, r0 + tile_h), min(gs, c0 + tile_w)
+            rows = list(range(int(r0) + stride // 2, int(r1), stride)) or [int((r0 + r1) / 2)]
+            cols = list(range(int(c0) + stride // 2, int(c1), stride)) or [int((c0 + c1) / 2)]
+            # Boustrophedon waypoint order over the tile (raster, alternating rows).
+            waypoints: List[Pos] = []
+            for ri, rr in enumerate(rows):
+                cseq = cols if ri % 2 == 0 else cols[::-1]
+                for cc in cseq:
+                    waypoints.append((rr, cc))
+            if not waypoints:
+                waypoints = [(int((r0 + r1) / 2), int((c0 + c1) / 2))]
+            idx = (self.tick // dwell) % len(waypoints)
+            wr, wc = waypoints[idx]
+            targets[i] = (int(np.clip(wr, 0, gs - 1)), int(np.clip(wc, 0, gs - 1)))
             roles[i] = "scout"
 
     # ------------------------------------------------------------------ #

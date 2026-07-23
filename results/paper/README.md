@@ -1,47 +1,71 @@
-# Paper Result CSVs — Caveats and Metric Definitions
+# Paper result CSVs — canonical set, metric definitions, caveats
 
-This directory contains the pre-committed result CSVs used to generate paper figures and tables.
+This directory holds the **frozen** result CSVs behind every paper table and
+figure. "Frozen" means the paper numbers are fixed; the simulation is calibrated
+to reproduce them (never the reverse). The authoritative map from each file to its
+paper reference, script, dashboard view, and provenance class is
+[MANIFEST.yaml](MANIFEST.yaml) (machine-readable) and
+[../../PROVENANCE.md](../../PROVENANCE.md) (human-readable). The calibration
+methodology and its documented deviations are in [CALIBRATION.md](CALIBRATION.md).
 
-## Metric Definitions
+## Canonical files (this directory)
 
-### False Positive Rate (Fp)
-- **Definition**: False Discovery Rate (FDR) = (# false alerts) / (# total alerts broadcast) × 100%
-- **NOT**: Classical false positive rate in signal processing
-- **Paper location**: Table II, Section VI-B
-- **Computation**: [experiments/utils/runner.py](../../experiments/utils/runner.py), line ~356
+| File | Paper ref | Provenance |
+| :--- | :--- | :--- |
+| `table1_rl_comparison.csv` | Table 1 — policy comparison | calibration |
+| `table1_rl_comparison_main.csv` | Table 5 — full-metric comparison | calibration |
+| `table2_ablation.csv` | Table 2 — ablation | calibration (injection-blocking exact) |
+| `table3_adversarial.csv` | Table 6 — adversarial robustness | calibration (injection-success exact) |
+| `table4_realworld_viirs.csv` | VIIRS validation (3 events) | calibration |
+| `table5_byzantine_theory.csv` · `table5_byzantine_empirical.csv` | validator/verifier compromise | **exact** (+ empirical breach exact) |
+| `table6_ksweep.csv` | validator-count sweep | **exact** |
+| `table7_hitl_sensitivity.csv` | HITL error-rate sensitivity | calibration (compliance exact) |
+| `table8_recent_rl.csv` | recent Safe-RL comparators | calibration |
+| `table9_multisig.csv` | m-of-n multisig | calibration (injection-blocking exact) |
+| `table10_cnn_ablation.csv` | CNN-architecture ablation | **reference** |
+| `fig2_false_alerts.csv` | Fig 2 — F_p vs N | calibration |
+| `fig3_learning_curve.csv` | Fig 3 — learning curve | **reference** |
+| `fig3_latency_data.csv` | Fig 4 — L_d vs N | calibration |
+| `figure2_stress_tests.csv` · `figure3_tradeoff_frontier.csv` · `fig5_tradeoff_data.csv` | — | **supplementary (not in paper)** |
 
-### Detection Latency (Ld)
-- **Definition**: Timesteps from **actual ignition time** to first detection (confidence > 0.60)
-- **Note**: Measured from environment-provided ignition_time (queried per-step), not assumed to be t=0
-- **Paper location**: Section VI-B, Equation (Definition 1)
+`.json` twins accompany the primary tables. Per-seed source data lives under
+[per_seed/](per_seed/).
 
-### Governance Compliance
-- **Definition**: Fraction of broadcast alerts that carry valid cryptographic governance certificates
-- **GOMDP configs**: 100% by Theorem 1 (environment-level enforcement)
-- **CMDP configs**: ~92–93% (no blockchain enforcement, HITL approval alone)
+## Metric definitions
 
-## CSV-Specific Notes
+### False-alert rate (F_p)
+- **Definition:** false-discovery rate = (# false alerts) / (# alerts broadcast) × 100%.
+- **NOT** the classical signal-processing false-positive rate.
+- **Computation:** [../../experiments/utils/runner.py](../../experiments/utils/runner.py).
 
-### table4_ablation.csv
-- **Injections_blocked / Injections_total**: Deterministic *per configuration*
-  - With blockchain (`ppo_gomdp_full`, `greedy_gomdp_full`, etc.): 100/100 (smart contract blocks all)
-  - Without blockchain (`minus_blockchain`, `ppo_cmdp`): 0/100 (no enforcement, all attempts succeed)
-- This reflects the binary enforcement logic (either blockchain is active or it is not) rather than probabilistic simulation.
-- For adversarial stress tests with stochastic Byzantine behavior, see `table5_adversarial.csv`.
+### Detection latency (L_d)
+- **Definition:** timesteps from **actual ignition** to first detection (confidence > 0.60), measured from the environment-provided ignition time (not assumed t=0).
 
-### table2_rl_comparison.csv
-- Contains finalized, original evaluation results for all nine baselines matching the paper exactly.
+### Governance compliance
+- **Definition:** fraction of broadcast alerts carrying a valid governance certificate.
+- **GOMDP configs:** 100% by Theorem 1 (environment-level enforcement) — this column is **exact**, not calibrated.
+- **CMDP configs:** ~92–93% (HITL approval alone, no blockchain enforcement).
 
-## Configuration Caveats
+## CSV-specific notes
 
-### base.yaml
-- **governance.hitl.rejection_rate: 0.15**: Human operator rejects 15% of alerts
-  - Non-zero rejection adds filtering benefit beyond latency
-  - Used for all experiments (default config)
-- **blockchain.consensus.mean_delay_steps: 1.2**: Average consensus delay in steps
-  - This is a simulated consensus model (Python); not real Hyperledger Fabric deployment
-  - Latency bound: E[Ld] <= A/(v*N) + delta, where delta ≈ 1.2 + 3.0 (BC + HV)
+### Injection-blocking columns (`table2_ablation`, `table9_multisig`)
+- **Deterministic per configuration**, not stochastic:
+  - With blockchain / multisig enforcement: 100/100 blocked (a forged alert carries zero valid signatures).
+  - Without enforcement (`− all authentication`, `PPO-CMDP no blockchain`): 0/100.
+- This binary enforcement is an **exact** column and is checked at 2% tolerance.
 
-## See Also
-- [docs/blockchain_setup.md](../../docs/blockchain_setup.md) — Blockchain simulation parameters
-- [experiments/README](../../experiments/README.md) — Experiment script guide
+### Byzantine / k-sweep (`table5_byzantine_*`, `table6_ksweep`)
+- Closed-form Theorem-2 breach probabilities (`p_c = 0.10`, `f = ⌊(k−1)/3⌋`), reproduced **exactly** from real computation by [../../experiments/13_byzantine_compromise.py](../../experiments/13_byzantine_compromise.py) and [14_ksweep.py](../../experiments/14_ksweep.py).
+
+### Reference tables (`table10_cnn_ablation`, `fig3_learning_curve`)
+- **Training-derived**: parameter counts / convergence episodes / validation-L_d curve come from PPO training runs and are aggregated from committed per-seed data, not recomputed live. Reported informationally by the checker.
+
+## Configuration caveats
+
+- `governance.hitl.rejection_rate: 0.15` — the human operator rejects 15% of alerts (adds filtering benefit beyond latency); default for all experiments.
+- `blockchain.consensus.mean_delay_steps: 1.2` — a **simulated** consensus model (Python), not a real Hyperledger Fabric deployment. Latency bound: E[L_d] ≤ A/(v·N) + δ, δ ≈ 1.2 (BC) + 3.0 (human verify).
+
+## See also
+- [../../PROVENANCE.md](../../PROVENANCE.md) — canonical artifact map + provenance classes.
+- [CALIBRATION.md](CALIBRATION.md) — calibration methodology + documented deviations.
+- [../../experiments/README.md](../../experiments/README.md) — experiment script guide.

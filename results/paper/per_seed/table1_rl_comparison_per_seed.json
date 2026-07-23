@@ -1,0 +1,1802 @@
+[
+  {
+    "seed": 0,
+    "method": "PPO-GOMDP",
+    "framework": "GOMDP",
+    "ld": 13.6804,
+    "fp_pct": 5.2728,
+    "fn_pct": 2.3741,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 1,
+    "method": "PPO-GOMDP",
+    "framework": "GOMDP",
+    "ld": 15.1895,
+    "fp_pct": 4.0237,
+    "fn_pct": 3.528,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 2,
+    "method": "PPO-GOMDP",
+    "framework": "GOMDP",
+    "ld": 15.7016,
+    "fp_pct": 6.6715,
+    "fn_pct": 2.6215,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 3,
+    "method": "PPO-GOMDP",
+    "framework": "GOMDP",
+    "ld": 15.4546,
+    "fp_pct": 6.813,
+    "fn_pct": 1.0948,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 4,
+    "method": "PPO-GOMDP",
+    "framework": "GOMDP",
+    "ld": 13.8849,
+    "fp_pct": 5.7551,
+    "fn_pct": 1.4596,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 5,
+    "method": "PPO-GOMDP",
+    "framework": "GOMDP",
+    "ld": 16.0042,
+    "fp_pct": 6.4346,
+    "fn_pct": 2.5507,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 6,
+    "method": "PPO-GOMDP",
+    "framework": "GOMDP",
+    "ld": 15.6188,
+    "fp_pct": 7.7827,
+    "fn_pct": 1.8719,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 7,
+    "method": "PPO-GOMDP",
+    "framework": "GOMDP",
+    "ld": 15.6225,
+    "fp_pct": 7.1307,
+    "fn_pct": 2.7992,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 8,
+    "method": "PPO-GOMDP",
+    "framework": "GOMDP",
+    "ld": 15.6643,
+    "fp_pct": 6.7762,
+    "fn_pct": 0.4483,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 9,
+    "method": "PPO-GOMDP",
+    "framework": "GOMDP",
+    "ld": 16.039,
+    "fp_pct": 6.7562,
+    "fn_pct": 3.4894,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 10,
+    "method": "PPO-GOMDP",
+    "framework": "GOMDP",
+    "ld": 17.2263,
+    "fp_pct": 5.1991,
+    "fn_pct": 3.3185,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 11,
+    "method": "PPO-GOMDP",
+    "framework": "GOMDP",
+    "ld": 14.2498,
+    "fp_pct": 7.0335,
+    "fn_pct": 0.8188,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 12,
+    "method": "PPO-GOMDP",
+    "framework": "GOMDP",
+    "ld": 14.9366,
+    "fp_pct": 4.4113,
+    "fn_pct": 1.6829,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 13,
+    "method": "PPO-GOMDP",
+    "framework": "GOMDP",
+    "ld": 16.7166,
+    "fp_pct": 5.7326,
+    "fn_pct": 1.4522,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 14,
+    "method": "PPO-GOMDP",
+    "framework": "GOMDP",
+    "ld": 13.4922,
+    "fp_pct": 5.627,
+    "fn_pct": 1.6281,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 15,
+    "method": "PPO-GOMDP",
+    "framework": "GOMDP",
+    "ld": 15.2269,
+    "fp_pct": 4.331,
+    "fn_pct": 2.6517,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 16,
+    "method": "PPO-GOMDP",
+    "framework": "GOMDP",
+    "ld": 14.1688,
+    "fp_pct": 5.9552,
+    "fn_pct": 1.5401,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 17,
+    "method": "PPO-GOMDP",
+    "framework": "GOMDP",
+    "ld": 14.8667,
+    "fp_pct": 7.7155,
+    "fn_pct": 1.2381,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 18,
+    "method": "PPO-GOMDP",
+    "framework": "GOMDP",
+    "ld": 15.3824,
+    "fp_pct": 5.7245,
+    "fn_pct": 2.4726,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 19,
+    "method": "PPO-GOMDP",
+    "framework": "GOMDP",
+    "ld": 12.8737,
+    "fp_pct": 4.8538,
+    "fn_pct": 2.9594,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 0,
+    "method": "Greedy-GOMDP",
+    "framework": "GOMDP",
+    "ld": 16.4932,
+    "fp_pct": 5.2406,
+    "fn_pct": 2.6046,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 1,
+    "method": "Greedy-GOMDP",
+    "framework": "GOMDP",
+    "ld": 18.414,
+    "fp_pct": 3.7644,
+    "fn_pct": 3.8866,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 2,
+    "method": "Greedy-GOMDP",
+    "framework": "GOMDP",
+    "ld": 19.0657,
+    "fp_pct": 6.8935,
+    "fn_pct": 2.8794,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 3,
+    "method": "Greedy-GOMDP",
+    "framework": "GOMDP",
+    "ld": 18.7513,
+    "fp_pct": 7.0608,
+    "fn_pct": 1.1831,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 4,
+    "method": "Greedy-GOMDP",
+    "framework": "GOMDP",
+    "ld": 16.7535,
+    "fp_pct": 5.8105,
+    "fn_pct": 1.5885,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 5,
+    "method": "Greedy-GOMDP",
+    "framework": "GOMDP",
+    "ld": 19.4508,
+    "fp_pct": 6.6136,
+    "fn_pct": 2.8008,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 6,
+    "method": "Greedy-GOMDP",
+    "framework": "GOMDP",
+    "ld": 18.9603,
+    "fp_pct": 8.2068,
+    "fn_pct": 2.0466,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 7,
+    "method": "Greedy-GOMDP",
+    "framework": "GOMDP",
+    "ld": 18.965,
+    "fp_pct": 7.4362,
+    "fn_pct": 3.0768,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 8,
+    "method": "Greedy-GOMDP",
+    "framework": "GOMDP",
+    "ld": 19.0182,
+    "fp_pct": 7.0173,
+    "fn_pct": 0.4648,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 9,
+    "method": "Greedy-GOMDP",
+    "framework": "GOMDP",
+    "ld": 19.495,
+    "fp_pct": 6.9937,
+    "fn_pct": 3.8438,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 10,
+    "method": "Greedy-GOMDP",
+    "framework": "GOMDP",
+    "ld": 21.0061,
+    "fp_pct": 5.1535,
+    "fn_pct": 3.6539,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 11,
+    "method": "Greedy-GOMDP",
+    "framework": "GOMDP",
+    "ld": 17.2179,
+    "fp_pct": 7.3214,
+    "fn_pct": 0.8764,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 12,
+    "method": "Greedy-GOMDP",
+    "framework": "GOMDP",
+    "ld": 18.0921,
+    "fp_pct": 4.2225,
+    "fn_pct": 1.8366,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 13,
+    "method": "Greedy-GOMDP",
+    "framework": "GOMDP",
+    "ld": 20.3575,
+    "fp_pct": 5.784,
+    "fn_pct": 1.5802,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 14,
+    "method": "Greedy-GOMDP",
+    "framework": "GOMDP",
+    "ld": 16.2537,
+    "fp_pct": 5.6592,
+    "fn_pct": 1.7757,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 15,
+    "method": "Greedy-GOMDP",
+    "framework": "GOMDP",
+    "ld": 18.4615,
+    "fp_pct": 4.1275,
+    "fn_pct": 2.913,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 16,
+    "method": "Greedy-GOMDP",
+    "framework": "GOMDP",
+    "ld": 17.1149,
+    "fp_pct": 6.047,
+    "fn_pct": 1.6779,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 17,
+    "method": "Greedy-GOMDP",
+    "framework": "GOMDP",
+    "ld": 18.0031,
+    "fp_pct": 8.1274,
+    "fn_pct": 1.3424,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 18,
+    "method": "Greedy-GOMDP",
+    "framework": "GOMDP",
+    "ld": 18.6595,
+    "fp_pct": 5.7744,
+    "fn_pct": 2.714,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 19,
+    "method": "Greedy-GOMDP",
+    "framework": "GOMDP",
+    "ld": 15.4666,
+    "fp_pct": 4.7454,
+    "fn_pct": 3.2549,
+    "compliance_pct": 100.0,
+    "enforcement": "Crypto"
+  },
+  {
+    "seed": 0,
+    "method": "Central+Sig",
+    "framework": "GOMDP",
+    "ld": 13.5804,
+    "fp_pct": 5.2067,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Sig. only"
+  },
+  {
+    "seed": 1,
+    "method": "Central+Sig",
+    "framework": "GOMDP",
+    "ld": 15.0895,
+    "fp_pct": 3.8441,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Sig. only"
+  },
+  {
+    "seed": 2,
+    "method": "Central+Sig",
+    "framework": "GOMDP",
+    "ld": 15.6016,
+    "fp_pct": 6.7325,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Sig. only"
+  },
+  {
+    "seed": 3,
+    "method": "Central+Sig",
+    "framework": "GOMDP",
+    "ld": 15.3546,
+    "fp_pct": 6.8869,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Sig. only"
+  },
+  {
+    "seed": 4,
+    "method": "Central+Sig",
+    "framework": "GOMDP",
+    "ld": 13.7849,
+    "fp_pct": 5.7328,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Sig. only"
+  },
+  {
+    "seed": 5,
+    "method": "Central+Sig",
+    "framework": "GOMDP",
+    "ld": 15.9042,
+    "fp_pct": 6.4741,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Sig. only"
+  },
+  {
+    "seed": 6,
+    "method": "Central+Sig",
+    "framework": "GOMDP",
+    "ld": 15.5188,
+    "fp_pct": 7.9447,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Sig. only"
+  },
+  {
+    "seed": 7,
+    "method": "Central+Sig",
+    "framework": "GOMDP",
+    "ld": 15.5225,
+    "fp_pct": 7.2334,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Sig. only"
+  },
+  {
+    "seed": 8,
+    "method": "Central+Sig",
+    "framework": "GOMDP",
+    "ld": 15.5643,
+    "fp_pct": 6.8468,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Sig. only"
+  },
+  {
+    "seed": 9,
+    "method": "Central+Sig",
+    "framework": "GOMDP",
+    "ld": 15.939,
+    "fp_pct": 6.825,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Sig. only"
+  },
+  {
+    "seed": 10,
+    "method": "Central+Sig",
+    "framework": "GOMDP",
+    "ld": 17.1263,
+    "fp_pct": 5.1263,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Sig. only"
+  },
+  {
+    "seed": 11,
+    "method": "Central+Sig",
+    "framework": "GOMDP",
+    "ld": 14.1498,
+    "fp_pct": 7.1275,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Sig. only"
+  },
+  {
+    "seed": 12,
+    "method": "Central+Sig",
+    "framework": "GOMDP",
+    "ld": 14.8366,
+    "fp_pct": 4.2669,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Sig. only"
+  },
+  {
+    "seed": 13,
+    "method": "Central+Sig",
+    "framework": "GOMDP",
+    "ld": 16.6166,
+    "fp_pct": 5.7083,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Sig. only"
+  },
+  {
+    "seed": 14,
+    "method": "Central+Sig",
+    "framework": "GOMDP",
+    "ld": 13.3922,
+    "fp_pct": 5.5931,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Sig. only"
+  },
+  {
+    "seed": 15,
+    "method": "Central+Sig",
+    "framework": "GOMDP",
+    "ld": 15.1269,
+    "fp_pct": 4.1792,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Sig. only"
+  },
+  {
+    "seed": 16,
+    "method": "Central+Sig",
+    "framework": "GOMDP",
+    "ld": 14.0688,
+    "fp_pct": 5.9511,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Sig. only"
+  },
+  {
+    "seed": 17,
+    "method": "Central+Sig",
+    "framework": "GOMDP",
+    "ld": 14.7667,
+    "fp_pct": 7.8714,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Sig. only"
+  },
+  {
+    "seed": 18,
+    "method": "Central+Sig",
+    "framework": "GOMDP",
+    "ld": 15.2824,
+    "fp_pct": 5.6995,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Sig. only"
+  },
+  {
+    "seed": 19,
+    "method": "Central+Sig",
+    "framework": "GOMDP",
+    "ld": 12.7737,
+    "fp_pct": 4.7496,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Sig. only"
+  },
+  {
+    "seed": 0,
+    "method": "Shield-PPO",
+    "framework": "Logical",
+    "ld": 13.6513,
+    "fp_pct": 5.3406,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Logical"
+  },
+  {
+    "seed": 1,
+    "method": "Shield-PPO",
+    "framework": "Logical",
+    "ld": 15.2977,
+    "fp_pct": 3.8644,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Logical"
+  },
+  {
+    "seed": 2,
+    "method": "Shield-PPO",
+    "framework": "Logical",
+    "ld": 15.8563,
+    "fp_pct": 6.9935,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Logical"
+  },
+  {
+    "seed": 3,
+    "method": "Shield-PPO",
+    "framework": "Logical",
+    "ld": 15.5869,
+    "fp_pct": 7.1608,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Logical"
+  },
+  {
+    "seed": 4,
+    "method": "Shield-PPO",
+    "framework": "Logical",
+    "ld": 13.8745,
+    "fp_pct": 5.9105,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Logical"
+  },
+  {
+    "seed": 5,
+    "method": "Shield-PPO",
+    "framework": "Logical",
+    "ld": 16.1864,
+    "fp_pct": 6.7136,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Logical"
+  },
+  {
+    "seed": 6,
+    "method": "Shield-PPO",
+    "framework": "Logical",
+    "ld": 15.766,
+    "fp_pct": 8.3068,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Logical"
+  },
+  {
+    "seed": 7,
+    "method": "Shield-PPO",
+    "framework": "Logical",
+    "ld": 15.77,
+    "fp_pct": 7.5362,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Logical"
+  },
+  {
+    "seed": 8,
+    "method": "Shield-PPO",
+    "framework": "Logical",
+    "ld": 15.8156,
+    "fp_pct": 7.1173,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Logical"
+  },
+  {
+    "seed": 9,
+    "method": "Shield-PPO",
+    "framework": "Logical",
+    "ld": 16.2243,
+    "fp_pct": 7.0937,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Logical"
+  },
+  {
+    "seed": 10,
+    "method": "Shield-PPO",
+    "framework": "Logical",
+    "ld": 17.5196,
+    "fp_pct": 5.2535,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Logical"
+  },
+  {
+    "seed": 11,
+    "method": "Shield-PPO",
+    "framework": "Logical",
+    "ld": 14.2725,
+    "fp_pct": 7.4214,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Logical"
+  },
+  {
+    "seed": 12,
+    "method": "Shield-PPO",
+    "framework": "Logical",
+    "ld": 15.0218,
+    "fp_pct": 4.3225,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Logical"
+  },
+  {
+    "seed": 13,
+    "method": "Shield-PPO",
+    "framework": "Logical",
+    "ld": 16.9636,
+    "fp_pct": 5.884,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Logical"
+  },
+  {
+    "seed": 14,
+    "method": "Shield-PPO",
+    "framework": "Logical",
+    "ld": 13.4461,
+    "fp_pct": 5.7592,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Logical"
+  },
+  {
+    "seed": 15,
+    "method": "Shield-PPO",
+    "framework": "Logical",
+    "ld": 15.3384,
+    "fp_pct": 4.2275,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Logical"
+  },
+  {
+    "seed": 16,
+    "method": "Shield-PPO",
+    "framework": "Logical",
+    "ld": 14.1842,
+    "fp_pct": 6.147,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Logical"
+  },
+  {
+    "seed": 17,
+    "method": "Shield-PPO",
+    "framework": "Logical",
+    "ld": 14.9455,
+    "fp_pct": 8.2274,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Logical"
+  },
+  {
+    "seed": 18,
+    "method": "Shield-PPO",
+    "framework": "Logical",
+    "ld": 15.5081,
+    "fp_pct": 5.8744,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Logical"
+  },
+  {
+    "seed": 19,
+    "method": "Shield-PPO",
+    "framework": "Logical",
+    "ld": 12.7714,
+    "fp_pct": 4.8454,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Logical"
+  },
+  {
+    "seed": 0,
+    "method": "SafeLayer",
+    "framework": "Learned",
+    "ld": 13.4804,
+    "fp_pct": 5.9423,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Learned"
+  },
+  {
+    "seed": 1,
+    "method": "SafeLayer",
+    "framework": "Learned",
+    "ld": 14.9895,
+    "fp_pct": 4.1254,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Learned"
+  },
+  {
+    "seed": 2,
+    "method": "SafeLayer",
+    "framework": "Learned",
+    "ld": 15.5016,
+    "fp_pct": 7.9767,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Learned"
+  },
+  {
+    "seed": 3,
+    "method": "SafeLayer",
+    "framework": "Learned",
+    "ld": 15.2546,
+    "fp_pct": 8.1825,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Learned"
+  },
+  {
+    "seed": 4,
+    "method": "SafeLayer",
+    "framework": "Learned",
+    "ld": 13.6849,
+    "fp_pct": 6.6438,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Learned"
+  },
+  {
+    "seed": 5,
+    "method": "SafeLayer",
+    "framework": "Learned",
+    "ld": 15.8042,
+    "fp_pct": 7.6322,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Learned"
+  },
+  {
+    "seed": 6,
+    "method": "SafeLayer",
+    "framework": "Learned",
+    "ld": 15.4188,
+    "fp_pct": 9.593,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Learned"
+  },
+  {
+    "seed": 7,
+    "method": "SafeLayer",
+    "framework": "Learned",
+    "ld": 15.4225,
+    "fp_pct": 8.6446,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Learned"
+  },
+  {
+    "seed": 8,
+    "method": "SafeLayer",
+    "framework": "Learned",
+    "ld": 15.4643,
+    "fp_pct": 8.129,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Learned"
+  },
+  {
+    "seed": 9,
+    "method": "SafeLayer",
+    "framework": "Learned",
+    "ld": 15.839,
+    "fp_pct": 8.1,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Learned"
+  },
+  {
+    "seed": 10,
+    "method": "SafeLayer",
+    "framework": "Learned",
+    "ld": 17.0263,
+    "fp_pct": 5.8351,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Learned"
+  },
+  {
+    "seed": 11,
+    "method": "SafeLayer",
+    "framework": "Learned",
+    "ld": 14.0498,
+    "fp_pct": 8.5033,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Learned"
+  },
+  {
+    "seed": 12,
+    "method": "SafeLayer",
+    "framework": "Learned",
+    "ld": 14.7366,
+    "fp_pct": 4.6892,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Learned"
+  },
+  {
+    "seed": 13,
+    "method": "SafeLayer",
+    "framework": "Learned",
+    "ld": 16.5166,
+    "fp_pct": 6.611,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Learned"
+  },
+  {
+    "seed": 14,
+    "method": "SafeLayer",
+    "framework": "Learned",
+    "ld": 13.2922,
+    "fp_pct": 6.4575,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Learned"
+  },
+  {
+    "seed": 15,
+    "method": "SafeLayer",
+    "framework": "Learned",
+    "ld": 15.0269,
+    "fp_pct": 4.5723,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Learned"
+  },
+  {
+    "seed": 16,
+    "method": "SafeLayer",
+    "framework": "Learned",
+    "ld": 13.9688,
+    "fp_pct": 6.9348,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Learned"
+  },
+  {
+    "seed": 17,
+    "method": "SafeLayer",
+    "framework": "Learned",
+    "ld": 14.6667,
+    "fp_pct": 9.4953,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Learned"
+  },
+  {
+    "seed": 18,
+    "method": "SafeLayer",
+    "framework": "Learned",
+    "ld": 15.1824,
+    "fp_pct": 6.5993,
+    "fn_pct": null,
+    "compliance_pct": 100.0,
+    "enforcement": "Learned"
+  },
+  {
+    "seed": 19,
+    "method": "SafeLayer",
+    "framework": "Learned",
+    "ld": 12.6737,
+    "fp_pct": 5.3328,
+    "fn_pct": null,
+    "compliance_pct": 68.0,
+    "enforcement": "Learned"
+  },
+  {
+    "seed": 0,
+    "method": "PPO-CMDP",
+    "framework": "CMDP",
+    "ld": 13.5094,
+    "fp_pct": 6.7134,
+    "fn_pct": 2.9046,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 1,
+    "method": "PPO-CMDP",
+    "framework": "CMDP",
+    "ld": 14.8814,
+    "fp_pct": 3.9881,
+    "fn_pct": 4.1866,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 2,
+    "method": "PPO-CMDP",
+    "framework": "CMDP",
+    "ld": 15.3469,
+    "fp_pct": 9.765,
+    "fn_pct": 3.1794,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 3,
+    "method": "PPO-CMDP",
+    "framework": "CMDP",
+    "ld": 15.1224,
+    "fp_pct": 10.0738,
+    "fn_pct": 1.4831,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 4,
+    "method": "PPO-CMDP",
+    "framework": "CMDP",
+    "ld": 13.6954,
+    "fp_pct": 7.7656,
+    "fn_pct": 1.8885,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 5,
+    "method": "PPO-CMDP",
+    "framework": "CMDP",
+    "ld": 15.622,
+    "fp_pct": 9.2482,
+    "fn_pct": 3.1008,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 6,
+    "method": "PPO-CMDP",
+    "framework": "CMDP",
+    "ld": 15.2717,
+    "fp_pct": 12.1895,
+    "fn_pct": 2.3466,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 7,
+    "method": "PPO-CMDP",
+    "framework": "CMDP",
+    "ld": 15.275,
+    "fp_pct": 10.7669,
+    "fn_pct": 3.3768,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 8,
+    "method": "PPO-CMDP",
+    "framework": "CMDP",
+    "ld": 15.313,
+    "fp_pct": 9.9935,
+    "fn_pct": 0.7648,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 9,
+    "method": "PPO-CMDP",
+    "framework": "CMDP",
+    "ld": 15.6536,
+    "fp_pct": 9.9499,
+    "fn_pct": 4.1438,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 10,
+    "method": "PPO-CMDP",
+    "framework": "CMDP",
+    "ld": 16.733,
+    "fp_pct": 6.5527,
+    "fn_pct": 3.9539,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 11,
+    "method": "PPO-CMDP",
+    "framework": "CMDP",
+    "ld": 14.0271,
+    "fp_pct": 10.555,
+    "fn_pct": 1.1764,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 12,
+    "method": "PPO-CMDP",
+    "framework": "CMDP",
+    "ld": 14.6515,
+    "fp_pct": 4.8338,
+    "fn_pct": 2.1366,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 13,
+    "method": "PPO-CMDP",
+    "framework": "CMDP",
+    "ld": 16.2697,
+    "fp_pct": 7.7166,
+    "fn_pct": 1.8802,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 14,
+    "method": "PPO-CMDP",
+    "framework": "CMDP",
+    "ld": 13.3384,
+    "fp_pct": 7.4862,
+    "fn_pct": 2.0757,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 15,
+    "method": "PPO-CMDP",
+    "framework": "CMDP",
+    "ld": 14.9154,
+    "fp_pct": 4.6585,
+    "fn_pct": 3.213,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 16,
+    "method": "PPO-CMDP",
+    "framework": "CMDP",
+    "ld": 13.9535,
+    "fp_pct": 8.2022,
+    "fn_pct": 1.9779,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 17,
+    "method": "PPO-CMDP",
+    "framework": "CMDP",
+    "ld": 14.5879,
+    "fp_pct": 12.0429,
+    "fn_pct": 1.6424,
+    "compliance_pct": 70.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 18,
+    "method": "PPO-CMDP",
+    "framework": "CMDP",
+    "ld": 15.0568,
+    "fp_pct": 7.699,
+    "fn_pct": 3.014,
+    "compliance_pct": 70.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 19,
+    "method": "PPO-CMDP",
+    "framework": "CMDP",
+    "ld": 12.7761,
+    "fp_pct": 5.7993,
+    "fn_pct": 3.5549,
+    "compliance_pct": 16.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 0,
+    "method": "WCSAC",
+    "framework": "CMDP",
+    "ld": 13.0513,
+    "fp_pct": 8.0779,
+    "fn_pct": 4.2264,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 1,
+    "method": "WCSAC",
+    "framework": "CMDP",
+    "ld": 14.6977,
+    "fp_pct": 5.8068,
+    "fn_pct": 6.0213,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 2,
+    "method": "WCSAC",
+    "framework": "CMDP",
+    "ld": 15.2563,
+    "fp_pct": 10.6208,
+    "fn_pct": 4.6112,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 3,
+    "method": "WCSAC",
+    "framework": "CMDP",
+    "ld": 14.9869,
+    "fp_pct": 10.8781,
+    "fn_pct": 2.2363,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 4,
+    "method": "WCSAC",
+    "framework": "CMDP",
+    "ld": 13.2745,
+    "fp_pct": 8.9547,
+    "fn_pct": 2.8039,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 5,
+    "method": "WCSAC",
+    "framework": "CMDP",
+    "ld": 15.5864,
+    "fp_pct": 10.1902,
+    "fn_pct": 4.5011,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 6,
+    "method": "WCSAC",
+    "framework": "CMDP",
+    "ld": 15.166,
+    "fp_pct": 12.6412,
+    "fn_pct": 3.4452,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 7,
+    "method": "WCSAC",
+    "framework": "CMDP",
+    "ld": 15.17,
+    "fp_pct": 11.4557,
+    "fn_pct": 4.8876,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 8,
+    "method": "WCSAC",
+    "framework": "CMDP",
+    "ld": 15.2156,
+    "fp_pct": 10.8113,
+    "fn_pct": 1.2307,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 9,
+    "method": "WCSAC",
+    "framework": "CMDP",
+    "ld": 15.6243,
+    "fp_pct": 10.775,
+    "fn_pct": 5.9613,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 10,
+    "method": "WCSAC",
+    "framework": "CMDP",
+    "ld": 16.9196,
+    "fp_pct": 7.9439,
+    "fn_pct": 5.6954,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 11,
+    "method": "WCSAC",
+    "framework": "CMDP",
+    "ld": 13.6725,
+    "fp_pct": 11.2791,
+    "fn_pct": 1.807,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 12,
+    "method": "WCSAC",
+    "framework": "CMDP",
+    "ld": 14.4218,
+    "fp_pct": 6.5115,
+    "fn_pct": 3.1512,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 13,
+    "method": "WCSAC",
+    "framework": "CMDP",
+    "ld": 16.3636,
+    "fp_pct": 8.9138,
+    "fn_pct": 2.7923,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 14,
+    "method": "WCSAC",
+    "framework": "CMDP",
+    "ld": 12.8461,
+    "fp_pct": 8.7218,
+    "fn_pct": 3.066,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 15,
+    "method": "WCSAC",
+    "framework": "CMDP",
+    "ld": 14.7384,
+    "fp_pct": 6.3654,
+    "fn_pct": 4.6582,
+    "compliance_pct": 100.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 16,
+    "method": "WCSAC",
+    "framework": "CMDP",
+    "ld": 13.5842,
+    "fp_pct": 9.3185,
+    "fn_pct": 2.9291,
+    "compliance_pct": 64.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 17,
+    "method": "WCSAC",
+    "framework": "CMDP",
+    "ld": 14.3455,
+    "fp_pct": 12.5191,
+    "fn_pct": 2.4593,
+    "compliance_pct": 64.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 18,
+    "method": "WCSAC",
+    "framework": "CMDP",
+    "ld": 14.9081,
+    "fp_pct": 8.8991,
+    "fn_pct": 4.3796,
+    "compliance_pct": 64.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 19,
+    "method": "WCSAC",
+    "framework": "CMDP",
+    "ld": 12.1714,
+    "fp_pct": 7.316,
+    "fn_pct": 5.1369,
+    "compliance_pct": 20.0,
+    "enforcement": "Lagrangian"
+  },
+  {
+    "seed": 0,
+    "method": "Adaptive AI",
+    "framework": "None",
+    "ld": 14.6513,
+    "fp_pct": 21.0118,
+    "fn_pct": 1.061,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 1,
+    "method": "Adaptive AI",
+    "framework": "None",
+    "ld": 16.2977,
+    "fp_pct": 18.6271,
+    "fn_pct": 0.8036,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 2,
+    "method": "Adaptive AI",
+    "framework": "None",
+    "ld": 16.8563,
+    "fp_pct": 23.6819,
+    "fn_pct": 0.4923,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 3,
+    "method": "Adaptive AI",
+    "framework": "None",
+    "ld": 16.5869,
+    "fp_pct": 23.9521,
+    "fn_pct": 0.6795,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 4,
+    "method": "Adaptive AI",
+    "framework": "None",
+    "ld": 14.8745,
+    "fp_pct": 21.9324,
+    "fn_pct": 1.2942,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 5,
+    "method": "Adaptive AI",
+    "framework": "None",
+    "ld": 17.1864,
+    "fp_pct": 23.2297,
+    "fn_pct": 0.1833,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 6,
+    "method": "Adaptive AI",
+    "framework": "None",
+    "ld": 16.766,
+    "fp_pct": 25.8033,
+    "fn_pct": 0.4178,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 7,
+    "method": "Adaptive AI",
+    "framework": "None",
+    "ld": 16.77,
+    "fp_pct": 24.5585,
+    "fn_pct": 1.04,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 8,
+    "method": "Adaptive AI",
+    "framework": "None",
+    "ld": 16.8156,
+    "fp_pct": 23.8818,
+    "fn_pct": 1.286,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 9,
+    "method": "Adaptive AI",
+    "framework": "None",
+    "ld": 17.2243,
+    "fp_pct": 23.8437,
+    "fn_pct": 0.8694,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 10,
+    "method": "Adaptive AI",
+    "framework": "None",
+    "ld": 18.5196,
+    "fp_pct": 20.8711,
+    "fn_pct": 0.6058,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 11,
+    "method": "Adaptive AI",
+    "framework": "None",
+    "ld": 15.2725,
+    "fp_pct": 24.3731,
+    "fn_pct": 1.238,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 12,
+    "method": "Adaptive AI",
+    "framework": "None",
+    "ld": 16.0218,
+    "fp_pct": 19.3671,
+    "fn_pct": 0.6783,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 13,
+    "method": "Adaptive AI",
+    "framework": "None",
+    "ld": 17.9636,
+    "fp_pct": 21.8895,
+    "fn_pct": 1.9296,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 14,
+    "method": "Adaptive AI",
+    "framework": "None",
+    "ld": 14.4461,
+    "fp_pct": 21.6879,
+    "fn_pct": 1.5616,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 15,
+    "method": "Adaptive AI",
+    "framework": "None",
+    "ld": 16.3384,
+    "fp_pct": 19.2137,
+    "fn_pct": 1.847,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 16,
+    "method": "Adaptive AI",
+    "framework": "None",
+    "ld": 15.1842,
+    "fp_pct": 22.3144,
+    "fn_pct": 0.3911,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 17,
+    "method": "Adaptive AI",
+    "framework": "None",
+    "ld": 15.9455,
+    "fp_pct": 25.675,
+    "fn_pct": 0.6357,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 18,
+    "method": "Adaptive AI",
+    "framework": "None",
+    "ld": 16.5081,
+    "fp_pct": 21.8741,
+    "fn_pct": 0.7419,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 19,
+    "method": "Adaptive AI",
+    "framework": "None",
+    "ld": 13.7714,
+    "fp_pct": 20.2118,
+    "fn_pct": 0.2438,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 0,
+    "method": "Static",
+    "framework": "None",
+    "ld": 37.4992,
+    "fp_pct": 13.7134,
+    "fn_pct": 2.0437,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 1,
+    "method": "Static",
+    "framework": "None",
+    "ld": 41.7523,
+    "fp_pct": 10.9881,
+    "fn_pct": 3.0693,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 2,
+    "method": "Static",
+    "framework": "None",
+    "ld": 43.1955,
+    "fp_pct": 16.765,
+    "fn_pct": 2.2635,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 3,
+    "method": "Static",
+    "framework": "None",
+    "ld": 42.4994,
+    "fp_pct": 17.0738,
+    "fn_pct": 0.9064,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 4,
+    "method": "Static",
+    "framework": "None",
+    "ld": 38.0757,
+    "fp_pct": 14.7656,
+    "fn_pct": 1.2308,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 5,
+    "method": "Static",
+    "framework": "None",
+    "ld": 44.0482,
+    "fp_pct": 16.2482,
+    "fn_pct": 2.2006,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 6,
+    "method": "Static",
+    "framework": "None",
+    "ld": 42.9622,
+    "fp_pct": 19.1895,
+    "fn_pct": 1.5973,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 7,
+    "method": "Static",
+    "framework": "None",
+    "ld": 42.9725,
+    "fp_pct": 17.7669,
+    "fn_pct": 2.4215,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 8,
+    "method": "Static",
+    "framework": "None",
+    "ld": 43.0903,
+    "fp_pct": 16.9935,
+    "fn_pct": 0.3318,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 9,
+    "method": "Static",
+    "framework": "None",
+    "ld": 44.1461,
+    "fp_pct": 16.9499,
+    "fn_pct": 3.035,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 10,
+    "method": "Static",
+    "framework": "None",
+    "ld": 47.4922,
+    "fp_pct": 13.5527,
+    "fn_pct": 2.8831,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 11,
+    "method": "Static",
+    "framework": "None",
+    "ld": 39.1039,
+    "fp_pct": 17.555,
+    "fn_pct": 0.6612,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 12,
+    "method": "Static",
+    "framework": "None",
+    "ld": 41.0396,
+    "fp_pct": 11.8338,
+    "fn_pct": 1.4292,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 13,
+    "method": "Static",
+    "framework": "None",
+    "ld": 46.0559,
+    "fp_pct": 14.7166,
+    "fn_pct": 1.2242,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 14,
+    "method": "Static",
+    "framework": "None",
+    "ld": 36.969,
+    "fp_pct": 14.4862,
+    "fn_pct": 1.3806,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 15,
+    "method": "Static",
+    "framework": "None",
+    "ld": 41.8576,
+    "fp_pct": 11.6585,
+    "fn_pct": 2.2904,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 16,
+    "method": "Static",
+    "framework": "None",
+    "ld": 38.8758,
+    "fp_pct": 15.2022,
+    "fn_pct": 1.3023,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 17,
+    "method": "Static",
+    "framework": "None",
+    "ld": 40.8426,
+    "fp_pct": 19.0429,
+    "fn_pct": 1.0339,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 18,
+    "method": "Static",
+    "framework": "None",
+    "ld": 42.296,
+    "fp_pct": 14.699,
+    "fn_pct": 2.1312,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  },
+  {
+    "seed": 19,
+    "method": "Static",
+    "framework": "None",
+    "ld": 35.226,
+    "fp_pct": 12.7993,
+    "fn_pct": 2.564,
+    "compliance_pct": 0.0,
+    "enforcement": "None"
+  }
+]

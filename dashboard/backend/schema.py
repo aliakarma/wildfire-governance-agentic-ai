@@ -9,6 +9,12 @@ from __future__ import annotations
 
 from typing import Any, Dict
 
+# One taxonomy: the dashboard method presets are PROJECTED from the shared
+# canonical registry (src/wildfire_governance/methods) so the dashboard and the
+# experiments use the exact same method definitions and calibrated knobs. Adding
+# or recalibrating a method happens in the registry only.
+from wildfire_governance.methods import METHODS as _REGISTRY, table1_method_ids
+
 # ---------------------------------------------------------------------------
 # Parameter schema — drives the UI control panel and server-side validation.
 # ---------------------------------------------------------------------------
@@ -20,7 +26,7 @@ PARAM_SCHEMA: Dict[str, Dict[str, Any]] = {
     "tau":                 {"type": "float", "min": 0.50,"max": 0.99, "step": 0.01,"default": 0.80, "unit": "τ","i18n": "param.tau"},
     "seed":                {"type": "int",   "min": 0,   "max": 9999, "step": 1,   "default": 0,    "unit": "",      "i18n": "param.seed"},
     "policy":              {"type": "enum",  "options": ["greedy", "ppo"], "default": "greedy", "i18n": "param.policy"},
-    "method":              {"type": "enum",  "options": ["ppo_gomdp", "greedy_gomdp", "central_sig", "ppo_cmdp", "adaptive_ai", "static"], "default": "ppo_gomdp", "i18n": "param.method"},
+    "method":              {"type": "enum",  "options": list(table1_method_ids()), "default": "ppo_gomdp", "i18n": "param.method"},
     # Adversarial
     "attack_type":         {"type": "enum",  "options": ["none", "spoofing", "spoofing_strategic", "injection", "byzantine"], "default": "none", "i18n": "param.attack"},
     "p_spoof":             {"type": "float", "min": 0.0, "max": 0.5,  "step": 0.01,"default": 0.0,  "unit": "p",     "i18n": "param.p_spoof"},
@@ -32,14 +38,62 @@ PARAM_SCHEMA: Dict[str, Dict[str, Any]] = {
 # ---------------------------------------------------------------------------
 # Method presets → governance/architecture flags used by run_episode.
 # Mirrors the configurations in experiments/11b_rl_comparison.py & 02_ablation.
+#
+# Extra per-method knobs that make the six methods behave *distinctly* in the
+# live viewer (all computed live from these flags — never hardcoded outputs):
+#   authorization  — how a broadcast alert is authorised, which decides
+#                    governance compliance:
+#                      "crypto"     → on-chain cert (HITL + signature + PBFT)   → 100%
+#                      "signature"  → HITL + signature, no consensus            → 100%
+#                      "soft"       → Lagrangian penalty (in-expectation only)  → ~100·(1-soft_leak)%
+#                      "none"       → broadcast with no authorisation           → 0%
+#   verify_strength — probability the multi-stage verification + HITL review
+#                     suppresses a *false* candidate (anomaly/noise) before it
+#                     is broadcast. Higher → lower false-alert rate F_p. This is
+#                     a model of the pipeline's discriminative power, not an F_p
+#                     value; the realised F_p emerges from the anomalies the
+#                     fleet actually encounters that episode.
+#   soft_leak      — for "soft" (CMDP) only: fraction of broadcasts the
+#                     Lagrangian relaxation lets through *unauthorised*
+#                     (a governance violation), so compliance lands near 92%.
+#   search         — fleet search strategy while hunting the fire: "ppo" is a
+#                     trained, well-dispersed sweep that covers the grid faster
+#                     (lower detection latency L_d); "greedy" is a plainer
+#                     lawnmower; "static" never coordinates.
 # ---------------------------------------------------------------------------
+# Registry display strings -> the dashboard's stable enforcement token vocabulary.
+_ENFORCEMENT_TOKEN = {
+    "Crypto": "crypto",
+    "Sig. only": "signature",
+    "Logical": "logical",
+    "Learned": "learned",
+    "Lagrangian": "lagrangian",
+    "None": "none",
+}
+
+
+def _preset_from_registry(method_id: str) -> Dict[str, Any]:
+    """Project a registry MethodSpec into the dashboard's preset dict shape."""
+    m = _REGISTRY[method_id]
+    return {
+        "label": m.label,
+        "enforcement": _ENFORCEMENT_TOKEN.get(m.enforcement, m.enforcement.lower()),
+        "governance": m.governance,
+        "hitl": m.hitl,
+        "blockchain": m.blockchain,
+        "verification": m.verification,
+        "coordination": m.coordination,
+        "policy": m.policy,
+        "authorization": m.authorization,
+        "verify_strength": m.verify_strength,
+        "soft_leak": m.soft_leak,
+        "search": m.search,
+    }
+
+
+# All nine Table-1 methods, projected from the canonical registry.
 METHOD_PRESETS: Dict[str, Dict[str, Any]] = {
-    "ppo_gomdp":    {"label": "PPO-GOMDP",    "enforcement": "crypto",     "governance": True,  "hitl": True,  "blockchain": True,  "verification": True,  "coordination": True,  "policy": "ppo"},
-    "greedy_gomdp": {"label": "Greedy-GOMDP", "enforcement": "crypto",     "governance": True,  "hitl": True,  "blockchain": True,  "verification": True,  "coordination": True,  "policy": "greedy"},
-    "central_sig":  {"label": "Central+Sig",  "enforcement": "signature",  "governance": True,  "hitl": True,  "blockchain": False, "verification": True,  "coordination": True,  "policy": "greedy"},
-    "ppo_cmdp":     {"label": "PPO-CMDP",     "enforcement": "lagrangian", "governance": False, "hitl": True,  "blockchain": False, "verification": True,  "coordination": True,  "policy": "ppo"},
-    "adaptive_ai":  {"label": "Adaptive AI",  "enforcement": "none",       "governance": False, "hitl": False, "blockchain": False, "verification": True,  "coordination": True,  "policy": "greedy"},
-    "static":       {"label": "Static",       "enforcement": "none",       "governance": False, "hitl": False, "blockchain": False, "verification": False, "coordination": False, "policy": "greedy"},
+    mid: _preset_from_registry(mid) for mid in table1_method_ids()
 }
 
 # UI colour token per method (kept in sync with Dashboard_Guide.md §9.1).
@@ -47,7 +101,10 @@ METHOD_COLORS: Dict[str, Dict[str, str]] = {
     "ppo_gomdp":    {"light": "#E4572E", "dark": "#FF6B3D"},
     "greedy_gomdp": {"light": "#C77D0A", "dark": "#F2B455"},
     "central_sig":  {"light": "#2D6BB0", "dark": "#6FB1FF"},
+    "shield_ppo":   {"light": "#1E8E6A", "dark": "#3FD9A6"},
+    "safelayer":    {"light": "#0E9EAE", "dark": "#42D4E4"},
     "ppo_cmdp":     {"light": "#7A5AF8", "dark": "#A78BFA"},
+    "wcsac":        {"light": "#B14AA0", "dark": "#E27CD0"},
     "adaptive_ai":  {"light": "#8A8F98", "dark": "#9AA6B8"},
     "static":       {"light": "#5B616E", "dark": "#6B7280"},
 }

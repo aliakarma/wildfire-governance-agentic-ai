@@ -114,18 +114,64 @@ export function GridCanvas({ frame, showFire, showUavs, showSectors, showComms =
       }
     }
 
-    // 6. UAV motion trails (older = fainter).
+    // 6. UAV motion trails — a fading polyline per UAV so the flight path each
+    //    drone has taken is clearly visible (older segments fainter). Trails are
+    //    index-aligned across frames, so uav i's path is trail[0][i] → … → now.
     const uavR = Math.max(4, Math.min(9, cs * 0.5));
-    if (showUavs && trail && trail.length) {
-      for (let d = 0; d < trail.length; d++) {
-        const alpha = ((d + 1) / (trail.length + 1)) * 0.5;
-        ctx.fillStyle = theme === "dark" ? `rgba(57,198,255,${alpha})` : `rgba(11,111,184,${alpha})`;
-        for (const u of trail[d]) {
+    if (showUavs && trail && trail.length && frame.uavs.length) {
+      const pathColor = theme === "dark" ? "57,198,255" : "11,111,184";
+      const nUav = frame.uavs.length;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      for (let i = 0; i < nUav; i++) {
+        // Build this UAV's recent positions (past trail + current).
+        const pts: { x: number; y: number }[] = [];
+        for (let d = 0; d < trail.length; d++) {
+          const u = trail[d][i];
+          if (u) pts.push({ x: px(u.x), y: px(u.y) });
+        }
+        pts.push({ x: px(frame.uavs[i].x), y: px(frame.uavs[i].y) });
+        if (pts.length < 2) continue;
+        for (let s = 1; s < pts.length; s++) {
+          // Fade from faint (oldest) to bright (newest). Skip long jumps
+          // (wrap-arounds) so the path stays clean.
+          const dx = pts[s].x - pts[s - 1].x;
+          const dy = pts[s].y - pts[s - 1].y;
+          if (Math.hypot(dx, dy) > cs * 3) continue;
+          const alpha = 0.12 + 0.5 * (s / (pts.length - 1));
+          ctx.strokeStyle = `rgba(${pathColor},${alpha})`;
+          ctx.lineWidth = Math.max(1, uavR * 0.35);
           ctx.beginPath();
-          ctx.arc(px(u.x), px(u.y), uavR * 0.5, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.moveTo(pts[s - 1].x, pts[s - 1].y);
+          ctx.lineTo(pts[s].x, pts[s].y);
+          ctx.stroke();
         }
       }
+    }
+
+    // 6b. Heading cue — a short segment from each UAV toward its current target
+    //     (where the coordinator is sending it), so intent is legible even when
+    //     the drone has not moved far yet.
+    if (showUavs) {
+      ctx.save();
+      ctx.setLineDash([2, 3]);
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = theme === "dark" ? "rgba(232,237,244,0.35)" : "rgba(27,30,36,0.30)";
+      for (const u of frame.uavs) {
+        if (u.tx == null || u.ty == null) continue;
+        const ox = px(u.x);
+        const oy = px(u.y);
+        const dx = px(u.tx) - ox;
+        const dy = px(u.ty) - oy;
+        const len = Math.hypot(dx, dy);
+        if (len < cs * 0.6) continue; // already there
+        const k = Math.min(1, (cs * 2.4) / len); // cap cue length
+        ctx.beginPath();
+        ctx.moveTo(ox, oy);
+        ctx.lineTo(ox + dx * k, oy + dy * k);
+        ctx.stroke();
+      }
+      ctx.restore();
     }
 
     // 7. Communication links between UAVs (drawn under the UAV dots).

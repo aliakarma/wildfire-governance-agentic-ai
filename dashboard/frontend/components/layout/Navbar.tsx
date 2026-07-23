@@ -10,6 +10,12 @@ const NAV: Array<{ id: View; key: string }> = [
   { id: "compare", key: "nav.compare" },
   { id: "viirs", key: "nav.viirs" },
   { id: "benchmark", key: "nav.benchmark" },
+  { id: "ablation", key: "nav.ablation" },
+  { id: "scalability", key: "nav.scalability" },
+  { id: "learning", key: "nav.learning" },
+  { id: "hitl", key: "nav.hitl" },
+  { id: "cnn", key: "nav.cnn" },
+  { id: "experiments", key: "nav.experiments" },
 ];
 
 export function Navbar({

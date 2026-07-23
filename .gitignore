@@ -19,9 +19,11 @@ data/processed/*
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 
-# Results — only paper/ is committed; runs/ is gitignored
+# Results — only paper/ is committed; runs/ and reproduced/ are gitignored
 results/runs/*
 !results/runs/.gitkeep
+# Aggregation preview from generate_all_paper_results.py (never the frozen paper CSVs)
+results/reproduced/
 
 # Credentials and secrets — NEVER commit
 .env
@@ -81,3 +83,5 @@ logs/
 *.fls
 *.fdb_latexmk
 *.log
+.gstack/
+/Paper
