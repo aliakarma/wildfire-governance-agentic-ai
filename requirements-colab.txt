@@ -1,0 +1,21 @@
+# Minimal dependency set for PPO-GOMDP training on Google Colab.
+#
+# Deliberately EXCLUDES:
+#   * torch / torchvision — Colab ships a CUDA-matched build; reinstalling the
+#     pinned CPU-era version would be slow and can break GPU support.
+#   * geopandas / rasterio / fiona / netCDF4 / xarray / boto3 — only needed for
+#     VIIRS preprocessing, not for training. Install requirements.txt if you
+#     want to regenerate the fire grids from raw FIRMS data.
+#   * mlflow — tracking is disabled in configs/experiments/ppo_training.yaml.
+#
+# Colab already provides numpy, pandas, scipy, matplotlib, requests, pyyaml,
+# tqdm and click at compatible versions, so they are left unpinned here to
+# avoid forcing a resolver conflict with the preinstalled stack.
+
+gymnasium>=0.29
+cryptography>=42.0
+pynacl>=1.5
+omegaconf>=2.3
+structlog>=24.1
+rich>=13.7
+seaborn>=0.13

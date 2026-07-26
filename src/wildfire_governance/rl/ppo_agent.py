@@ -112,8 +112,11 @@ class PPOGOMDPAgent:
         entropy_coeff: float = 0.01,
         gamma: float = 0.99,
         n_epochs: int = 4,
+        device: "str | None" = None,
     ) -> None:
         _require_torch()
+        import torch
+
         self.grid_size = grid_size
         self.n_uavs = n_uavs
         self.n_sectors = n_sectors
@@ -121,10 +124,17 @@ class PPOGOMDPAgent:
         self.clip_ratio = clip_ratio
         self.entropy_coeff = entropy_coeff
         self.n_epochs = n_epochs
+        # Rollout is dominated by per-step policy forward passes (~72% of
+        # episode wall-clock on CPU), so honouring an available accelerator
+        # matters more here than for the update step.
+        self.device = torch.device(
+            device if device is not None
+            else ("cuda" if torch.cuda.is_available() else "cpu")
+        )
 
         obs_dim = grid_size * grid_size + 2 * n_uavs
-        self.policy = PolicyNetwork(obs_dim, n_uavs, n_sectors)
-        self.value_net = ValueNetwork(obs_dim)
+        self.policy = PolicyNetwork(obs_dim, n_uavs, n_sectors).to(self.device)
+        self.value_net = ValueNetwork(obs_dim).to(self.device)
         self.optimizer = optim.Adam(
             list(self.policy.parameters()) + list(self.value_net.parameters()),
             lr=lr,
@@ -172,7 +182,9 @@ class PPOGOMDPAgent:
             Dict mapping uav_index → sector_id.
         """
         import torch
-        obs_tensor = torch.FloatTensor(obs).unsqueeze(0)
+        obs_tensor = torch.as_tensor(
+            np.asarray(obs), dtype=torch.float32, device=self.device
+        ).unsqueeze(0)
         with torch.no_grad():
             logits_list = self.policy(obs_tensor)
 
@@ -209,11 +221,13 @@ class PPOGOMDPAgent:
         if not observations:
             return 0.0
 
-        obs_tensor: torch.Tensor = torch.tensor(np.asarray(observations), dtype=torch.float32)
+        obs_tensor: torch.Tensor = torch.tensor(
+            np.asarray(observations), dtype=torch.float32, device=self.device
+        )
 
         # Build a dense [T, n_uavs] tensor from the actual rollout actions.
         action_tensor: torch.Tensor = torch.zeros(
-            (len(actions), self.n_uavs), dtype=torch.long
+            (len(actions), self.n_uavs), dtype=torch.long, device=self.device
         )
         for t, action_dict in enumerate(actions):
             for uav_idx, sector_idx in action_dict.items():
@@ -229,7 +243,9 @@ class PPOGOMDPAgent:
             running_return = float(reward) + self.gamma * running_return
             returns.insert(0, running_return)
 
-        returns_tensor: torch.Tensor = torch.tensor(returns, dtype=torch.float32)
+        returns_tensor: torch.Tensor = torch.tensor(
+            returns, dtype=torch.float32, device=self.device
+        )
         if returns_tensor.std() > 1e-8:
             returns_tensor = (returns_tensor - returns_tensor.mean()) / (
                 returns_tensor.std() + 1e-8
@@ -239,7 +255,9 @@ class PPOGOMDPAgent:
         # The policy has not been updated yet, so these match the rollout policy.
         with torch.no_grad():
             old_logits_list = self.policy(obs_tensor)
-            old_log_probs: torch.Tensor = torch.zeros(len(observations), dtype=torch.float32)
+            old_log_probs: torch.Tensor = torch.zeros(
+                len(observations), dtype=torch.float32, device=self.device
+            )
             for uav_idx, logits in enumerate(old_logits_list):
                 dist = Categorical(logits=logits)
                 old_log_probs = old_log_probs + dist.log_prob(action_tensor[:, uav_idx])
@@ -256,7 +274,9 @@ class PPOGOMDPAgent:
                 )
 
             logits_list = self.policy(obs_tensor)
-            new_log_probs: torch.Tensor = torch.zeros(len(observations), dtype=torch.float32)
+            new_log_probs: torch.Tensor = torch.zeros(
+                len(observations), dtype=torch.float32, device=self.device
+            )
             entropy_terms = []
 
             for uav_idx, logits in enumerate(logits_list):
@@ -270,7 +290,10 @@ class PPOGOMDPAgent:
             surrogate_2 = clipped_ratio * advantages
             policy_loss = -torch.min(surrogate_1, surrogate_2).mean()
             value_loss = nn.functional.mse_loss(values, returns_tensor)
-            entropy_loss = -torch.stack(entropy_terms).mean() if entropy_terms else torch.tensor(0.0)
+            entropy_loss = (
+                -torch.stack(entropy_terms).mean() if entropy_terms
+                else torch.tensor(0.0, device=self.device)
+            )
 
             loss = policy_loss + 0.5 * value_loss + self.entropy_coeff * entropy_loss
             self.optimizer.zero_grad()
@@ -309,7 +332,7 @@ class PPOGOMDPAgent:
                 f"PPO-GOMDP checkpoint not found: {path_obj}\n"
                 "Run: make train-ppo  OR  use --use_pretrained with the pre-trained checkpoint."
             )
-        self.load_state_dict(torch.load(path_obj, map_location="cpu"))
+        self.load_state_dict(torch.load(path_obj, map_location=self.device))
 
 
 def _compute_returns(rewards: List[float], gamma: float) -> List[float]:

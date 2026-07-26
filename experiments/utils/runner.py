@@ -261,6 +261,12 @@ def run_episode(
         else None
     )
     hitl_gate = HITLAuthorisationGate(oracle=oracle, rng=rng) if enable_hitl else None
+    # Register the duty officer's signing key as the contract's authorised
+    # validator set. Without this the contract runs in open mode and any
+    # self-generated keypair verifies, so key-authorisation enforcement
+    # (Theorem 1, Case 1) would be inactive.
+    if contract is not None and hitl_gate is not None:
+        contract.register_validator(hitl_gate.public_key_bytes)
     checker = GovernanceInvariantChecker(tau=TAU_2)
 
     # Two-stage verification pipeline (manuscript Section "Two-Stage

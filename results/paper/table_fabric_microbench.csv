@@ -1,3 +1,0 @@
-source,latency_mean_s,latency_std_s,budget_s,n_transactions,notes
-fabric_2.5_real,2.3,0.7,12.0,1000,Reported 7-peer Fabric 2.5 endorsement+ordering latency (paper appendix app:fabric); external measurement not reproduced in this repo
-simulation_pbft,12.0,3.0,12.0,,Delta_BC ~ N(1.2 0.3) steps x 10 s/step; the conservative consensus-delay budget used in end-to-end latency (experiments/07_blockchain_throughput.py)

@@ -42,6 +42,8 @@ class ContractVerificationResult:
         alert_enabled: True if the alert may be publicly broadcast.
         confidence_ok: Whether confidence threshold was satisfied.
         signature_ok: Whether the Ed25519 signature was valid.
+        key_authorised: Whether the presenting public key is a registered validator.
+        replay_ok: Whether the transaction nonce was previously unseen.
         consensus_result: Result of the PBFT consensus round.
         cert: Governance certificate hash (non-None iff APPROVED).
     """
@@ -53,6 +55,8 @@ class ContractVerificationResult:
     signature_ok: bool
     consensus_result: Optional[ConsensusResult]
     cert: Optional[str]
+    key_authorised: bool = True
+    replay_ok: bool = True
 
 
 class GovernanceSmartContract:
@@ -83,10 +87,30 @@ class GovernanceSmartContract:
         self.tau = tau
         self._consensus = consensus or PBFTConsensus()
         self._audit_log = audit_log or ImmutableAuditLog()
-        self._validator_public_keys: list[bytes] = validator_public_keys or []
+        self._validator_public_keys: list[bytes] = list(validator_public_keys or [])
         self._n_approved: int = 0
         self._n_rejected: int = 0
         self._n_blocked: int = 0
+        # Per-event nonces already committed, for replay resistance (paper
+        # Section "Blockchain-Enforced Governance Invariant").
+        self._seen_nonces: set[str] = set()
+        # Last approved (tx, signature, key) triple, retained so adversarial
+        # probes can attempt a genuine replay against real credentials.
+        self._last_approved_credential: Optional[tuple] = None
+
+    def register_validator(self, public_key: bytes) -> None:
+        """Add a public key to the authorised validator set.
+
+        While the set is empty the contract runs in *open* mode: any
+        well-formed signature verifies. Registering at least one key activates
+        key-authorisation enforcement, which is what Theorem 1's Case 1
+        ("forge a certificate without an authorised validator key") requires.
+
+        Args:
+            public_key: Ed25519 public key bytes of an authorised validator.
+        """
+        if public_key not in self._validator_public_keys:
+            self._validator_public_keys.append(public_key)
 
     # ------------------------------------------------------------------
     # Public API
@@ -128,17 +152,38 @@ class GovernanceSmartContract:
             transaction.to_bytes(), validator_signature, validator_public_key
         )
 
-        # Step 3: Run PBFT consensus (simulated)
+        # Step 3: Check the presenting key is an authorised validator. Without
+        # this an adversary can generate its own keypair, sign its own forged
+        # transaction, and present its own public key — a valid signature over
+        # an unauthorised certificate. Enforced only when a validator set has
+        # been registered; see register_validator().
+        key_authorised = (
+            validator_public_key in self._validator_public_keys
+            if self._validator_public_keys
+            else True
+        )
+
+        # Step 4: Replay resistance — a per-event nonce may be committed once.
+        replay_ok = transaction.nonce not in self._seen_nonces
+
+        # Step 5: Run PBFT consensus (simulated)
         consensus_result: Optional[ConsensusResult] = None
-        if confidence_ok and signature_ok:
+        if confidence_ok and signature_ok and key_authorised and replay_ok:
             consensus_result = self._consensus.propose(transaction, burst_mode)
 
-        # Step 4: Determine final state
-        if confidence_ok and signature_ok and consensus_result and consensus_result.approved:
+        # Step 6: Determine final state
+        if (
+            confidence_ok and signature_ok and key_authorised and replay_ok
+            and consensus_result and consensus_result.approved
+        ):
             state = ContractState.APPROVED
             alert_enabled = True
             cert = consensus_result.transaction_hash
             self._n_approved += 1
+            self._seen_nonces.add(transaction.nonce)
+            self._last_approved_credential = (
+                transaction, validator_signature, validator_public_key,
+            )
             self._audit_log.append(
                 "APPROVED", tx_hash,
                 {"confidence": transaction.confidence_score, "cert": cert},
@@ -161,6 +206,22 @@ class GovernanceSmartContract:
             self._audit_log.append(
                 "BLOCKED_INVALID_SIGNATURE", tx_hash, {}
             )
+        elif not key_authorised:
+            state = ContractState.BLOCKED
+            alert_enabled = False
+            cert = None
+            self._n_blocked += 1
+            self._audit_log.append(
+                "BLOCKED_UNAUTHORISED_VALIDATOR_KEY", tx_hash, {}
+            )
+        elif not replay_ok:
+            state = ContractState.BLOCKED
+            alert_enabled = False
+            cert = None
+            self._n_blocked += 1
+            self._audit_log.append(
+                "BLOCKED_REPLAYED_NONCE", tx_hash, {"nonce": transaction.nonce},
+            )
         else:
             state = ContractState.REJECTED
             alert_enabled = False
@@ -179,36 +240,123 @@ class GovernanceSmartContract:
             signature_ok=signature_ok,
             consensus_result=consensus_result,
             cert=cert,
+            key_authorised=key_authorised,
+            replay_ok=replay_ok,
         )
+
+    def probe_injection(
+        self,
+        geo_boundary: tuple,
+        severity: str = "critical",
+        attack: str = "unsigned",
+        confidence: float = 0.99,
+    ) -> ContractVerificationResult:
+        """Mount a real alert-injection attack against the contract.
+
+        The attempt is executed through :meth:`verify_and_execute`, the same
+        code path a legitimate alert traverses — nothing is short-circuited, so
+        the outcome is a measurement of the enforcement mechanism rather than a
+        restatement of it. The adversary controls the payload and may set an
+        arbitrarily high confidence score; what it lacks is an authorised
+        validator key.
+
+        Attack variants:
+            ``"unsigned"``   garbage signature bytes (defeated by Ed25519
+                             verification alone — the claim the ablation's
+                             injection column tests).
+            ``"wrong_key"``  adversary generates its own Ed25519 keypair and
+                             produces a *cryptographically valid* signature
+                             over its forged transaction, presenting its own
+                             public key. Defeated only by validator-key
+                             authorisation; requires a registered validator set.
+            ``"replay"``     resubmits the last approved (transaction,
+                             signature, key) triple. Defeated by the nonce
+                             ledger.
+
+        Args:
+            geo_boundary: Target geographic boundary for the injected alert.
+            severity: Severity string recorded in the forged evidence payload.
+            attack: One of ``"unsigned"``, ``"wrong_key"``, ``"replay"``.
+            confidence: Confidence score the adversary claims.
+
+        Returns:
+            The full ContractVerificationResult. ``alert_enabled`` is True only
+            if the injection actually breached the governance predicate.
+        """
+        from wildfire_governance.blockchain.crypto_utils import generate_key_pair, sign
+        from wildfire_governance.blockchain.transaction import build_transaction
+
+        self._audit_log.append(
+            "ADVERSARIAL_INJECTION_ATTEMPT",
+            "UNAUTHORISED",
+            {"geo_boundary": list(geo_boundary), "severity": severity, "attack": attack},
+        )
+
+        if attack == "replay":
+            if self._last_approved_credential is None:
+                # Nothing legitimate has been approved yet, so there is no
+                # credential to replay; treat as a blocked no-op.
+                return ContractVerificationResult(
+                    transaction_hash="", contract_state=ContractState.BLOCKED,
+                    alert_enabled=False, confidence_ok=False, signature_ok=False,
+                    consensus_result=None, cert=None, key_authorised=False,
+                    replay_ok=False,
+                )
+            tx, sig, pub = self._last_approved_credential
+            return self.verify_and_execute(tx, sig, pub)
+
+        forged_tx = build_transaction(
+            event_id=f"forged_{geo_boundary}",
+            geo_boundary=geo_boundary,
+            confidence_score=confidence,
+            sensor_readings={"forged": True, "severity": severity},
+        )
+
+        if attack == "wrong_key":
+            adversary_priv, adversary_pub = generate_key_pair()
+            forged_sig = sign(forged_tx.to_bytes(), adversary_priv)
+            return self.verify_and_execute(forged_tx, forged_sig, adversary_pub)
+
+        # "unsigned": well-formed but meaningless signature bytes, presented
+        # against a registered validator key (or a decoy when none is set).
+        garbage_sig = b"\x00" * 64
+        target_key = (
+            self._validator_public_keys[0]
+            if self._validator_public_keys
+            else generate_key_pair()[1]
+        )
+        return self.verify_and_execute(forged_tx, garbage_sig, target_key)
 
     def attempt_unauthorised_injection(
         self,
         geo_boundary: tuple,
         severity: str = "critical",
+        attack: str = "unsigned",
     ) -> bool:
-        """Simulate an adversarial direct alert injection attempt.
+        """Attempt an unauthorised alert injection.
 
-        The adversary tries to broadcast an alert without going through
-        the governance pipeline — i.e., without a valid transaction or signature.
-
-        In GOMDP: this ALWAYS fails (returns False) because the contract
-        requires a valid cryptographic transaction. This is the empirical
-        confirmation of Theorem 2 (Adversarial Robustness) at P_breach=0.
+        Thin boolean wrapper over :meth:`probe_injection` for call sites that
+        only need the outcome.
 
         Args:
             geo_boundary: Target geographic boundary for the injected alert.
             severity: Severity string for the injected alert.
+            attack: Attack variant; see :meth:`probe_injection`.
 
         Returns:
-            False always — injection is impossible in the GOMDP framework.
+            True iff the injection succeeded in enabling an alert (a breach).
+            False iff the contract blocked it.
         """
-        self._audit_log.append(
-            "ADVERSARIAL_INJECTION_ATTEMPT",
-            "UNAUTHORISED",
-            {"geo_boundary": list(geo_boundary), "severity": severity},
-        )
-        logger.info("adversarial_injection_blocked", geo_boundary=str(geo_boundary))
-        return False  # Always blocked — Theorem 2
+        result = self.probe_injection(geo_boundary, severity=severity, attack=attack)
+        if not result.alert_enabled:
+            logger.info(
+                "adversarial_injection_blocked",
+                geo_boundary=str(geo_boundary),
+                reason=result.contract_state.name,
+            )
+        else:
+            logger.warning("adversarial_injection_BREACH", geo_boundary=str(geo_boundary))
+        return result.alert_enabled
 
     @property
     def n_approved(self) -> int:

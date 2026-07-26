@@ -62,8 +62,9 @@ methodology and its documented deviations are in [CALIBRATION.md](CALIBRATION.md
 
 ## Configuration caveats
 
-- `governance.hitl.rejection_rate: 0.15` — the human operator rejects 15% of alerts (adds filtering benefit beyond latency); default for all experiments.
-- `blockchain.consensus.mean_delay_steps: 1.2` — a **simulated** consensus model (Python), not a real Hyperledger Fabric deployment. Latency bound: E[L_d] ≤ A/(v·N) + δ, δ ≈ 1.2 (BC) + 3.0 (human verify).
+- `governance.hitl.rejection_rate: 0.05` — the operator error rate `p_err` of Eq. (5); default for all experiments (matches `configs/base.yaml`).
+- `blockchain.consensus.mean_delay_steps: 1.2` — a **simulated** consensus model (Python), not a real Hyperledger Fabric deployment. No Fabric network is deployed anywhere in this repository, and the paper makes no claim based on one. Latency bound: E[L_d] ≤ A/(v·N) + δ, δ ≈ 1.2 (BC) + 3.0 (human verify).
+- Cryptography is **real**: Ed25519 signing/verification and SHA3-256 hashing via the `cryptography` library (`src/wildfire_governance/blockchain/crypto_utils.py`). Alert authorisation additionally enforces a registered-validator allowlist and a per-event nonce ledger, so injection and replay resistance are measured through the same code path a legitimate alert takes.
 
 ## See also
 - [../../PROVENANCE.md](../../PROVENANCE.md) — canonical artifact map + provenance classes.

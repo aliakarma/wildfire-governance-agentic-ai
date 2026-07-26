@@ -94,16 +94,67 @@ def test_theorem1_compliance_with_greedy() -> None:
     )
 
 
-def test_theorem1_injection_always_blocked() -> None:
-    """Theorem 2 empirical check: unauthorised injection always returns False."""
+def _registered_contract():
+    """Contract with one authorised validator, plus that validator's keypair."""
     from wildfire_governance.blockchain.smart_contract import GovernanceSmartContract
+    from wildfire_governance.blockchain.crypto_utils import generate_key_pair
+    priv, pub = generate_key_pair()
     contract = GovernanceSmartContract(tau=0.80)
+    contract.register_validator(pub)
+    return contract, priv, pub
+
+
+def test_theorem1_unsigned_injection_blocked() -> None:
+    """Ed25519 verification alone defeats direct injection (ablation column)."""
+    contract, _, _ = _registered_contract()
     n_attempts = 100
     n_blocked = sum(
-        1 for _ in range(n_attempts)
-        if not contract.attempt_unauthorised_injection((0, 0, 5, 5))
+        1 for i in range(n_attempts)
+        if not contract.attempt_unauthorised_injection((i, i, i + 1, i + 1))
     )
     assert n_blocked == n_attempts, (
         f"Expected 100 blocked injections, got {n_blocked}. "
         f"P_breach^GOMDP should be 0.000 (Theorem 2)."
     )
+
+
+def test_theorem1_valid_signature_from_unauthorised_key_blocked() -> None:
+    """Theorem 1 Case 1: a cryptographically valid signature from a
+    non-validator key must not authorise an alert."""
+    contract, _, _ = _registered_contract()
+    n_attempts = 100
+    n_blocked = sum(
+        1 for i in range(n_attempts)
+        if not contract.attempt_unauthorised_injection(
+            (i, i, i + 1, i + 1), attack="wrong_key"
+        )
+    )
+    assert n_blocked == n_attempts, (
+        f"Adversary keypair breached {n_attempts - n_blocked}/{n_attempts} times; "
+        f"validator-key authorisation is not being enforced."
+    )
+
+
+def test_replayed_certificate_blocked() -> None:
+    """Per-event nonces prevent replay of a previously approved certificate."""
+    from wildfire_governance.blockchain.crypto_utils import sign
+    from wildfire_governance.blockchain.transaction import build_transaction
+    contract, priv, pub = _registered_contract()
+
+    tx = build_transaction("legit", (0, 0, 5, 5), 0.95, {"heat": 0.9})
+    first = contract.verify_and_execute(tx, sign(tx.to_bytes(), priv), pub)
+    assert first.alert_enabled, "legitimate alert should be approved"
+
+    replay = contract.probe_injection((0, 0, 5, 5), attack="replay")
+    assert not replay.alert_enabled, "replayed certificate must be rejected"
+    assert not replay.replay_ok
+
+
+def test_legitimate_alert_still_approved() -> None:
+    """Key authorisation must not break the legitimate duty-officer path."""
+    from wildfire_governance.blockchain.crypto_utils import sign
+    from wildfire_governance.blockchain.transaction import build_transaction
+    contract, priv, pub = _registered_contract()
+    tx = build_transaction("legit", (0, 0, 5, 5), 0.95, {"heat": 0.9})
+    result = contract.verify_and_execute(tx, sign(tx.to_bytes(), priv), pub)
+    assert result.alert_enabled and result.key_authorised and result.confidence_ok
