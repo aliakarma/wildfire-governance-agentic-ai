@@ -9,7 +9,7 @@
         train-ppo eval-ppo \
         reproduce figures \
         adversarial stress-test \
-        verify-theorem1 verify-theorem2 \
+        verify-theorem1 verify-theorem2 verify-paper check-repro \
         docker-build docker-run \
         clean help
 
@@ -99,6 +99,14 @@ verify-theorem1:
 
 verify-theorem2:
 	pytest tests/unit/test_breach_probability.py -v
+
+# Submission gate: every committed result cell vs Paper/AAAI/Wildfire.tex
+verify-paper:
+	python scripts/verify_paper_alignment.py
+
+# Diff a fresh run under results/runs/ against the committed CSVs
+check-repro:
+	python scripts/check_reproducibility.py
 
 # ---- Experiments ---------------------------------------------------
 

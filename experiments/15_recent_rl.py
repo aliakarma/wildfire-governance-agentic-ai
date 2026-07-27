@@ -1,23 +1,16 @@
 #!/usr/bin/env python3
-"""Experiment 15 — Recent constrained-RL baselines (tab:recent_rl in paper).
+"""Experiment 15 - Recent constrained-RL stand-ins. WITHDRAWN FROM THE MANUSCRIPT.
 
-Evaluates the two recent policy-level constrained-RL baselines from Table 8,
-SafeDreamer (model-based, Lagrangian cost) and CCPO (constrained cross-entropy /
-projection), against the same fleet-detection task.
+This script evaluates calibrated STAND-INS on the shared constrained-baseline
+path; it is NOT an implementation of SafeDreamer or CCPO, and the two rows differ
+only by a HITL rejection knob. Presenting its output as an evaluation of those
+published methods was not supportable, so the comparison was removed from the
+paper - SafeDreamer and CCPO are now cited as related work only, and the
+manuscript states that a controlled comparison against them is future work.
 
-IMPORTANT — provenance. Faithful re-implementations of SafeDreamer and CCPO are
-out of scope for this repository; per the approved plan they are evaluated as
-*calibrated stand-ins* that run through the shared simulation core on the
-policy-level constrained-baseline path (soft Lagrangian constraint, no
-environment-level governance invariant — hence compliance < 100%, unlike the
-GOMDP configs). This makes them run against the identical fire model, sensor
-footprint, and verification pipeline as every other method, so the comparison is
-apples-to-apples; the reported magnitudes are calibration-pending until WS1, and
-the two methods differ only by the registry knobs WS1 will attach (documented
-here rather than fabricated).
-
-Canonical output: results/paper/table8_recent_rl.csv  (see results/paper/MANIFEST.yaml)
-Paper reference: Table (tab:recent_rl), SafeDreamer & CCPO.
+The script is retained for reference and writes to results/runs/recent_rl/ only.
+It produces NO canonical paper artifact; see the `withdrawn:` block of
+results/paper/MANIFEST.yaml.
 """
 from __future__ import annotations
 
@@ -102,8 +95,8 @@ def main() -> None:
     agg = aggregate(per_seed)
 
     outdir = Path(args.outdir); outdir.mkdir(parents=True, exist_ok=True)
-    per_seed.to_csv(outdir / "table8_recent_rl_per_seed.csv", index=False)
-    agg.to_csv(outdir / "table8_recent_rl.csv", index=False)
+    per_seed.to_csv(outdir / "recent_rl_standins_per_seed.csv", index=False)
+    agg.to_csv(outdir / "recent_rl_standins.csv", index=False)
 
     print("=== Recent constrained-RL baselines (SafeDreamer, CCPO) ===")
     print(agg.to_string(index=False))

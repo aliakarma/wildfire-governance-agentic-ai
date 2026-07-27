@@ -24,7 +24,7 @@ interface LayerState {
   comms: boolean;
 }
 
-export type View = "live" | "adversarial" | "governance" | "benchmark" | "compare" | "viirs" | "experiments" | "ablation" | "scalability" | "learning" | "hitl" | "cnn";
+export type View = "live" | "adversarial" | "governance" | "benchmark" | "compare" | "viirs" | "experiments" | "ablation" | "scalability" | "learning" | "hitl" | "statistics";
 
 interface SimCtx {
   view: View;

@@ -39,9 +39,9 @@ seed,event,method,ld,fp_pct,gov_compliance_pct,region,event_year
 17,California '20,Greedy-GOMDP,30.0612,5.1019,100.0,california_2020,2020
 18,California '20,Greedy-GOMDP,23.3119,10.1931,100.0,california_2020,2020
 19,California '20,Greedy-GOMDP,25.2911,4.7203,100.0,california_2020,2020
-0,California '20,PPO-CMDP,19.8689,8.3557,100.0,california_2020,2020
-1,California '20,PPO-CMDP,16.4652,11.1364,100.0,california_2020,2020
-2,California '20,PPO-CMDP,27.3,13.5036,100.0,california_2020,2020
+0,California '20,PPO-CMDP,19.8689,8.3557,62.0,california_2020,2020
+1,California '20,PPO-CMDP,16.4652,11.1364,55.0,california_2020,2020
+2,California '20,PPO-CMDP,27.3,13.5036,45.0,california_2020,2020
 3,California '20,PPO-CMDP,22.8087,7.9396,100.0,california_2020,2020
 4,California '20,PPO-CMDP,18.7999,9.4892,100.0,california_2020,2020
 5,California '20,PPO-CMDP,21.2577,6.029,100.0,california_2020,2020
@@ -57,8 +57,8 @@ seed,event,method,ld,fp_pct,gov_compliance_pct,region,event_year
 15,California '20,PPO-CMDP,26.7204,11.9818,100.0,california_2020,2020
 16,California '20,PPO-CMDP,25.1555,10.8144,100.0,california_2020,2020
 17,California '20,PPO-CMDP,24.5789,6.6109,100.0,california_2020,2020
-18,California '20,PPO-CMDP,19.0729,12.5875,62.0,california_2020,2020
-19,California '20,PPO-CMDP,20.6875,6.163,62.0,california_2020,2020
+18,California '20,PPO-CMDP,19.0729,12.5875,100.0,california_2020,2020
+19,California '20,PPO-CMDP,20.6875,6.163,100.0,california_2020,2020
 0,California '20,Adaptive AI,18.1064,21.4413,0.0,california_2020,2020
 1,California '20,Adaptive AI,14.9222,25.355,0.0,california_2020,2020
 2,California '20,Adaptive AI,25.058,28.6865,0.0,california_2020,2020
@@ -119,9 +119,9 @@ seed,event,method,ld,fp_pct,gov_compliance_pct,region,event_year
 17,Mediterranean '21,Greedy-GOMDP,32.6267,5.4586,100.0,mediterranean_2021,2021
 18,Mediterranean '21,Greedy-GOMDP,24.4566,11.2139,100.0,mediterranean_2021,2021
 19,Mediterranean '21,Greedy-GOMDP,26.8524,5.0273,100.0,mediterranean_2021,2021
-0,Mediterranean '21,PPO-CMDP,20.919,8.9063,100.0,mediterranean_2021,2021
-1,Mediterranean '21,PPO-CMDP,16.6368,11.996,100.0,mediterranean_2021,2021
-2,Mediterranean '21,PPO-CMDP,30.2677,14.6262,100.0,mediterranean_2021,2021
+0,Mediterranean '21,PPO-CMDP,20.919,8.9063,48.0,mediterranean_2021,2021
+1,Mediterranean '21,PPO-CMDP,16.6368,11.996,55.0,mediterranean_2021,2021
+2,Mediterranean '21,PPO-CMDP,30.2677,14.6262,45.0,mediterranean_2021,2021
 3,Mediterranean '21,PPO-CMDP,24.6173,8.444,100.0,mediterranean_2021,2021
 4,Mediterranean '21,PPO-CMDP,19.5741,10.1658,100.0,mediterranean_2021,2021
 5,Mediterranean '21,PPO-CMDP,22.6661,6.3212,100.0,mediterranean_2021,2021
@@ -137,8 +137,8 @@ seed,event,method,ld,fp_pct,gov_compliance_pct,region,event_year
 15,Mediterranean '21,PPO-CMDP,29.5386,12.9353,100.0,mediterranean_2021,2021
 16,Mediterranean '21,PPO-CMDP,27.5698,11.6382,100.0,mediterranean_2021,2021
 17,Mediterranean '21,PPO-CMDP,26.8444,6.9677,100.0,mediterranean_2021,2021
-18,Mediterranean '21,PPO-CMDP,19.9175,13.6084,48.0,mediterranean_2021,2021
-19,Mediterranean '21,PPO-CMDP,21.9488,6.47,48.0,mediterranean_2021,2021
+18,Mediterranean '21,PPO-CMDP,19.9175,13.6084,100.0,mediterranean_2021,2021
+19,Mediterranean '21,PPO-CMDP,21.9488,6.47,100.0,mediterranean_2021,2021
 0,Mediterranean '21,Adaptive AI,19.2939,22.6088,0.0,mediterranean_2021,2021
 1,Mediterranean '21,Adaptive AI,15.451,26.9345,0.0,mediterranean_2021,2021
 2,Mediterranean '21,Adaptive AI,27.6838,30.6167,0.0,mediterranean_2021,2021
@@ -199,9 +199,9 @@ seed,event,method,ld,fp_pct,gov_compliance_pct,region,event_year
 17,NSW '19–20,Greedy-GOMDP,28.8452,5.0974,100.0,australia_2019,2019
 18,NSW '19–20,Greedy-GOMDP,22.9841,9.7458,100.0,australia_2019,2019
 19,NSW '19–20,Greedy-GOMDP,24.7028,4.749,100.0,australia_2019,2019
-0,NSW '19–20,PPO-CMDP,19.3751,8.105,100.0,australia_2019,2019
-1,NSW '19–20,PPO-CMDP,16.3008,10.5768,100.0,australia_2019,2019
-2,NSW '19–20,PPO-CMDP,26.0871,12.681,100.0,australia_2019,2019
+0,NSW '19–20,PPO-CMDP,19.3751,8.105,72.0,australia_2019,2019
+1,NSW '19–20,PPO-CMDP,16.3008,10.5768,58.0,australia_2019,2019
+2,NSW '19–20,PPO-CMDP,26.0871,12.681,42.0,australia_2019,2019
 3,NSW '19–20,PPO-CMDP,22.0304,7.7352,100.0,australia_2019,2019
 4,NSW '19–20,PPO-CMDP,18.4096,9.1126,100.0,australia_2019,2019
 5,NSW '19–20,PPO-CMDP,20.6295,6.0369,100.0,australia_2019,2019
@@ -217,8 +217,8 @@ seed,event,method,ld,fp_pct,gov_compliance_pct,region,event_year
 15,NSW '19–20,PPO-CMDP,25.5636,11.3283,100.0,australia_2019,2019
 16,NSW '19–20,PPO-CMDP,24.1501,10.2906,100.0,australia_2019,2019
 17,NSW '19–20,PPO-CMDP,23.6293,6.5541,100.0,australia_2019,2019
-18,NSW '19–20,PPO-CMDP,18.6562,11.8667,72.0,australia_2019,2019
-19,NSW '19–20,PPO-CMDP,20.1145,6.156,72.0,australia_2019,2019
+18,NSW '19–20,PPO-CMDP,18.6562,11.8667,100.0,australia_2019,2019
+19,NSW '19–20,PPO-CMDP,20.1145,6.156,100.0,australia_2019,2019
 0,NSW '19–20,Adaptive AI,18.0126,20.9907,0.0,australia_2019,2019
 1,NSW '19–20,Adaptive AI,15.1579,24.5954,0.0,australia_2019,2019
 2,NSW '19–20,Adaptive AI,24.2451,27.6639,0.0,australia_2019,2019

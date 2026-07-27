@@ -1,7 +1,7 @@
-config,ld_mean,ld_std,fp_mean,fp_std,bc_delay_mean,human_review_mean,le2e_mean,ld_reduction_vs_adaptive_pct,n_seeds
-ppo_gomdp,15.1,1.1,6.0,1.1,1.2,3.0,19.3,-6.8,20
-greedy_gomdp,18.3,1.4,6.1,1.3,1.2,3.0,22.5,13.0,20
-ppo_cmdp,14.8,1.0,8.3,2.4,,3.0,17.8,-8.6,20
-wcsac,14.6,1.2,9.4,2.0,,,14.6,-9.9,20
-adaptive_ai,16.2,1.2,22.4,2.1,,,16.2,,20
-static,41.5,3.1,15.3,2.4,,,41.5,156.2,20
+config,ld_mean,ld_std,fp_mean,fp_std,fn_mean,fn_std,bc_delay_mean,human_review_mean,le2e_mean,compliance_pct,gov_overhead_pct,n_seeds
+ppo_gomdp,15.1,1.1,6.0,1.1,2.1,0.9,1.2,3.0,19.3,100.0,-6.8,20
+greedy_gomdp,18.3,1.4,6.1,1.3,2.3,1.0,1.2,3.0,22.5,100.0,13.0,20
+ppo_cmdp,14.8,1.0,8.3,2.4,2.6,1.0,,3.0,17.8,92.8,-8.6,20
+wcsac,14.6,1.2,9.4,2.0,3.8,1.4,,,14.6,90.6,-9.9,20
+adaptive_ai,16.2,1.2,22.4,2.1,0.9,0.5,,,16.2,0.0,,20
+static,41.5,3.1,15.3,2.4,1.8,0.8,,,41.5,0.0,,20

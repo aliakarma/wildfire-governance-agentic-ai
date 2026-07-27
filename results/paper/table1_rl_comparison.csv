@@ -6,5 +6,5 @@ Shield-PPO,Logical,15.2,1.2,6.2,1.3,,,100.0,Logical
 SafeLayer,Learned,14.9,1.1,7.0,1.6,,,98.4,Learned
 PPO-CMDP,CMDP,14.8,1.0,8.3,2.4,2.6,1.0,92.8,Lagrangian
 WCSAC,CMDP,14.6,1.2,9.4,2.0,3.8,1.4,90.6,Lagrangian
-Adaptive AI,nan,16.2,1.2,22.4,2.1,0.9,0.5,0.0,nan
-Static,nan,41.5,3.1,15.3,2.4,1.8,0.8,0.0,nan
+Adaptive AI,Ungoverned,16.2,1.2,22.4,2.1,0.9,0.5,0.0,None
+Static,Ungoverned,41.5,3.1,15.3,2.4,1.8,0.8,0.0,None

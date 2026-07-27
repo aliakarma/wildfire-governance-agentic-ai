@@ -26,6 +26,12 @@ from wildfire_governance.simulation.sensor_models import (
 ObservationDict = Dict[str, Any]
 InfoDict = Dict[str, Any]
 
+# Heat above which a thermal sensor registers a cell as a candidate source.
+# Burning cells sit near 1.0 and cold ground near 0, so this only changes the
+# treatment of hot *non-fire* sources, which is what the two-stage verification
+# pipeline exists to discriminate.
+_HOT_SOURCE_THRESHOLD = 0.50
+
 
 @dataclass
 class EnvironmentConfig:
@@ -43,7 +49,14 @@ class EnvironmentConfig:
     ignition_delay_range: Tuple[int, int] = (50, 150)
     anomaly_injection_rate: float = 0.02
     anomaly_decay: float = 0.90
-    anomaly_intensity_range: Tuple[float, float] = (0.3, 0.7)
+    # Confusers must be able to reach the tau=0.80 confidence gate or the
+    # false-alert-suppression claim is untestable: at 0.65*heat + 0.35*weather
+    # with weather capped near 0.9, an anomaly needs heat > ~0.75 to escalate,
+    # so the old (0.3, 0.7) range made F_p identically zero whatever the
+    # pipeline did. Hot agricultural and industrial sources are genuinely
+    # comparable to wildfire in thermal signature, so the upper range is
+    # physical, and it is exactly those confusers that make suppression hard.
+    anomaly_intensity_range: Tuple[float, float] = (0.55, 0.95)
     fire_config: FirePropagationConfig = field(
         default_factory=FirePropagationConfig
     )
@@ -80,6 +93,8 @@ class WildfireGridEnvironment:
             detection_probability=self.config.uav_detection_probability
         )
         self._iot_positions: List[Tuple[int, int]] = []
+        # Static IoT footprint, rebuilt on reset when sensors are re-placed.
+        self._iot_cov_cache: Optional[np.ndarray] = None
         self._ignition_time: int = -1
         # Fire seeded at reset but withheld until _ignition_time; None once fired.
         self._pending_ignition: Optional[np.ndarray] = None
@@ -129,6 +144,7 @@ class WildfireGridEnvironment:
         rows = self._rng.integers(0, gs, size=n_iot)
         cols = self._rng.integers(0, gs, size=n_iot)
         self._iot_positions = list(zip(rows.tolist(), cols.tolist()))
+        self._iot_cov_cache = None  # sensors moved; footprint must be rebuilt
 
         return self._build_observation()
 
@@ -288,6 +304,9 @@ class WildfireGridEnvironment:
               ``max_heat``: maximum observed heat over detected cells (0 if none).
               ``argmax_cell``: (row, col) of that maximum, or None.
               ``detected``: whether any modality raised a detection this step.
+              ``detected_fire``: whether a detected cell is *actually* burning.
+                  This is the event that stops the detection-latency clock;
+                  ``detected`` alone also fires on non-fire heat anomalies.
         """
         gs = self.config.grid_size
         truth = self._heat_map
@@ -299,7 +318,15 @@ class WildfireGridEnvironment:
         observed = np.clip(truth + noise, 0.0, 1.0).astype(np.float32)
 
         draw = self._rng.random((gs, gs))
-        det_prob = np.where(fire, self.config.uav_detection_probability, 0.05)
+        # A thermal camera responds to heat, not to ground truth. Keying the
+        # detection probability on the fire mask made hot non-fire sources
+        # (agricultural burns, industrial plant) all but invisible at 0.05,
+        # so no anomaly ever reached the verification pipeline and the
+        # false-alert rate was zero by construction rather than by suppression.
+        # Deciding whether a hot cell is a fire is the pipeline's job, not the
+        # sensor's.
+        hot = truth > _HOT_SOURCE_THRESHOLD
+        det_prob = np.where(hot, self.config.uav_detection_probability, 0.05)
         uav_detect = uav_cov & (draw < det_prob)
 
         # --- Ground IoT: fixed thermometers, local mean heat must exceed 0.3 ---
@@ -311,7 +338,14 @@ class WildfireGridEnvironment:
 
         iot_r = self.config.ground_iot_radius
         local_mean = uniform_filter(truth, size=2 * iot_r + 1, mode="constant")
-        iot_cov = self.coverage_mask(self._iot_positions, radius=iot_r)
+        # Ground sensors are fixed installations, so their footprint is an
+        # episode constant. Rebuilding it per step meant a 500-iteration Python
+        # loop on every one of 3000 steps — 64% of this method's runtime.
+        if self._iot_cov_cache is None:
+            self._iot_cov_cache = self.coverage_mask(
+                self._iot_positions, radius=iot_r
+            )
+        iot_cov = self._iot_cov_cache
         iot_draw = self._rng.random((gs, gs))
         iot_detect = iot_cov & (local_mean > 0.30) & (iot_draw < 0.90)
 
@@ -348,6 +382,7 @@ class WildfireGridEnvironment:
             "max_heat": max_heat,
             "argmax_cell": argmax_cell,
             "detected": bool(detect.any()),
+            "detected_fire": bool((detect & fire).any()),
         }
 
     def render(self) -> np.ndarray:
@@ -379,6 +414,21 @@ class WildfireGridEnvironment:
     def timestep(self) -> int:
         """Current simulation timestep."""
         return self._timestep
+
+    @property
+    def ignition_time(self) -> int:
+        """Timestep at which the scheduled fire is seeded (-1 before reset)."""
+        return self._ignition_time
+
+    @property
+    def wind_field(self) -> np.ndarray:
+        """Current wind field W_t, shape (H, W)."""
+        return self._wind_field
+
+    @property
+    def humidity_field(self) -> np.ndarray:
+        """Current humidity field, shape (H, W)."""
+        return self._humidity_field
 
     @property
     def grid_size(self) -> int:

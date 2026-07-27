@@ -1,5 +1,6 @@
 "use client";
 import { AttackConsole } from "@/components/adv/AttackConsole";
+import { AttackReference } from "@/components/adv/AttackReference";
 import { BreachMeter } from "@/components/adv/BreachMeter";
 import { ConsensusReference } from "@/components/adv/ConsensusReference";
 import { SafetyVerdict } from "@/components/adv/SafetyVerdict";
@@ -51,6 +52,7 @@ export function AdversarialScreen() {
               {s.error}
             </div>
           )}
+          <AttackReference />
         </section>
         <aside className="flex flex-col gap-4">
           <SwarmStatus frame={s.currentFrame} />

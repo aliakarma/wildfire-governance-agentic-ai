@@ -1,0 +1,28 @@
+group,parameter,symbol,value,source
+Environment,Grid size,,100 x 100,configs/base.yaml
+Environment,Timesteps per episode,T,3000 (10 s each),configs/base.yaml
+Environment,Random seeds (simulation),,20 (seeds 0-19),configs/base.yaml
+Environment,UAV fleet sizes,N,"{5, 10, 20, 40}",configs/base.yaml
+Environment,Thermal detection probability,p_det,0.85,configs/base.yaml
+Environment,Fire-spread weights,"(alpha_1, alpha_2, alpha_3)","(0.45, 0.35, 0.30)",configs/base.yaml
+Governance,Blockchain platform,,Hyperledger Fabric,configs/blockchain
+Governance,Consensus,,BFT ordering (simulated),src/wildfire_governance/blockchain
+Governance,Validators / tolerance,"k / f","7 / 2 (k >= 3f+1)",configs/base.yaml
+Governance,Blockchain delay (nominal),Delta_BC,"N(1.2, 0.3) steps",configs/base.yaml
+Governance,Human review delay,Delta_HITL,"N(3.0, 0.8) steps",configs/base.yaml
+Governance,HITL approval,HA_t,"Bernoulli(1 - p_err), p_err = 0.05",configs/base.yaml
+Verification,Stage thresholds,"(tau_1, tau_2 = tau)","(0.60, 0.80)",configs/base.yaml
+Verification,Fusion weights,"(w_H, w_W)","(0.65, 0.35)",configs/base.yaml
+Verification,Secondary-verification likelihood,P(V|fire),0.85,configs/base.yaml
+Objective,Cost weights,"(alpha, beta, gamma)","(0.50, 0.35, 0.15)",configs/base.yaml
+PPO,Learning rate,,3e-4,configs/models
+PPO,Training episodes,,1000,configs/models
+PPO,Hidden dims,,"(256, 128)",configs/models
+PPO,Clip ratio,epsilon,0.2,configs/models
+PPO,Entropy bonus,,0.01,configs/models
+PPO,Discount,gamma_RL,0.99,configs/models
+PPO,Update epochs per episode,,4,configs/models
+PPO,Batch size,,64,configs/models
+PPO,Observation normalization,,Min-max per episode,configs/models
+PPO,Reward scaling,,"Max return, first 50 episodes",configs/models
+Baselines,WCSAC safety budget,,E[c] <= 0.10 (as PPO-CMDP),configs/experiments

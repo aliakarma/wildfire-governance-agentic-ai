@@ -1,0 +1,10 @@
+comparison,metric,test,n,mean_a,mean_b,statistic,p_value,effect_size_d,ci95_low,ci95_high,conclusion
+PPO-GOMDP vs Greedy-GOMDP,L_d,paired t-test (two-sided),20,15.1,18.3,-47.705,1.21e-20,-10.67,-3.34,-3.06,significant (Holm-corrected p < 0.01)
+PPO-GOMDP vs PPO-CMDP,L_d,paired t-test (two-sided),20,15.1,14.8,1.282,0.2153,0.29,-0.19,0.79,not significant
+PPO-GOMDP vs Static,L_d,paired t-test (two-sided),20,15.1,41.5,-59.033,2.70e-22,-13.2,-27.336,-25.464,significant (Holm-corrected p < 0.01)
+PPO-GOMDP vs Adaptive AI,F_p,paired t-test (two-sided),20,6.0,22.4,-73.344,5.34e-24,-16.4,-16.868,-15.932,significant (Holm-corrected p < 0.01)
+PPO-GOMDP vs PPO-CMDP,F_p,paired t-test (two-sided),20,6.0,8.3,-7.912,3.95e-07,-1.77,-2.908,-1.692,significant (Holm-corrected p < 0.01)
+PPO-GOMDP vs WCSAC,F_p,paired t-test (two-sided),20,6.0,9.4,-16.895,2.00e-12,-3.78,-3.821,-2.979,significant (Holm-corrected p < 0.01)
+PPO-GOMDP vs PPO-CMDP,L_d,"TOST one-sided (lower, delta = 1.0 step)",20,15.1,14.8,5.556,<0.001,0.29,-0.105,0.705,rejects non-equivalence on the lower side
+PPO-GOMDP vs PPO-CMDP,L_d,"TOST one-sided (upper, delta = 1.0 step)",20,15.1,14.8,-2.991,0.0038,0.29,-0.105,0.705,rejects non-equivalence on the upper side
+PPO-GOMDP vs PPO-CMDP,L_d,TOST equivalence (delta = +/-1.0 step),20,15.1,14.8,-2.991,0.0038,0.29,-0.105,0.705,"equivalent within +/-1.0 step (max(p_L, p_U) = 0.004 < 0.05)"

@@ -56,28 +56,16 @@ export function ScalabilityScreen() {
   };
 
   const fpSeries = useMemo(() => groupSeries(fp, "fp_mean", color), [fp, theme]); // eslint-disable-line react-hooks/exhaustive-deps
-  const ldSeries = useMemo(() => {
-    const s = groupSeries(lat, "ld_mean", color);
-    // Add the Proposition-1 bound as a dashed reference series if present.
-    const bnd = groupSeries(lat, "proposition1_bound", () => color("bound"))
-      .flatMap((x) => x.points);
-    const uniq = new Map<number, number>();
-    for (const p of bnd) uniq.set(p.x, p.y);
-    if (uniq.size) {
-      s.push({ label: "Proposition-1 bound", color: color("bound"),
-               points: [...uniq.entries()].map(([x, y]) => ({ x, y })) });
-    }
-    return s;
-  }, [lat, theme]); // eslint-disable-line react-hooks/exhaustive-deps
+  const ldSeries = useMemo(() => groupSeries(lat, "ld_mean", color), [lat, theme]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="space-y-6">
       <header>
         <h2 className="text-xl font-bold text-slate-100">Scalability</h2>
-        <p className="mt-1 max-w-3xl text-sm text-slate-400">
-          How the fleet scales with fleet size N. Values are the frozen manuscript
-          reference (Figures 2 &amp; 4). Governance keeps false alerts low and detection fast
-          as N grows.
+        <p className="mt-1 max-w-3xl text-sm text-muted">
+          How the pipeline scales with fleet size N (Figures 2 &amp; 3 of the manuscript,
+          n = 20 seeds). Governance keeps false alerts low while detection latency falls
+          with fleet size; the ranking is stable across N ∈ {"{5, 10, 20, 40}"}.
         </p>
       </header>
       {err && <div className="text-sm text-red-400">Failed to load: {err}</div>}
@@ -87,7 +75,7 @@ export function ScalabilityScreen() {
                      xLabel="Fleet size N (UAVs)" yLabel="F_p" yUnit="%" />
         </div>
         <div>
-          <LineChart title="Figure 4 · Detection latency vs fleet size" series={ldSeries}
+          <LineChart title="Figure 3 · Detection latency vs fleet size" series={ldSeries}
                      xLabel="Fleet size N (UAVs)" yLabel="L_d" yUnit="steps" />
         </div>
       </div>

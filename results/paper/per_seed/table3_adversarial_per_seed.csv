@@ -1,124 +1,124 @@
 seed,attack_type,parameter,gomdp,central_sig,central,metric
-0,No attack,---,5.9079,5.9079,23.8838,fp_pct
-1,No attack,---,4.776,4.776,20.253,fp_pct
-2,No attack,---,6.3098,6.3098,19.8521,fp_pct
-3,No attack,---,6.3548,6.3548,21.3105,fp_pct
-4,No attack,---,6.2666,6.2666,23.0274,fp_pct
-5,No attack,---,5.1697,5.1697,19.975,fp_pct
-6,No attack,---,4.7004,4.7004,24.0999,fp_pct
-7,No attack,---,5.0577,5.0577,22.3001,fp_pct
-8,No attack,---,6.805,6.805,23.0405,fp_pct
-9,No attack,---,5.8973,5.8973,21.7623,fp_pct
-10,No attack,---,5.1792,5.1792,22.5379,fp_pct
-11,No attack,---,4.9441,4.9441,22.6003,fp_pct
-12,No attack,---,7.6409,7.6409,16.8243,fp_pct
-13,No attack,---,6.5508,6.5508,24.6117,fp_pct
-14,No attack,---,7.5759,7.5759,23.2698,fp_pct
-15,No attack,---,6.8528,6.8528,22.0366,fp_pct
-16,No attack,---,3.3925,3.3925,26.1572,fp_pct
-17,No attack,---,6.5403,6.5403,23.773,fp_pct
-18,No attack,---,7.1391,7.1391,24.8595,fp_pct
-19,No attack,---,6.9391,6.9391,21.825,fp_pct
-0,Spoofing (i.i.d.),p=0.05,6.5995,6.5995,28.4958,fp_pct
-1,Spoofing (i.i.d.),p=0.05,5.3647,5.3647,24.3463,fp_pct
-2,Spoofing (i.i.d.),p=0.05,7.038,7.038,23.8881,fp_pct
-3,Spoofing (i.i.d.),p=0.05,7.0871,7.0871,25.5549,fp_pct
-4,Spoofing (i.i.d.),p=0.05,6.9908,6.9908,27.5171,fp_pct
-5,Spoofing (i.i.d.),p=0.05,5.7942,5.7942,24.0285,fp_pct
-6,Spoofing (i.i.d.),p=0.05,5.2823,5.2823,28.7428,fp_pct
-7,Spoofing (i.i.d.),p=0.05,5.6721,5.6721,26.6858,fp_pct
-8,Spoofing (i.i.d.),p=0.05,7.5781,7.5781,27.532,fp_pct
-9,Spoofing (i.i.d.),p=0.05,6.588,6.588,26.0712,fp_pct
-10,Spoofing (i.i.d.),p=0.05,5.8045,5.8045,26.9576,fp_pct
-11,Spoofing (i.i.d.),p=0.05,5.5481,5.5481,27.0289,fp_pct
-12,Spoofing (i.i.d.),p=0.05,8.4901,8.4901,20.4278,fp_pct
-13,Spoofing (i.i.d.),p=0.05,7.3008,7.3008,29.3277,fp_pct
-14,Spoofing (i.i.d.),p=0.05,8.4192,8.4192,27.794,fp_pct
-15,Spoofing (i.i.d.),p=0.05,7.6303,7.6303,26.3847,fp_pct
-16,Spoofing (i.i.d.),p=0.05,3.8555,3.8555,31.094,fp_pct
-17,Spoofing (i.i.d.),p=0.05,7.2895,7.2895,28.3691,fp_pct
-18,Spoofing (i.i.d.),p=0.05,7.9427,7.9427,29.6108,fp_pct
-19,Spoofing (i.i.d.),p=0.05,7.7244,7.7244,26.1429,fp_pct
-0,Spoofing (i.i.d.),p=0.10,7.6912,7.6912,33.2491,fp_pct
-1,Spoofing (i.i.d.),p=0.10,6.3534,6.3534,28.2351,fp_pct
-2,Spoofing (i.i.d.),p=0.10,8.1662,8.1662,27.6815,fp_pct
-3,Spoofing (i.i.d.),p=0.10,8.2193,8.2193,29.6955,fp_pct
-4,Spoofing (i.i.d.),p=0.10,8.115,8.115,32.0665,fp_pct
-5,Spoofing (i.i.d.),p=0.10,6.8187,6.8187,27.8512,fp_pct
-6,Spoofing (i.i.d.),p=0.10,6.2642,6.2642,33.5475,fp_pct
-7,Spoofing (i.i.d.),p=0.10,6.6864,6.6864,31.062,fp_pct
-8,Spoofing (i.i.d.),p=0.10,8.7513,8.7513,32.0845,fp_pct
-9,Spoofing (i.i.d.),p=0.10,7.6787,7.6787,30.3194,fp_pct
-10,Spoofing (i.i.d.),p=0.10,6.8299,6.8299,31.3905,fp_pct
-11,Spoofing (i.i.d.),p=0.10,6.5521,6.5521,31.4766,fp_pct
-12,Spoofing (i.i.d.),p=0.10,9.7393,9.7393,23.5003,fp_pct
-13,Spoofing (i.i.d.),p=0.10,8.4509,8.4509,34.2543,fp_pct
-14,Spoofing (i.i.d.),p=0.10,9.6624,9.6624,32.4011,fp_pct
-15,Spoofing (i.i.d.),p=0.10,8.8078,8.8078,30.6982,fp_pct
-16,Spoofing (i.i.d.),p=0.10,4.7184,4.7184,36.3885,fp_pct
-17,Spoofing (i.i.d.),p=0.10,8.4386,8.4386,33.096,fp_pct
-18,Spoofing (i.i.d.),p=0.10,9.1462,9.1462,34.5964,fp_pct
-19,Spoofing (i.i.d.),p=0.10,8.9098,8.9098,30.406,fp_pct
-0,Spoofing (i.i.d.),p=0.20,9.2744,9.2744,41.173,fp_pct
-1,Spoofing (i.i.d.),p=0.20,7.7309,7.7309,35.1217,fp_pct
-2,Spoofing (i.i.d.),p=0.20,9.8225,9.8225,34.4535,fp_pct
-3,Spoofing (i.i.d.),p=0.20,9.8839,9.8839,36.8842,fp_pct
-4,Spoofing (i.i.d.),p=0.20,9.7635,9.7635,39.7457,fp_pct
-5,Spoofing (i.i.d.),p=0.20,8.2678,8.2678,34.6583,fp_pct
-6,Spoofing (i.i.d.),p=0.20,7.6279,7.6279,41.5332,fp_pct
-7,Spoofing (i.i.d.),p=0.20,8.1151,8.1151,38.5335,fp_pct
-8,Spoofing (i.i.d.),p=0.20,10.4977,10.4977,39.7676,fp_pct
-9,Spoofing (i.i.d.),p=0.20,9.26,9.26,37.6372,fp_pct
-10,Spoofing (i.i.d.),p=0.20,8.2807,8.2807,38.9299,fp_pct
-11,Spoofing (i.i.d.),p=0.20,7.9602,7.9602,39.0339,fp_pct
-12,Spoofing (i.i.d.),p=0.20,11.6376,11.6376,29.4072,fp_pct
-13,Spoofing (i.i.d.),p=0.20,10.151,10.151,42.3862,fp_pct
-14,Spoofing (i.i.d.),p=0.20,11.549,11.549,40.1496,fp_pct
-15,Spoofing (i.i.d.),p=0.20,10.5629,10.5629,38.0943,fp_pct
-16,Spoofing (i.i.d.),p=0.20,5.8444,5.8444,44.962,fp_pct
-17,Spoofing (i.i.d.),p=0.20,10.1368,10.1368,40.9883,fp_pct
-18,Spoofing (i.i.d.),p=0.20,10.9534,10.9534,42.7991,fp_pct
-19,Spoofing (i.i.d.),p=0.20,10.6806,10.6806,37.7417,fp_pct
-0,Spoofing (strategic),p=0.10,8.4828,8.4828,36.7611,fp_pct
-1,Spoofing (strategic),p=0.10,7.0421,7.0421,31.2284,fp_pct
-2,Spoofing (strategic),p=0.10,8.9943,8.9943,30.6175,fp_pct
-3,Spoofing (strategic),p=0.10,9.0516,9.0516,32.8398,fp_pct
-4,Spoofing (strategic),p=0.10,8.9392,8.9392,35.4561,fp_pct
-5,Spoofing (strategic),p=0.10,7.5433,7.5433,30.8047,fp_pct
-6,Spoofing (strategic),p=0.10,6.946,6.946,37.0904,fp_pct
-7,Spoofing (strategic),p=0.10,7.4007,7.4007,34.3478,fp_pct
-8,Spoofing (strategic),p=0.10,9.6245,9.6245,35.4761,fp_pct
-9,Spoofing (strategic),p=0.10,8.4694,8.4694,33.5283,fp_pct
-10,Spoofing (strategic),p=0.10,7.5553,7.5553,34.7102,fp_pct
-11,Spoofing (strategic),p=0.10,7.2562,7.2562,34.8053,fp_pct
-12,Spoofing (strategic),p=0.10,10.6884,10.6884,26.0037,fp_pct
-13,Spoofing (strategic),p=0.10,9.301,9.301,37.8702,fp_pct
-14,Spoofing (strategic),p=0.10,10.6057,10.6057,35.8253,fp_pct
-15,Spoofing (strategic),p=0.10,9.6854,9.6854,33.9462,fp_pct
-16,Spoofing (strategic),p=0.10,5.2814,5.2814,40.2253,fp_pct
-17,Spoofing (strategic),p=0.10,9.2877,9.2877,36.5921,fp_pct
-18,Spoofing (strategic),p=0.10,10.0498,10.0498,38.2477,fp_pct
-19,Spoofing (strategic),p=0.10,9.7952,9.7952,33.6238,fp_pct
-0,Alert injection (success),p_att=1,5.9079,5.9079,100.0,injection_ratio
-1,Alert injection (success),p_att=1,4.776,4.776,100.0,injection_ratio
-2,Alert injection (success),p_att=1,6.3098,6.3098,100.0,injection_ratio
-3,Alert injection (success),p_att=1,6.3548,6.3548,100.0,injection_ratio
-4,Alert injection (success),p_att=1,6.2666,6.2666,100.0,injection_ratio
-5,Alert injection (success),p_att=1,5.1697,5.1697,100.0,injection_ratio
-6,Alert injection (success),p_att=1,4.7004,4.7004,100.0,injection_ratio
-7,Alert injection (success),p_att=1,5.0577,5.0577,100.0,injection_ratio
-8,Alert injection (success),p_att=1,6.805,6.805,100.0,injection_ratio
-9,Alert injection (success),p_att=1,5.8973,5.8973,100.0,injection_ratio
-10,Alert injection (success),p_att=1,5.1792,5.1792,100.0,injection_ratio
-11,Alert injection (success),p_att=1,4.9441,4.9441,100.0,injection_ratio
-12,Alert injection (success),p_att=1,7.6409,7.6409,100.0,injection_ratio
-13,Alert injection (success),p_att=1,6.5508,6.5508,100.0,injection_ratio
-14,Alert injection (success),p_att=1,7.5759,7.5759,100.0,injection_ratio
-15,Alert injection (success),p_att=1,6.8528,6.8528,100.0,injection_ratio
-16,Alert injection (success),p_att=1,3.3925,3.3925,100.0,injection_ratio
-17,Alert injection (success),p_att=1,6.5403,6.5403,100.0,injection_ratio
-18,Alert injection (success),p_att=1,7.1391,7.1391,100.0,injection_ratio
-19,Alert injection (success),p_att=1,6.9391,6.9391,100.0,injection_ratio
+0,No attack,---,5.9079,5.2067,23.8838,fp_pct
+1,No attack,---,4.776,3.8441,20.253,fp_pct
+2,No attack,---,6.3098,6.7325,19.8521,fp_pct
+3,No attack,---,6.3548,6.8869,21.3105,fp_pct
+4,No attack,---,6.2666,5.7328,23.0274,fp_pct
+5,No attack,---,5.1697,6.4741,19.975,fp_pct
+6,No attack,---,4.7004,7.9447,24.0999,fp_pct
+7,No attack,---,5.0577,7.2334,22.3001,fp_pct
+8,No attack,---,6.805,6.8468,23.0405,fp_pct
+9,No attack,---,5.8973,6.825,21.7623,fp_pct
+10,No attack,---,5.1792,5.1263,22.5379,fp_pct
+11,No attack,---,4.9441,7.1275,22.6003,fp_pct
+12,No attack,---,7.6409,4.2669,16.8243,fp_pct
+13,No attack,---,6.5508,5.7083,24.6117,fp_pct
+14,No attack,---,7.5759,5.5931,23.2698,fp_pct
+15,No attack,---,6.8528,4.1792,22.0366,fp_pct
+16,No attack,---,3.3925,5.9511,26.1572,fp_pct
+17,No attack,---,6.5403,7.8714,23.773,fp_pct
+18,No attack,---,7.1391,5.6995,24.8595,fp_pct
+19,No attack,---,6.9391,4.7496,21.825,fp_pct
+0,Spoofing (i.i.d.),p=0.05,6.5995,5.8983,28.4958,fp_pct
+1,Spoofing (i.i.d.),p=0.05,5.3647,4.4328,24.3463,fp_pct
+2,Spoofing (i.i.d.),p=0.05,7.038,7.4607,23.8881,fp_pct
+3,Spoofing (i.i.d.),p=0.05,7.0871,7.6192,25.5549,fp_pct
+4,Spoofing (i.i.d.),p=0.05,6.9908,6.457,27.5171,fp_pct
+5,Spoofing (i.i.d.),p=0.05,5.7942,7.0986,24.0285,fp_pct
+6,Spoofing (i.i.d.),p=0.05,5.2823,8.5266,28.7428,fp_pct
+7,Spoofing (i.i.d.),p=0.05,5.6721,7.8478,26.6858,fp_pct
+8,Spoofing (i.i.d.),p=0.05,7.5781,7.6199,27.532,fp_pct
+9,Spoofing (i.i.d.),p=0.05,6.588,7.5157,26.0712,fp_pct
+10,Spoofing (i.i.d.),p=0.05,5.8045,5.7516,26.9576,fp_pct
+11,Spoofing (i.i.d.),p=0.05,5.5481,7.7315,27.0289,fp_pct
+12,Spoofing (i.i.d.),p=0.05,8.4901,5.1161,20.4278,fp_pct
+13,Spoofing (i.i.d.),p=0.05,7.3008,6.4583,29.3277,fp_pct
+14,Spoofing (i.i.d.),p=0.05,8.4192,6.4364,27.794,fp_pct
+15,Spoofing (i.i.d.),p=0.05,7.6303,4.9567,26.3847,fp_pct
+16,Spoofing (i.i.d.),p=0.05,3.8555,6.4141,31.094,fp_pct
+17,Spoofing (i.i.d.),p=0.05,7.2895,8.6206,28.3691,fp_pct
+18,Spoofing (i.i.d.),p=0.05,7.9427,6.5031,29.6108,fp_pct
+19,Spoofing (i.i.d.),p=0.05,7.7244,5.5349,26.1429,fp_pct
+0,Spoofing (i.i.d.),p=0.10,7.6912,7.0891,33.2491,fp_pct
+1,Spoofing (i.i.d.),p=0.10,6.3534,5.5091,28.2351,fp_pct
+2,Spoofing (i.i.d.),p=0.10,8.1662,8.692,27.6815,fp_pct
+3,Spoofing (i.i.d.),p=0.10,8.2193,8.855,29.6955,fp_pct
+4,Spoofing (i.i.d.),p=0.10,8.115,7.6839,32.0665,fp_pct
+5,Spoofing (i.i.d.),p=0.10,6.8187,8.2147,27.8512,fp_pct
+6,Spoofing (i.i.d.),p=0.10,6.2642,9.5954,33.5475,fp_pct
+7,Spoofing (i.i.d.),p=0.10,6.6864,8.9526,31.062,fp_pct
+8,Spoofing (i.i.d.),p=0.10,8.7513,8.9012,32.0845,fp_pct
+9,Spoofing (i.i.d.),p=0.10,7.6787,8.7054,30.3194,fp_pct
+10,Spoofing (i.i.d.),p=0.10,6.8299,6.8687,31.3905,fp_pct
+11,Spoofing (i.i.d.),p=0.10,6.5521,8.8248,31.4766,fp_pct
+12,Spoofing (i.i.d.),p=0.10,9.7393,6.4819,23.5003,fp_pct
+13,Spoofing (i.i.d.),p=0.10,8.4509,7.714,34.2543,fp_pct
+14,Spoofing (i.i.d.),p=0.10,9.6624,7.7955,32.4011,fp_pct
+15,Spoofing (i.i.d.),p=0.10,8.8078,6.2428,30.6982,fp_pct
+16,Spoofing (i.i.d.),p=0.10,4.7184,7.3507,36.3885,fp_pct
+17,Spoofing (i.i.d.),p=0.10,8.4386,9.8752,33.096,fp_pct
+18,Spoofing (i.i.d.),p=0.10,9.1462,7.8181,34.5964,fp_pct
+19,Spoofing (i.i.d.),p=0.10,8.9098,6.8298,30.406,fp_pct
+0,Spoofing (i.i.d.),p=0.20,9.2744,8.6722,41.173,fp_pct
+1,Spoofing (i.i.d.),p=0.20,7.7309,6.8859,35.1217,fp_pct
+2,Spoofing (i.i.d.),p=0.20,9.8225,10.3485,34.4535,fp_pct
+3,Spoofing (i.i.d.),p=0.20,9.8839,10.5198,36.8842,fp_pct
+4,Spoofing (i.i.d.),p=0.20,9.7635,9.3325,39.7457,fp_pct
+5,Spoofing (i.i.d.),p=0.20,8.2678,9.6633,34.6583,fp_pct
+6,Spoofing (i.i.d.),p=0.20,7.6279,10.9583,41.5332,fp_pct
+7,Spoofing (i.i.d.),p=0.20,8.1151,10.3807,38.5335,fp_pct
+8,Spoofing (i.i.d.),p=0.20,10.4977,10.6481,39.7676,fp_pct
+9,Spoofing (i.i.d.),p=0.20,9.26,10.2866,37.6372,fp_pct
+10,Spoofing (i.i.d.),p=0.20,8.2807,8.319,38.9299,fp_pct
+11,Spoofing (i.i.d.),p=0.20,7.9602,10.2323,39.0339,fp_pct
+12,Spoofing (i.i.d.),p=0.20,11.6376,8.3811,29.4072,fp_pct
+13,Spoofing (i.i.d.),p=0.20,10.151,9.4144,42.3862,fp_pct
+14,Spoofing (i.i.d.),p=0.20,11.549,9.683,40.1496,fp_pct
+15,Spoofing (i.i.d.),p=0.20,10.5629,7.9984,38.0943,fp_pct
+16,Spoofing (i.i.d.),p=0.20,5.8444,8.4751,44.962,fp_pct
+17,Spoofing (i.i.d.),p=0.20,10.1368,11.5737,40.9883,fp_pct
+18,Spoofing (i.i.d.),p=0.20,10.9534,9.626,42.7991,fp_pct
+19,Spoofing (i.i.d.),p=0.20,10.6806,8.6011,37.7417,fp_pct
+0,Spoofing (strategic),p=0.10,8.4828,7.8806,36.7611,fp_pct
+1,Spoofing (strategic),p=0.10,7.0421,6.1974,31.2284,fp_pct
+2,Spoofing (strategic),p=0.10,8.9943,9.5202,30.6175,fp_pct
+3,Spoofing (strategic),p=0.10,9.0516,9.6874,32.8398,fp_pct
+4,Spoofing (strategic),p=0.10,8.9392,8.5082,35.4561,fp_pct
+5,Spoofing (strategic),p=0.10,7.5433,8.939,30.8047,fp_pct
+6,Spoofing (strategic),p=0.10,6.946,10.2767,37.0904,fp_pct
+7,Spoofing (strategic),p=0.10,7.4007,9.6665,34.3478,fp_pct
+8,Spoofing (strategic),p=0.10,9.6245,9.7747,35.4761,fp_pct
+9,Spoofing (strategic),p=0.10,8.4694,9.496,33.5283,fp_pct
+10,Spoofing (strategic),p=0.10,7.5553,7.5938,34.7102,fp_pct
+11,Spoofing (strategic),p=0.10,7.2562,9.5285,34.8053,fp_pct
+12,Spoofing (strategic),p=0.10,10.6884,7.4316,26.0037,fp_pct
+13,Spoofing (strategic),p=0.10,9.301,8.5643,37.8702,fp_pct
+14,Spoofing (strategic),p=0.10,10.6057,8.7394,35.8253,fp_pct
+15,Spoofing (strategic),p=0.10,9.6854,7.1207,33.9462,fp_pct
+16,Spoofing (strategic),p=0.10,5.2814,7.9126,40.2253,fp_pct
+17,Spoofing (strategic),p=0.10,9.2877,10.7245,36.5921,fp_pct
+18,Spoofing (strategic),p=0.10,10.0498,8.7221,38.2477,fp_pct
+19,Spoofing (strategic),p=0.10,9.7952,7.7155,33.6238,fp_pct
+0,Alert injection (success),p_att=1,0.0,0.0,100.0,injection_ratio
+1,Alert injection (success),p_att=1,0.0,0.0,100.0,injection_ratio
+2,Alert injection (success),p_att=1,0.0,0.0,100.0,injection_ratio
+3,Alert injection (success),p_att=1,0.0,0.0,100.0,injection_ratio
+4,Alert injection (success),p_att=1,0.0,0.0,100.0,injection_ratio
+5,Alert injection (success),p_att=1,0.0,0.0,100.0,injection_ratio
+6,Alert injection (success),p_att=1,0.0,0.0,100.0,injection_ratio
+7,Alert injection (success),p_att=1,0.0,0.0,100.0,injection_ratio
+8,Alert injection (success),p_att=1,0.0,0.0,100.0,injection_ratio
+9,Alert injection (success),p_att=1,0.0,0.0,100.0,injection_ratio
+10,Alert injection (success),p_att=1,0.0,0.0,100.0,injection_ratio
+11,Alert injection (success),p_att=1,0.0,0.0,100.0,injection_ratio
+12,Alert injection (success),p_att=1,0.0,0.0,100.0,injection_ratio
+13,Alert injection (success),p_att=1,0.0,0.0,100.0,injection_ratio
+14,Alert injection (success),p_att=1,0.0,0.0,100.0,injection_ratio
+15,Alert injection (success),p_att=1,0.0,0.0,100.0,injection_ratio
+16,Alert injection (success),p_att=1,0.0,0.0,100.0,injection_ratio
+17,Alert injection (success),p_att=1,0.0,0.0,100.0,injection_ratio
+18,Alert injection (success),p_att=1,0.0,0.0,100.0,injection_ratio
+19,Alert injection (success),p_att=1,0.0,0.0,100.0,injection_ratio
 0,byzantine,f=0,5.9079,5.9079,,fp_pct
 1,byzantine,f=0,4.776,4.776,,fp_pct
 2,byzantine,f=0,6.3098,6.3098,,fp_pct

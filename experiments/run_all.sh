@@ -85,11 +85,9 @@ echo "[8b/9] Stress testing (Figure 6, supplementary — not in paper)..."
 python experiments/10_stress_testing.py \
     --config configs/experiments/stress_testing.yaml $SMOKE
 
-# ── Theorem-2 closed form, sensitivity, and recent baselines ─────────────
+# ── Theorem-2 closed form and sensitivity sweeps ─────────────────────────
 # These emit canonical CSVs directly (see results/paper/MANIFEST.yaml).
-# 13/14 are closed-form and reproduce the paper EXACTLY; the rest run on the
-# shared simulation core and are calibration-pending until the engine is
-# calibrated (WS1).
+# 13/14 are closed-form and reproduce the manuscript EXACTLY.
 echo "[9a/9] Byzantine validator compromise (tab:byzantine, closed form)..."
 python experiments/13_byzantine_compromise.py --no-fp
 
@@ -102,10 +100,7 @@ python experiments/16_multisig.py $SMOKE
 echo "[9d/9] HITL operator-error sensitivity (tab:hitl_sensitivity)..."
 python experiments/06b_hitl_sensitivity.py $SMOKE
 
-echo "[9e/9] Recent constrained-RL baselines (tab:recent_rl)..."
-python experiments/15_recent_rl.py $SMOKE
-
-echo "[9f/9] False-alert rate vs fleet size (Figure 2)..."
+echo "[9e/9] False-alert rate vs fleet size (Figure 2)..."
 python experiments/04b_false_alert_scaling.py $SMOKE
 
 # ── Real-world VIIRS (gracefully skipped if data not present) ───────────
@@ -123,7 +118,8 @@ echo " All experiments complete!"
 echo "=============================================="
 echo ""
 echo "Next steps:"
-echo "  Verify results:  bash scripts/check_reproducibility.sh"
+echo "  Check results vs manuscript: python scripts/verify_paper_alignment.py"
+echo "  Diff this run vs committed:  bash scripts/check_reproducibility.sh"
 echo "  Generate figures: make figures"
 echo "  Results saved to: results/runs/"
 echo ""

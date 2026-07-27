@@ -44,6 +44,15 @@ REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "src"))
 sys.path.insert(0, str(REPO))
 
+# Paper's PPO learning rate, annealed linearly to zero over training.
+_LR0 = 3e-4
+
+# Episodes averaged when deciding whether to checkpoint. Selecting on a single
+# episode's reward picks the luckiest ignition draw rather than the best
+# policy: in the 500-episode run the two seeds' best single episodes differed
+# by 0.0004, which is noise, while their converged L_d differed by 62 steps.
+_CKPT_WINDOW = 25
+
 
 def _train_one_seed(args: dict) -> dict:
     """Train a single seed to completion. Runs in its own process."""
@@ -76,7 +85,7 @@ def _train_one_seed(args: dict) -> dict:
         enable_governance=True,
     )
     agent = PPOGOMDPAgent(
-        grid_size=grid_size, n_uavs=n_uavs, lr=3e-4, clip_ratio=0.2,
+        grid_size=grid_size, n_uavs=n_uavs, lr=_LR0, clip_ratio=0.2,
         entropy_coeff=0.01, gamma=0.99, n_epochs=4, device=device,
     )
     checker = GovernanceInvariantChecker(tau=0.80)
@@ -88,12 +97,18 @@ def _train_one_seed(args: dict) -> dict:
     # Header written once; rows appended per episode so an interrupted run
     # still leaves a usable history on disk.
     with curve_path.open("w", encoding="utf-8") as fh:
-        fh.write("episode,reward,ld,compliance,loss,elapsed_s\n")
+        fh.write("episode,reward,ld,compliance,fp_pct,n_alerts,loss,elapsed_s\n")
 
     best_reward = -float("inf")
+    best_rolling_ld = float("inf")
+    recent_lds: list[float] = []
     t_start = time.time()
 
     for ep in range(n_episodes):
+        # Linear anneal (Schulman et al. 2017). Held fixed, the run peaked near
+        # episode 375 of 500 and then gave back 21% of its L_d gain — a step
+        # size that is right early and too large to settle with later.
+        agent.set_learning_rate(_LR0 * (1.0 - ep / n_episodes))
         obs, _ = env.reset(seed=seed * 100_000 + ep)
         ep_obs, ep_actions, ep_rewards, ep_dones = [], [], [], []
         done = False
@@ -120,13 +135,33 @@ def _train_one_seed(args: dict) -> dict:
         compliance = float(report.compliance_rate)
         elapsed = time.time() - t_start
 
+        # F_p is the metric the false-alert-suppression claim rests on, so it
+        # belongs in the curve rather than being recoverable only by re-running.
+        fp_pct = float(info.get("episode_fp_pct", 0.0))
+        n_alerts = int(getattr(env, "_n_alerts_broadcast", 0))
+
         with curve_path.open("a", encoding="utf-8") as fh:
             ld_str = "" if not np.isfinite(ep_ld) else f"{ep_ld:.4f}"
             fh.write(f"{ep},{total_reward:.6f},{ld_str},"
-                     f"{compliance:.6f},{loss:.6f},{elapsed:.2f}\n")
+                     f"{compliance:.6f},{fp_pct:.4f},{n_alerts},"
+                     f"{loss:.6f},{elapsed:.2f}\n")
 
-        if total_reward > best_reward:
-            best_reward = total_reward
+        best_reward = max(best_reward, total_reward)
+
+        # Checkpoint on a rolling mean of L_d — the metric the paper reports —
+        # so the saved policy is one that performs consistently rather than one
+        # that caught a single favourable ignition. Episodes that never detect
+        # count as the full horizon rather than being dropped, otherwise a
+        # policy that finds nothing would score as though it found everything.
+        recent_lds.append(ep_ld if np.isfinite(ep_ld) else float(n_timesteps))
+        if len(recent_lds) > _CKPT_WINDOW:
+            recent_lds.pop(0)
+        rolling_ld = float(np.mean(recent_lds))
+
+        if ep == 0:
+            agent.save_checkpoint(str(ckpt_path))  # ensure the file always exists
+        elif len(recent_lds) == _CKPT_WINDOW and rolling_ld < best_rolling_ld:
+            best_rolling_ld = rolling_ld
             agent.save_checkpoint(str(ckpt_path))
 
         status_path.write_text(json.dumps({
@@ -135,6 +170,10 @@ def _train_one_seed(args: dict) -> dict:
             "n_episodes": n_episodes,
             "pct": round(100.0 * (ep + 1) / n_episodes, 2),
             "best_reward": best_reward,
+            "rolling_ld": round(rolling_ld, 1),
+            "best_rolling_ld": (
+                round(best_rolling_ld, 1) if np.isfinite(best_rolling_ld) else None
+            ),
             "last_ld": ep_ld if np.isfinite(ep_ld) else None,
             "elapsed_s": round(elapsed, 1),
             "eta_s": round(elapsed / (ep + 1) * (n_episodes - ep - 1), 1),
@@ -143,6 +182,9 @@ def _train_one_seed(args: dict) -> dict:
     return {
         "seed": seed,
         "best_reward": best_reward,
+        "best_rolling_ld": (
+            best_rolling_ld if np.isfinite(best_rolling_ld) else None
+        ),
         "episodes": n_episodes,
         "wall_s": round(time.time() - t_start, 1),
         "checkpoint": str(ckpt_path),
@@ -167,12 +209,15 @@ def aggregate(outdir: Path, seeds: list[int]) -> None:
         return
 
     allc = pd.concat(frames, ignore_index=True)
-    grouped = allc.groupby("episode").agg(
+    agg_spec = dict(
         reward_mean=("reward", "mean"), reward_std=("reward", "std"),
         ld_mean=("ld", "mean"), ld_std=("ld", "std"),
         compliance_mean=("compliance", "mean"),
         n_seeds=("seed", "nunique"),
-    ).reset_index()
+    )
+    if "fp_pct" in allc.columns:
+        agg_spec["fp_pct_mean"] = ("fp_pct", "mean")
+    grouped = allc.groupby("episode").agg(**agg_spec).reset_index()
     out = outdir / "learning_curve_aggregate.csv"
     grouped.to_csv(out, index=False)
     print(f"wrote {out}  ({len(grouped)} episodes x {allc['seed'].nunique()} seeds)")
@@ -182,6 +227,8 @@ def aggregate(outdir: Path, seeds: list[int]) -> None:
     print(f"  L_d        : {tail['ld_mean'].mean():.2f}")
     print(f"  reward     : {tail['reward_mean'].mean():.2f}")
     print(f"  compliance : {100 * grouped['compliance_mean'].mean():.1f}%")
+    if "fp_pct_mean" in grouped.columns:
+        print(f"  F_p        : {tail['fp_pct_mean'].mean():.2f}%")
 
 
 def main() -> None:
@@ -239,7 +286,14 @@ def main() -> None:
         results = pool.map(_train_one_seed, jobs)
     wall = time.time() - t0
 
-    results = sorted(results, key=lambda r: -r["best_reward"])
+    # Rank by converged detection latency, not by best single-episode reward:
+    # the latter separated two seeds by 0.0004 (noise) while their L_d differed
+    # by 62 steps, so it chose the exported checkpoint essentially at random.
+    results = sorted(
+        results,
+        key=lambda r: (r["best_rolling_ld"] if r["best_rolling_ld"] is not None
+                       else float("inf")),
+    )
     best = results[0]
     shutil.copy2(best["checkpoint"], outdir / "best_checkpoint.pt")
 
@@ -254,7 +308,8 @@ def main() -> None:
 
     print(f"\nall seeds done in {wall/3600:.2f} h "
           f"({wall/max(args.seeds*args.episodes,1):.2f} s/episode effective)")
-    print(f"best seed: {best['seed']}  (reward {best['best_reward']:.2f})")
+    print(f"best seed: {best['seed']}  (rolling L_d {best['best_rolling_ld']}, "
+          f"best reward {best['best_reward']:.3f})")
     aggregate(outdir, seeds)
     print(f"\noutputs in {outdir}")
 

@@ -34,10 +34,11 @@ export function AblationScreen() {
   return (
     <div className="space-y-6">
       <header>
-        <h2 className="text-xl font-bold text-slate-100">Component ablation</h2>
-        <p className="mt-1 max-w-3xl text-sm text-slate-400">
-          Knocking out each governance component from the full GOMDP stack (Table 2). Removing
-          authentication/consensus lets adversarial injections through; the full stack blocks all.
+        <h2 className="text-xl font-bold">Component ablation</h2>
+        <p className="mt-1 max-w-3xl text-sm text-muted">
+          Knocking out each governance component from the full GOMDP stack (Table 2, n = 20 seeds).
+          Signature verification alone defeats direct injection; only removing all authentication
+          lets forged alerts through. Removing HITL authorisation is what costs F_p.
         </p>
       </header>
       {err && <div className="text-sm text-red-400">Failed to load: {err}</div>}

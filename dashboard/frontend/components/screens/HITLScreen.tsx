@@ -40,13 +40,13 @@ export function HITLScreen() {
         <p className="mt-1 max-w-3xl text-sm text-slate-400">
           As the human operator's error rate p_err rises, missed detections increase and false
           alerts fall — but governance compliance stays pinned at 100% by Theorem 1: the operator
-          can only withhold an alert, never authorise an unverified one (Table 7).
+          can only withhold an alert, never authorise an unverified one (Table 10).
         </p>
       </header>
       {err && <div className="text-sm text-red-400">Failed to load: {err}</div>}
       <div className="flex flex-wrap items-start gap-4">
         <div className="max-w-xl grow">
-          <LineChart title="Table 7 · FN_r and F_p vs operator error p_err" series={series}
+          <LineChart title="Table 10 · FN_r and F_p vs operator error p_err" series={series}
                      xLabel="Operator error p_err" yLabel="rate" yUnit="%" />
         </div>
         <div className="card p-4">

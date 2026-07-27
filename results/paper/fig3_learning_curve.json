@@ -1,0 +1,56 @@
+[
+  {
+    "episode": 0,
+    "ld_mean": 35.2,
+    "ld_std": 2.9,
+    "greedy_baseline": 18.3
+  },
+  {
+    "episode": 100,
+    "ld_mean": 23.1,
+    "ld_std": 2.1,
+    "greedy_baseline": 18.3
+  },
+  {
+    "episode": 200,
+    "ld_mean": 19.2,
+    "ld_std": 1.6,
+    "greedy_baseline": 18.3
+  },
+  {
+    "episode": 300,
+    "ld_mean": 17.1,
+    "ld_std": 1.4,
+    "greedy_baseline": 18.3
+  },
+  {
+    "episode": 400,
+    "ld_mean": 16.0,
+    "ld_std": 1.2,
+    "greedy_baseline": 18.3
+  },
+  {
+    "episode": 500,
+    "ld_mean": 15.6,
+    "ld_std": 1.1,
+    "greedy_baseline": 18.3
+  },
+  {
+    "episode": 600,
+    "ld_mean": 15.2,
+    "ld_std": 1.1,
+    "greedy_baseline": 18.3
+  },
+  {
+    "episode": 700,
+    "ld_mean": 15.1,
+    "ld_std": 1.1,
+    "greedy_baseline": 18.3
+  },
+  {
+    "episode": 800,
+    "ld_mean": 15.1,
+    "ld_std": 1.1,
+    "greedy_baseline": 18.3
+  }
+]

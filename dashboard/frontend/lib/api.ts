@@ -84,7 +84,7 @@ export interface ArtifactMeta {
   kind: "table" | "figure";
   paper_ref: string;
   route: string;
-  provenance: "exact" | "calibration" | "reference" | "supplementary";
+  provenance: "exact" | "measured" | "specification" | "training-derived" | "supplementary";
   metrics: string[];
   csv_present: boolean;
 }

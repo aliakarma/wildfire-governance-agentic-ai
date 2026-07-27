@@ -19,7 +19,7 @@
     "attack_type": "Spoofing (i.i.d.)",
     "parameter": "p=0.10",
     "gomdp": 7.8,
-    "central_sig": 7.8,
+    "central_sig": 7.9,
     "central": 31.2,
     "metric": "fp_pct"
   },
@@ -27,7 +27,7 @@
     "attack_type": "Spoofing (i.i.d.)",
     "parameter": "p=0.20",
     "gomdp": 9.4,
-    "central_sig": 9.4,
+    "central_sig": 9.5,
     "central": 38.7,
     "metric": "fp_pct"
   },
@@ -35,16 +35,16 @@
     "attack_type": "Spoofing (strategic)",
     "parameter": "p=0.10",
     "gomdp": 8.6,
-    "central_sig": 8.6,
+    "central_sig": 8.7,
     "central": 34.5,
     "metric": "fp_pct"
   },
   {
     "attack_type": "Alert injection (success)",
     "parameter": "p_att=1",
-    "gomdp": "0/20",
-    "central_sig": "0/20",
-    "central": "20/20",
+    "gomdp": "0/100",
+    "central_sig": "0/100",
+    "central": "100/100",
     "metric": "injection_ratio"
   }
 ]

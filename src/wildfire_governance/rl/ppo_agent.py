@@ -150,6 +150,15 @@ class PPOGOMDPAgent:
         self._episode_lds: List[float] = []
         self._training_step: int = 0
 
+    def set_learning_rate(self, lr: float) -> None:
+        """Set the optimiser learning rate, for schedules driven by the caller.
+
+        Args:
+            lr: New learning rate, applied to every parameter group.
+        """
+        for group in self.optimizer.param_groups:
+            group["lr"] = float(lr)
+
     def state_dict(self) -> Dict[str, Any]:
         """Return serializable training state for checkpointing."""
         return {

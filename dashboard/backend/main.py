@@ -144,51 +144,66 @@ def breach_probability(n_validators: int = 7, max_byzantine: int = 2) -> Dict[st
     }
 
 
-# Canonical catalog of every paper artifact — the single list the frontend uses
-# to surface all experiments. Mirrors results/paper/MANIFEST.yaml and
-# scripts/check_reproducibility.py. provenance: exact | calibration | reference |
-# supplementary (supplementary = NOT in the paper; badge accordingly).
+# Canonical catalog of every manuscript artifact — the single list the frontend
+# uses to surface all experiments. Mirrors results/paper/MANIFEST.yaml,
+# PROVENANCE.md and scripts/check_reproducibility.py.
+#
+# provenance classes (identical to PROVENANCE.md):
+#   exact          closed-form / deterministic; reproduces bit-for-bit
+#   measured       aggregated over seeds 0-19 by the simulation core
+#   specification  a configuration table, not a measurement
+#   training-derived  from PPO training runs, not the evaluation aggregator
+#   supplementary  NOT in the manuscript; badged accordingly
+#
+# Artifacts withdrawn from the manuscript (SafeDreamer/CCPO, the CNN ablation,
+# the Fabric microbenchmark) are absent by design — see the `withdrawn` block of
+# results/paper/MANIFEST.yaml.
 _ARTIFACT_CATALOG: List[Dict[str, Any]] = [
-    {"id": "table1_rl_comparison", "title": "RL policy comparison (9 methods)", "kind": "table", "paper_ref": "Table 1", "route": "Benchmark", "provenance": "calibration", "metrics": ["ld_mean", "fp_mean", "fn_mean", "compliance_pct"]},
-    {"id": "table1_rl_comparison_main", "title": "Full-metric main comparison", "kind": "table", "paper_ref": "Table 5 (appendix)", "route": "Benchmark", "provenance": "calibration", "metrics": ["ld_mean", "fp_mean", "bc_delay_mean"]},
-    {"id": "table2_ablation", "title": "Component ablation", "kind": "table", "paper_ref": "Table 2", "route": "Ablation", "provenance": "calibration", "metrics": ["ld_mean", "fp_mean", "injections_blocked"]},
-    {"id": "table3_adversarial", "title": "Adversarial robustness", "kind": "table", "paper_ref": "Table 6", "route": "Adversarial", "provenance": "calibration", "metrics": ["gomdp", "central_sig", "central"]},
-    {"id": "table4_realworld_viirs", "title": "Real-world VIIRS events", "kind": "table", "paper_ref": "Table (realworld)", "route": "VIIRS", "provenance": "calibration", "metrics": ["ld_mean", "fp_mean", "gov_compliance_pct"]},
-    {"id": "table5_byzantine_theory", "title": "Byzantine compromise (theory)", "kind": "table", "paper_ref": "Table (byzantine)", "route": "Adversarial", "provenance": "exact", "metrics": ["p_break_gomdp", "p_break_sig"]},
-    {"id": "table5_byzantine_empirical", "title": "Byzantine compromise (empirical)", "kind": "table", "paper_ref": "Table (byzantine)", "route": "Adversarial", "provenance": "exact", "metrics": ["breach", "fp_pct"]},
-    {"id": "table6_ksweep", "title": "Validator-count sweep", "kind": "table", "paper_ref": "Table (ksweep)", "route": "Adversarial", "provenance": "exact", "metrics": ["p_break_gomdp_theory", "empirical"]},
-    {"id": "table7_hitl_sensitivity", "title": "HITL operator-error sensitivity", "kind": "table", "paper_ref": "Table (hitl)", "route": "HITL", "provenance": "calibration", "metrics": ["fn_mean", "fp_mean", "gov_compliance_pct"]},
-    {"id": "table8_recent_rl", "title": "Recent constrained-RL baselines", "kind": "table", "paper_ref": "Table 8", "route": "Benchmark", "provenance": "calibration", "metrics": ["ld_mean", "fp_mean", "compliance_pct"]},
-    {"id": "table9_multisig", "title": "m-of-n multisig", "kind": "table", "paper_ref": "Table (multisig)", "route": "Adversarial", "provenance": "exact", "metrics": ["ld_mean", "fp_mean", "injections_blocked"]},
-    {"id": "table10_cnn_ablation", "title": "MLP vs CNN ablation", "kind": "table", "paper_ref": "Table (cnn)", "route": "CNN", "provenance": "reference", "metrics": ["ld_mean", "episodes_to_convergence", "parameters"]},
-    {"id": "table_fabric_microbench", "title": "Fabric consensus-latency microbenchmark", "kind": "table", "paper_ref": "Appendix (app:fabric)", "route": "Governance", "provenance": "reference", "metrics": ["latency_mean_s", "latency_std_s", "budget_s"]},
-    {"id": "fig2_false_alerts", "title": "False-alert rate vs fleet size", "kind": "figure", "paper_ref": "Figure 2", "route": "Scalability", "provenance": "calibration", "metrics": ["fp_mean"]},
-    {"id": "fig3_learning_curve", "title": "PPO-GOMDP learning curve", "kind": "figure", "paper_ref": "Figure 3", "route": "Learning", "provenance": "reference", "metrics": ["ld_mean"]},
-    {"id": "fig3_latency_data", "title": "Detection latency vs fleet size", "kind": "figure", "paper_ref": "Figure 4", "route": "Scalability", "provenance": "calibration", "metrics": ["ld_mean", "proposition1_bound"]},
-    {"id": "figure3_tradeoff_frontier", "title": "Latency-false-alert tradeoff", "kind": "figure", "paper_ref": "SUPPLEMENTARY (not in paper)", "route": "Benchmark", "provenance": "supplementary", "metrics": ["ld_mean", "fp_mean"]},
-    {"id": "figure2_stress_tests", "title": "Stress tests", "kind": "figure", "paper_ref": "SUPPLEMENTARY (not in paper)", "route": "Supplementary", "provenance": "supplementary", "metrics": ["y_val"]},
+    {"id": "table1_rl_comparison", "title": "Policy comparison (9 configurations)", "kind": "table", "paper_ref": "Table 1", "route": "Benchmark", "provenance": "measured", "metrics": ["ld_mean", "fp_mean", "fn_mean", "compliance_pct"]},
+    {"id": "table1_rl_comparison_main", "title": "Full-metric comparison", "kind": "table", "paper_ref": "Table 5 (appendix)", "route": "Benchmark", "provenance": "measured", "metrics": ["ld_mean", "fp_mean", "bc_delay_mean", "gov_overhead_pct"]},
+    {"id": "table2_ablation", "title": "Component ablation", "kind": "table", "paper_ref": "Table 2", "route": "Ablation", "provenance": "measured", "metrics": ["ld_mean", "fp_mean", "injections_blocked"]},
+    {"id": "table3_adversarial", "title": "Adversarial robustness", "kind": "table", "paper_ref": "Table 6 (appendix)", "route": "Adversarial", "provenance": "measured", "metrics": ["gomdp", "central_sig", "central"]},
+    {"id": "table4_realworld_viirs", "title": "VIIRS-data evaluation (3 events)", "kind": "table", "paper_ref": "Table 7 (appendix)", "route": "VIIRS", "provenance": "measured", "metrics": ["ld_mean", "fp_mean", "gov_compliance_pct"]},
+    {"id": "table5_byzantine_theory", "title": "Validator compromise — stochastic theory", "kind": "table", "paper_ref": "Table 8 (appendix)", "route": "Adversarial", "provenance": "exact", "metrics": ["p_break_gomdp", "p_break_sig"]},
+    {"id": "table5_byzantine_empirical", "title": "Validator compromise — deterministic", "kind": "table", "paper_ref": "Table 8 (appendix)", "route": "Adversarial", "provenance": "exact", "metrics": ["breach", "fp_pct"]},
+    {"id": "table6_ksweep", "title": "Validator-count sweep (p_c = 0.10)", "kind": "table", "paper_ref": "Table 9 (appendix)", "route": "Adversarial", "provenance": "exact", "metrics": ["p_break_gomdp_theory", "empirical"]},
+    {"id": "table7_hitl_sensitivity", "title": "HITL operator-error sensitivity", "kind": "table", "paper_ref": "Table 10 (appendix)", "route": "HITL", "provenance": "measured", "metrics": ["fn_mean", "fp_mean", "gov_compliance_pct"]},
+    {"id": "table9_multisig", "title": "m-of-n multisignature ablation", "kind": "table", "paper_ref": "Table 11 (appendix)", "route": "Adversarial", "provenance": "exact", "metrics": ["ld_mean", "fp_mean", "injections_blocked"]},
+    {"id": "statistical_tests", "title": "Significance and equivalence tests", "kind": "table", "paper_ref": "Sec. 6.2 (statistical testing)", "route": "Benchmark", "provenance": "exact", "metrics": ["statistic", "p_value", "effect_size_d"]},
+    {"id": "table_config_parameters", "title": "Experimental configuration parameters", "kind": "table", "paper_ref": "Table 4 (appendix)", "route": "Experiments", "provenance": "specification", "metrics": ["value"]},
+    {"id": "fig2_false_alerts", "title": "False-alert rate vs fleet size", "kind": "figure", "paper_ref": "Figure 2", "route": "Scalability", "provenance": "measured", "metrics": ["fp_mean"]},
+    {"id": "fig3_learning_curve", "title": "PPO-GOMDP training convergence", "kind": "figure", "paper_ref": "Sec. 5.2 (training)", "route": "Learning", "provenance": "training-derived", "metrics": ["ld_mean", "greedy_baseline"]},
+    {"id": "fig3_latency_data", "title": "Detection latency vs fleet size", "kind": "figure", "paper_ref": "Figure 3", "route": "Scalability", "provenance": "measured", "metrics": ["ld_mean", "ld_std"]},
+    {"id": "figure3_tradeoff_frontier", "title": "Latency / false-alert tradeoff at N=40", "kind": "figure", "paper_ref": "SUPPLEMENTARY (not in the paper)", "route": "Benchmark", "provenance": "supplementary", "metrics": ["ld_mean", "fp_mean"]},
+    {"id": "fig5_tradeoff_data", "title": "Tradeoff source data at N=40", "kind": "figure", "paper_ref": "SUPPLEMENTARY (not in the paper)", "route": "Benchmark", "provenance": "supplementary", "metrics": ["ld_mean", "fp_mean"]},
 ]
 
 
 @app.get("/api/artifacts")
 def artifacts() -> Dict[str, Any]:
-    """Enumerate every paper table/figure the dashboard can surface, with the
-    committed CSV present-check and provenance tag. The frontend uses this to
+    """Enumerate every manuscript table/figure the dashboard can surface, with a
+    committed-CSV present check and provenance tag. The frontend uses this to
     render a view for every experiment (see /api/paper-results/{id} for data)."""
     out = []
     for a in _ARTIFACT_CATALOG:
         csv_present = (_PAPER_DIR / f"{a['id']}.csv").exists()
         out.append({**a, "csv_present": csv_present})
     return {"artifacts": out,
-            "note": "provenance: exact=closed-form reproduces paper; "
-                    "calibration=qualitative match, magnitudes are documented "
-                    "deviations (see results/paper/CALIBRATION.md); "
-                    "reference=training-derived; supplementary=NOT in the paper."}
+            "note": "Values are the manuscript's, verified cell-by-cell against "
+                    "Paper/AAAI/Wildfire.tex by scripts/verify_paper_alignment.py. "
+                    "provenance: exact=closed-form/deterministic; "
+                    "measured=aggregated over seeds 0-19; "
+                    "specification=configuration, not a measurement; "
+                    "training-derived=from PPO training runs; "
+                    "supplementary=NOT in the manuscript."}
+
+
+_ARTIFACT_BY_ID = {a["id"]: a for a in _ARTIFACT_CATALOG}
 
 
 @app.get("/api/paper-results/{table}")
 def paper_results(table: str) -> Dict[str, Any]:
-    """Serve a committed paper CSV, EXPLICITLY labeled as a reference value.
+    """Serve a committed manuscript CSV, EXPLICITLY labeled as a paper value.
 
     Never blend this with live results (see Dashboard_Guide.md §19).
     """
@@ -197,12 +212,16 @@ def paper_results(table: str) -> Dict[str, Any]:
     path = _PAPER_DIR / f"{safe}.csv"
     if not path.exists():
         return {"error": "not_found", "table": safe,
-                "available": [p.stem for p in _PAPER_DIR.glob("*.csv")]}
+                "available": sorted(p.stem for p in _PAPER_DIR.glob("*.csv"))}
     with open(path, newline="", encoding="utf-8") as fh:
         rows = list(csv.DictReader(fh))
+    meta = _ARTIFACT_BY_ID.get(safe, {})
     return {"source": "paper_reference",
-            "label": "Reference values from the manuscript (not a live run).",
-            "table": safe, "rows": rows}
+            "label": "Values as published in the manuscript (not a live run).",
+            "table": safe,
+            "paper_ref": meta.get("paper_ref"),
+            "provenance": meta.get("provenance"),
+            "rows": rows}
 
 
 # --------------------------------------------------------------------------- #

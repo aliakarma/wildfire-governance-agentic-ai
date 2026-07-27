@@ -1,6 +1,6 @@
 # Wildfire Governance Agentic AI
 
-**Governance-Constrained Agentic AI: A Governance-Invariant MDP Framework with Blockchain-Enforced Human Oversight for Safety-Critical Wildfire Monitoring**
+**Governance-Invariant MDPs: A Framework and Formal Safety Case for Agentic Wildfire Monitoring**
 
 *Ali Akarma · Toqeer Ali Syed · Salman Jan · Hammad Muneer · Abdul Khadar Jilani*
 
@@ -12,12 +12,12 @@ This repository implements the **Governance-Invariant MDP (GOMDP)** framework, w
 
 | Property | CMDP / CPO | **GOMDP (Ours)** |
 |----------|-----------|-----------------|
-| Safety guarantee | In-expectation | **Per-trajectory, prob. 1** |
+| Safety guarantee | In-expectation | **Per-trajectory, prob. >= 1 - T*eps_sig** |
 | Violation rate | 5–15% | **0%** |
 | Non-repudiation | None | **Cryptographic** |
 | Adversarial tolerance | None | **Byzantine-fault-tolerant** |
 
-**Theorem 1 (Policy-Agnostic Safety):** Any policy operating in a GOMDP satisfies the governance predicate with probability one, regardless of optimality gap.
+**Theorem 1 (Policy-Agnostic Safety):** Any policy operating in a GOMDP satisfies the governance predicate with probability negligibly close to one, regardless of optimality gap - conditional on Ed25519 signature security, a Byzantine validator threshold k >= 3f+1, and faithful chaincode implementation. The guarantee secures *authorization integrity*, not the correctness of the human decision.
 
 ---
 
@@ -40,4 +40,6 @@ This repository implements the **Governance-Invariant MDP (GOMDP)** framework, w
 | Greedy-GOMDP | 18.3 ± 1.4 | 6.1% | 100% |
 | PPO-CMDP | 14.8 ± 1.0 | 8.3% | 92.8% ← violates |
 | Adaptive AI | 16.2 ± 1.2 | 22.4% | 0% |
-| IoT baseline ([6]) | ~45 | — | 0% |
+| IoT threshold pipeline ([6]) | ~45 | — | — |
+
+The IoT threshold pipeline is qualitative context only: it differs in hardware, scenarios, modality, and latency definition, so no improvement over it is claimed. Every value above is verified against the manuscript by `scripts/verify_paper_alignment.py`.

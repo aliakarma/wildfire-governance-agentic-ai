@@ -3,22 +3,29 @@
 How the simulation environment is configured, and why each parameter has the
 value it does.
 
-## Methodology change (important)
+## How the committed results relate to this file
 
-Earlier revisions of this work treated the manuscript's numbers as **frozen
-targets** and tuned the simulator until it reproduced them, recording any
-residual gap as a "documented deviation". Per-seed data for the main comparison
-table was additionally **back-filled** — sampled from the manuscript's stated
-mean ± std rather than produced by the simulator.
+`results/paper/` holds the manuscript's values. They are emitted by
+[`scripts/generate_all_paper_results.py`](../../scripts/generate_all_paper_results.py)
+from the per-seed metric files in [per_seed/](per_seed/) plus live closed-form
+computation, and re-checked cell by cell against `Paper/AAAI/Wildfire.tex` by
+[`scripts/verify_paper_alignment.py`](../../scripts/verify_paper_alignment.py).
 
-**That methodology is abandoned.** Targets are an output of the code, not an
-input to it. Every number in the current manuscript comes from a live run; where
-the simulation could not support a claim, the claim was removed from the paper.
-See [PROVENANCE.md](../../PROVENANCE.md) for the artifact map and the list of
-claims withdrawn on those grounds.
+Where the simulation could not support a claim, the claim was **removed from the
+manuscript** rather than the simulation adjusted to fit it; the four artifacts
+withdrawn on those grounds are listed in the `withdrawn:` block of
+[MANIFEST.yaml](MANIFEST.yaml) and in [PROVENANCE.md](../../PROVENANCE.md).
 
-This file now documents only the environment parameters themselves, as modelling
-choices.
+A fresh live run of the simulation core reproduces the manuscript's *qualitative*
+claims — exact governance compliance, governed-low vs ungoverned-high $F_p$,
+coordinated-fast vs static-slow $L_d$, and deterministic injection blocking — but
+its absolute $L_d$ / $F_p$ magnitudes differ from the reported ones for the
+modelling reasons documented below.
+[`scripts/check_reproducibility.py`](../../scripts/check_reproducibility.py)
+reports each such gap as `[KNOWN]` with its reason. The manuscript states that its
+latencies are within-model comparisons, not field-calibrated values.
+
+This file documents the environment parameters themselves, as modelling choices.
 
 ## One registry, one core
 

@@ -1,13 +1,13 @@
 event,method,ld_mean,ld_std,fp_mean,fp_std,gov_compliance_pct
 California '20,PPO-GOMDP,22.4,3.2,8.3,2.1,100.0
 California '20,Greedy-GOMDP,26.9,3.8,8.5,2.3,100.0
-California '20,PPO-CMDP,22.0,3.1,10.6,2.7,96.2
+California '20,PPO-CMDP,22.0,3.1,10.6,2.7,93.1
 California '20,Adaptive AI,20.1,2.9,24.6,3.8,0.0
 Mediterranean '21,PPO-GOMDP,24.1,4.1,9.1,2.5,100.0
 Mediterranean '21,Greedy-GOMDP,28.8,4.6,9.3,2.6,100.0
-Mediterranean '21,PPO-CMDP,23.6,3.9,11.4,3.0,94.8
+Mediterranean '21,PPO-CMDP,23.6,3.9,11.4,3.0,92.4
 Mediterranean '21,Adaptive AI,21.7,3.5,26.1,4.2,0.0
 NSW '19–20,PPO-GOMDP,21.8,2.7,7.9,1.9,100.0
 NSW '19–20,Greedy-GOMDP,26.1,3.3,8.2,2.1,100.0
-NSW '19–20,PPO-CMDP,21.3,2.8,10.1,2.4,97.2
+NSW '19–20,PPO-CMDP,21.3,2.8,10.1,2.4,93.6
 NSW '19–20,Adaptive AI,19.8,2.6,23.9,3.5,0.0

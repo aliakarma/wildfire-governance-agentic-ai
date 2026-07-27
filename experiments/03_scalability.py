@@ -19,7 +19,7 @@ import pandas as pd
 
 from experiments.utils.io_utils import save_results
 from experiments.utils.runner import EpisodeResult, run_episode
-from wildfire_governance.decision.cpomdp import WildfireCPOMDP
+
 from wildfire_governance.utils.config import load_config
 from wildfire_governance.utils.logging import get_structured_logger
 from wildfire_governance.utils.reproducibility import generate_run_hash
@@ -58,14 +58,6 @@ def main(config_path: str, smoke: bool = False) -> None:
     }
 
     rows = []
-    cpomdp = WildfireCPOMDP()
-    grid_area = 100.0 * 100.0
-    # Proposition 1 uses A/(v·N) (+ optional constant overhead).
-    # The paper Figure 3 committed CSVs assume an effective v≈5 and omit the additive overhead,
-    # yielding bounds 404, 202, 101, 50.5 for N in {5,10,20,40}.
-    velocity = 5.0
-    delta = 0.0
-
     for n_uavs in fleet_sizes:
         for config_name, kwargs in configs_map.items():
             lds = []
@@ -79,13 +71,11 @@ def main(config_path: str, smoke: bool = False) -> None:
 
             ld_mean = float(np.mean(lds)) if lds else float(n_timesteps)
             ld_std = float(np.std(lds)) if lds else 0.0
-            bound = cpomdp.latency_bound(grid_area, velocity, n_uavs, delta)
             rows.append({
                 "config": config_name,
                 "n_uavs": n_uavs,
                 "ld_mean": round(ld_mean, 2),
                 "ld_std": round(ld_std, 2),
-                "proposition1_bound": round(bound, 2),
             })
             logger.info("scalability_point", config=config_name,
                         n_uavs=n_uavs, ld_mean=round(ld_mean, 2))

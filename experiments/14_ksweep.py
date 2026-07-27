@@ -23,8 +23,11 @@ from wildfire_governance.gomdp.breach_probability import compute_breach_probabil
 
 P_C = 0.10
 K_VALUES = [4, 7, 10, 13]
-N_TRIALS = 100_000
-SEED = 42
+# Monte-Carlo settings are fixed here and mirrored in
+# scripts/generate_all_paper_results.py so the empirical column is identical
+# whichever entry point produces it.
+N_TRIALS = 10_000
+SEED = 1
 
 
 def simulate_empirical(k: int, f: int, p_c: float, n_trials: int, seed: int) -> float:

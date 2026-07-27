@@ -59,6 +59,14 @@ class RiskWeightedGreedyPolicy:
         self._n_sectors = n_sectors
         self._grid_size = grid_size
         self._sector_cells = self._build_sector_cells()
+        # Sector geometry is fixed for the lifetime of the policy, but
+        # ``sector_centroid`` is called once per UAV per step by both the
+        # coordination engine and the GOMDP env. Averaging 400 cells on every
+        # one of those calls dominated rollout wall-clock, so precompute.
+        self._centroids: Dict[int, Tuple[int, int]] = {
+            s_id: self._compute_centroid(cells)
+            for s_id, cells in self._sector_cells.items()
+        }
 
     def _build_sector_cells(self) -> Dict[int, List[Tuple[int, int]]]:
         """Partition the grid into n_sectors square tiles."""
@@ -83,6 +91,15 @@ class RiskWeightedGreedyPolicy:
                 sector_id += 1
         return sectors
 
+    @staticmethod
+    def _compute_centroid(cells: List[Tuple[int, int]]) -> Tuple[int, int]:
+        """Mean (row, col) of *cells*, or the origin if the sector is empty."""
+        if not cells:
+            return (0, 0)
+        rows = [c[0] for c in cells]
+        cols = [c[1] for c in cells]
+        return (int(np.mean(rows)), int(np.mean(cols)))
+
     def sector_centroid(self, sector_id: int) -> Tuple[int, int]:
         """Return the (row, col) centroid of a sector.
 
@@ -92,12 +109,7 @@ class RiskWeightedGreedyPolicy:
         Returns:
             (row, col) centroid position.
         """
-        cells = self._sector_cells.get(sector_id, [])
-        if not cells:
-            return (0, 0)
-        rows = [c[0] for c in cells]
-        cols = [c[1] for c in cells]
-        return (int(np.mean(rows)), int(np.mean(cols)))
+        return self._centroids.get(sector_id, (0, 0))
 
     def compute_sector_risk(
         self, risk_map: np.ndarray, sector_id: int

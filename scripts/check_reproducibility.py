@@ -11,8 +11,7 @@ the frozen paper CSV in results/paper/, classifying the outcome by provenance:
                adversarial, VIIRS, HITL, recent-RL, fig2/fig4). Reported PASS or
                DRIFT within 5%; drift is a loud WARNING (not fatal) until WS1
                calibration lands, and becomes fatal under --strict.
-  reference    training-derived reference values that this repo does not recompute
-               live (CNN ablation, learning curve). Reported informationally.
+  reference    values this repo does not recompute live. Reported informationally.
 
 Exit status: 0 unless an `exact` artifact is missing or out of tolerance (or, with
 --strict, any calibration artifact drifts beyond tolerance).
@@ -57,13 +56,9 @@ ARTIFACTS = [
     ("table5_byzantine_empir",  "table5_byzantine_empirical.csv",  ["f_c"],                               "calibration", ["breach"]),
     ("table6_ksweep",           "table6_ksweep.csv",               ["k", "f"],                            "exact",       None),
     ("table7_hitl_sensitivity", "table7_hitl_sensitivity.csv",     ["p_err"],                             "calibration", ["gov_compliance_pct"]),
-    ("table8_recent_rl",        "table8_recent_rl.csv",            ["method"],                            "calibration", []),
     ("table9_multisig",         "table9_multisig.csv",             ["config"],                            "calibration", ["injections_blocked", "injections_total"]),
-    ("table10_cnn_ablation",    "table10_cnn_ablation.csv",        ["architecture"],                      "reference",   None),
     ("fig2_false_alerts",       "fig2_false_alerts.csv",           ["config", "n_uavs"],                  "calibration", []),
-    ("fig3_learning",           "fig3_learning_curve.csv",         ["episode"],                           "reference",   None),
     ("fig4_latency",            "fig3_latency_data.csv",           ["config", "n_uavs"],                  "calibration", []),
-    ("table_fabric_microbench", "table_fabric_microbench.csv",      ["source"],                            "reference",   None),
 ]
 
 
@@ -83,7 +78,6 @@ KNOWN_DEVIATIONS = {
     "table3_adversarial":     "F_p magnitudes; injection-success exact",
     "table4_realworld_viirs": "L_d/F_p magnitudes",
     "table7_hitl_sensitivity":"FN/F_p magnitudes; compliance exact",
-    "table8_recent_rl":       "L_d/F_p magnitudes (calibrated stand-ins)",
     "table9_multisig":        "L_d/F_p magnitudes; injection-blocking exact",
     "fig2_false_alerts":      "F_p magnitudes; monotone decrease reproduced",
     "fig4_latency":           "L_d magnitudes; scaling trend reproduced",
