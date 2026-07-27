@@ -50,20 +50,26 @@ class PolicyNetwork(nn.Module if _TORCH_AVAILABLE else object):  # type: ignore[
     def __init__(self, obs_dim: int, n_uavs: int, n_sectors: int) -> None:
         _require_torch()
         super().__init__()
+        self.n_uavs = n_uavs
+        self.n_sectors = n_sectors
         self.shared = nn.Sequential(
             nn.Linear(obs_dim, 256),
             nn.ReLU(),
             nn.Linear(256, 128),
             nn.ReLU(),
         )
-        self.heads = nn.ModuleList(
-            [nn.Linear(128, n_sectors) for _ in range(n_uavs)]
-        )
+        # One fused head rather than n_uavs small ones. Mathematically identical
+        # to independent per-UAV heads (the weight block for UAV i sees only its
+        # own output slice), but it issues a single matmul instead of n_uavs
+        # kernel launches -- which dominates wall-clock during batch-1 rollout
+        # on an accelerator.
+        self.head = nn.Linear(128, n_uavs * n_sectors)
 
-    def forward(self, obs: "torch.Tensor") -> List["torch.Tensor"]:  # type: ignore[name-defined]
-        """Forward pass returning per-UAV logit tensors."""
+    def forward(self, obs: "torch.Tensor") -> "torch.Tensor":  # type: ignore[name-defined]
+        """Return per-UAV logits shaped ``[..., n_uavs, n_sectors]``."""
         shared_out = self.shared(obs)
-        return [head(shared_out) for head in self.heads]
+        logits = self.head(shared_out)
+        return logits.view(*logits.shape[:-1], self.n_uavs, self.n_sectors)
 
 
 class ValueNetwork(nn.Module if _TORCH_AVAILABLE else object):  # type: ignore[misc]
@@ -160,11 +166,46 @@ class PPOGOMDPAgent:
             },
         }
 
+    @staticmethod
+    def _migrate_legacy_heads(policy_sd: Dict[str, Any]) -> Dict[str, Any]:
+        """Convert pre-fusion ``heads.<i>.*`` checkpoints to the fused ``head.*``.
+
+        Earlier revisions used one ``nn.Linear`` per UAV. Concatenating those
+        blocks along the output axis reproduces the fused layer exactly, so old
+        checkpoints stay loadable.
+        """
+        import torch
+
+        head_keys = sorted(
+            (k for k in policy_sd if k.startswith("heads.") and k.endswith(".weight")),
+            key=lambda k: int(k.split(".")[1]),
+        )
+        if not head_keys:
+            return policy_sd
+
+        migrated = {k: v for k, v in policy_sd.items() if not k.startswith("heads.")}
+        idxs = [int(k.split(".")[1]) for k in head_keys]
+        migrated["head.weight"] = torch.cat(
+            [policy_sd[f"heads.{i}.weight"] for i in idxs], dim=0
+        )
+        migrated["head.bias"] = torch.cat(
+            [policy_sd[f"heads.{i}.bias"] for i in idxs], dim=0
+        )
+        return migrated
+
     def load_state_dict(self, checkpoint: Dict[str, Any]) -> None:
         """Load serializable training state from checkpoint payload."""
-        self.policy.load_state_dict(checkpoint["policy_state_dict"])
+        self.policy.load_state_dict(
+            self._migrate_legacy_heads(checkpoint["policy_state_dict"])
+        )
         self.value_net.load_state_dict(checkpoint["value_state_dict"])
-        self.optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+        # A migrated checkpoint's optimiser state keys no longer match the fused
+        # parameter set, so skip it rather than fail; training resumes with a
+        # fresh Adam state.
+        try:
+            self.optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+        except (ValueError, KeyError):
+            pass
         self._training_step = checkpoint.get("training_step", 0)
 
     def select_actions(
@@ -186,16 +227,20 @@ class PPOGOMDPAgent:
             np.asarray(obs), dtype=torch.float32, device=self.device
         ).unsqueeze(0)
         with torch.no_grad():
-            logits_list = self.policy(obs_tensor)
+            logits = self.policy(obs_tensor)            # [1, n_uavs, n_sectors]
+            # Sample every UAV in one batched draw and transfer once. Sampling
+            # per head with .item() forces one device sync per UAV per step
+            # (n_uavs * T syncs per episode), which is the dominant cost of
+            # accelerated rollout; this reduces it to a single sync per step.
+            sampled = Categorical(logits=logits).sample()   # [1, n_uavs]
+            sectors = sampled.squeeze(0).cpu().numpy()
 
         allocation: Dict[int, int] = {}
-        for i, logits in enumerate(logits_list):
+        for i in range(self.n_uavs):
             if i < len(uav_fleet) and hasattr(uav_fleet[i], "battery_fraction"):
                 if uav_fleet[i].battery_fraction < 0.05:
                     continue
-            dist = Categorical(logits=logits.squeeze(0))
-            sector = int(dist.sample().item())
-            allocation[i] = sector
+            allocation[i] = int(sectors[i])
         return allocation
 
     def update(
@@ -254,13 +299,12 @@ class PPOGOMDPAgent:
         # Old log-probabilities are computed from the actual rollout actions.
         # The policy has not been updated yet, so these match the rollout policy.
         with torch.no_grad():
-            old_logits_list = self.policy(obs_tensor)
-            old_log_probs: torch.Tensor = torch.zeros(
-                len(observations), dtype=torch.float32, device=self.device
+            # [T, n_uavs, n_sectors] -> per-UAV log-probs summed over UAVs,
+            # equivalent to accumulating one head at a time but in one op.
+            old_logits = self.policy(obs_tensor)
+            old_log_probs: torch.Tensor = (
+                Categorical(logits=old_logits).log_prob(action_tensor).sum(dim=-1)
             )
-            for uav_idx, logits in enumerate(old_logits_list):
-                dist = Categorical(logits=logits)
-                old_log_probs = old_log_probs + dist.log_prob(action_tensor[:, uav_idx])
 
         total_loss = 0.0
         clip_eps = 0.2
@@ -273,16 +317,12 @@ class PPOGOMDPAgent:
                     advantages.std() + 1e-8
                 )
 
-            logits_list = self.policy(obs_tensor)
-            new_log_probs: torch.Tensor = torch.zeros(
-                len(observations), dtype=torch.float32, device=self.device
-            )
-            entropy_terms = []
-
-            for uav_idx, logits in enumerate(logits_list):
-                dist = Categorical(logits=logits)
-                entropy_terms.append(dist.entropy().mean())
-                new_log_probs = new_log_probs + dist.log_prob(action_tensor[:, uav_idx])
+            logits = self.policy(obs_tensor)
+            dist = Categorical(logits=logits)
+            new_log_probs: torch.Tensor = dist.log_prob(action_tensor).sum(dim=-1)
+            # Mean over both time and UAV axes, matching the previous
+            # mean-over-heads-of-mean-over-time.
+            entropy_mean = dist.entropy().mean()
 
             ratio = torch.exp(new_log_probs - old_log_probs)
             clipped_ratio = torch.clamp(ratio, 1.0 - clip_eps, 1.0 + clip_eps)
@@ -290,10 +330,7 @@ class PPOGOMDPAgent:
             surrogate_2 = clipped_ratio * advantages
             policy_loss = -torch.min(surrogate_1, surrogate_2).mean()
             value_loss = nn.functional.mse_loss(values, returns_tensor)
-            entropy_loss = (
-                -torch.stack(entropy_terms).mean() if entropy_terms
-                else torch.tensor(0.0, device=self.device)
-            )
+            entropy_loss = -entropy_mean
 
             loss = policy_loss + 0.5 * value_loss + self.entropy_coeff * entropy_loss
             self.optimizer.zero_grad()
