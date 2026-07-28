@@ -4,7 +4,7 @@ FROM python:3.10-slim
 LABEL org.opencontainers.image.title="Wildfire Governance Agentic AI"
 LABEL org.opencontainers.image.description="GOMDP: Blockchain-Enforced Human Oversight for Wildfire Monitoring"
 LABEL org.opencontainers.image.licenses="MIT"
-LABEL org.opencontainers.image.source="https://github.com/akarma-iu/wildfire-governance-agentic-ai"
+LABEL org.opencontainers.image.source="https://anonymous.submission.org"
 
 # System dependencies for geospatial and scientific libraries
 RUN apt-get update && apt-get install -y --no-install-recommends \

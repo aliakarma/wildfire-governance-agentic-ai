@@ -14,15 +14,15 @@ def read_requirements(fname: str) -> list:
 setup(
     name="wildfire-governance",
     version="1.0.0",
-    author="Ali Akarma, Toqeer Ali Syed, Salman Jan, Hammad Muneer, Abdul Khadar Jilani",
-    author_email="443059463@stu.iu.edu.sa",
+    author="Anonymous Authors",
+    author_email="anonymous@submission.org",
     description=(
         "Governance-Invariant MDP with Blockchain-Enforced Human Oversight "
         "for Safety-Critical Wildfire Monitoring"
     ),
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
-    url="https://github.com/akarma-iu/wildfire-governance-agentic-ai",
+    url="https://anonymous.submission.org",
     license="MIT",
     package_dir={"": "src"},
     packages=find_packages(where="src"),

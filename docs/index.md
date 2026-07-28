@@ -2,7 +2,7 @@
 
 **Governance-Invariant MDPs: A Framework and Formal Safety Case for Agentic Wildfire Monitoring**
 
-*Ali Akarma · Toqeer Ali Syed · Salman Jan · Hammad Muneer · Abdul Khadar Jilani*
+*Anonymous Submission — AAAI 2027 Reviewer Package*
 
 ---
 

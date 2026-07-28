@@ -6,8 +6,6 @@ Thank you for your interest in contributing to `wildfire-governance-agentic-ai`.
 
 ```bash
 # Bash (Linux/macOS)
-git clone https://github.com/akarma-iu/wildfire-governance-agentic-ai.git
-cd wildfire-governance-agentic-ai
 conda env create -f environment.yml
 conda activate wildfire-gov
 pip install -e ".[dev]"
@@ -17,8 +15,6 @@ make test-smoke
 
 ```powershell
 # PowerShell (Windows)
-git clone https://github.com/akarma-iu/wildfire-governance-agentic-ai.git
-Set-Location wildfire-governance-agentic-ai
 conda env create -f environment.yml
 conda activate wildfire-gov
 pip install -e ".[dev]"

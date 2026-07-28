@@ -29,14 +29,10 @@
 
 ```bash
 # Bash
-git clone https://github.com/akarma-iu/wildfire-governance-agentic-ai.git
-cd wildfire-governance-agentic-ai
 pip install -e .
 export PYTHONPATH=src
 
 # PowerShell
-git clone https://github.com/akarma-iu/wildfire-governance-agentic-ai.git
-Set-Location wildfire-governance-agentic-ai
 pip install -e .
 $env:PYTHONPATH = "src"
 ```

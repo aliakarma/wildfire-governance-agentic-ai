@@ -27,6 +27,47 @@ This repository contains the complete implementation, experiment suite, interact
 
 ---
 
+## Step-by-Step Interactive Web Dashboard Guide
+
+The repository includes a web dashboard that streams live simulation steps over WebSocket, rendering the UAV swarm search, Bayesian verification, and smart contract ledger in real time.
+
+### Launching the Dashboard (One Command)
+
+```bash
+# 1. Install dashboard dependencies
+pip install -r dashboard/backend/requirements.txt
+
+# 2. Launch backend API + pre-built frontend server
+python dashboard/run_dashboard.py --port 8123
+```
+
+Open your browser at: **`http://127.0.0.1:8123/`**
+
+---
+
+### Key Dashboard Screens for Reviewers
+
+1. **Live Simulation (`Live` Tab):**
+   - Interactive grid canvas with UAV flight paths, battery status, heat intensity, and live alert streams.
+   - Adjust active fleet size $N$, sector partition $Z$, confidence threshold $\tau$, and coordination policy in real time.
+2. **Governance Explorer (`Governance` Tab):**
+   - Real-time predicate inspector evaluating $\mathcal{G}(s_t, a_t) = [\Conf_t^{(2)} > \tau \land \HA_t = 1]$.
+   - PBFT validator ring visualizer showing BFT safety thresholds ($k=7, f=2$) and on-chain Ed25519 transaction hashes.
+3. **Adversarial Lab (`Adversarial` Tab):**
+   - Mount live attacks: sensor spoofing ($p_{\text{spoof}}$), alert injection ($p_{\text{att}}$), and Byzantine validator compromise ($f_c$).
+   - Real-time verification of Theorem 2's breach bounds.
+4. **Side-by-Side Comparison (`A/B Compare` Tab):**
+   - Run two policies on the **exact same random seed** side-by-side (e.g., Governed PPO-GOMDP vs. Ungoverned Adaptive AI) to observe 100% compliance enforcement vs. unconstrained false alerts.
+5. **Paper Experiments Dropdown (`Paper Experiments` Menu):**
+   - **Ablation (Table 2):** Component knockout metrics.
+   - **Scalability (Figs 2 & 3):** False-alert and latency scaling vs. fleet size $N \in \{5, 10, 20, 40\}$.
+   - **Learning (Fig 3):** PPO-GOMDP validation learning curve across training episodes.
+   - **HITL (Table 7):** Sensitivity to operator error rate $p_{\text{err}} \in \{0.05, 0.10, 0.15, 0.20\}$.
+   - **Statistics (Sec. 6.2):** Statistical significance tests ($t$-test, Holm–Bonferroni, and TOST equivalence $p=0.004$).
+   - **All Experiments:** Interactive registry of all manuscript artifacts and downloadable CSVs.
+
+---
+
 ## Quick Start (Environment Setup)
 
 ### System Requirements
@@ -158,46 +199,6 @@ make figures
 
 ---
 
-## Step-by-Step Interactive Web Dashboard Guide
-
-The repository includes a web dashboard that streams live simulation steps over WebSocket, rendering the UAV swarm search, Bayesian verification, and smart contract ledger in real time.
-
-### Launching the Dashboard (One Command)
-
-```bash
-# 1. Install dashboard dependencies
-pip install -r dashboard/backend/requirements.txt
-
-# 2. Launch backend API + pre-built frontend server
-python dashboard/run_dashboard.py --port 8123
-```
-
-Open your browser at: **`http://127.0.0.1:8123/`**
-
----
-
-### Key Dashboard Screens for Reviewers
-
-1. **Live Simulation (`Live` Tab):**
-   - Interactive grid canvas with UAV flight paths, battery status, heat intensity, and live alert streams.
-   - Adjust active fleet size $N$, sector partition $Z$, confidence threshold $\tau$, and coordination policy in real time.
-2. **Governance Explorer (`Governance` Tab):**
-   - Real-time predicate inspector evaluating $\mathcal{G}(s_t, a_t) = [\Conf_t^{(2)} > \tau \land \HA_t = 1]$.
-   - PBFT validator ring visualizer showing BFT safety thresholds ($k=7, f=2$) and on-chain Ed25519 transaction hashes.
-3. **Adversarial Lab (`Adversarial` Tab):**
-   - Mount live attacks: sensor spoofing ($p_{\text{spoof}}$), alert injection ($p_{\text{att}}$), and Byzantine validator compromise ($f_c$).
-   - Real-time verification of Theorem 2's breach bounds.
-4. **Side-by-Side Comparison (`A/B Compare` Tab):**
-   - Run two policies on the **exact same random seed** side-by-side (e.g., Governed PPO-GOMDP vs. Ungoverned Adaptive AI) to observe 100% compliance enforcement vs. unconstrained false alerts.
-5. **Paper Experiments Dropdown (`Paper Experiments` Menu):**
-   - **Ablation (Table 2):** Component knockout metrics.
-   - **Scalability (Figs 2 & 3):** False-alert and latency scaling vs. fleet size $N \in \{5, 10, 20, 40\}$.
-   - **Learning (Fig 3):** PPO-GOMDP validation learning curve across training episodes.
-   - **HITL (Table 7):** Sensitivity to operator error rate $p_{\text{err}} \in \{0.05, 0.10, 0.15, 0.20\}$.
-   - **Statistics (Sec. 6.2):** Statistical significance tests ($t$-test, Holm–Bonferroni, and TOST equivalence $p=0.004$).
-   - **All Experiments:** Interactive registry of all manuscript artifacts and downloadable CSVs.
-
----
 
 ## Manuscript-to-Code Mapping & Provenance
 
