@@ -86,8 +86,9 @@ train-ppo:
 	python experiments/11_ppo_training.py \
 	  --config configs/experiments/ppo_training.yaml
 
+# Needs a trained checkpoint; `make train-ppo` produces one (see TRAINING.md).
+# 11b_rl_comparison.py stops with instructions if none is present.
 eval-ppo:
-	python scripts/download_checkpoint.py
 	python experiments/11b_rl_comparison.py \
 	  --config configs/experiments/paper_main_results.yaml \
 	  --use_pretrained
@@ -120,8 +121,9 @@ stress-test:
 
 # ---- Full reproduction (all paper results) -------------------------
 
+# The RL stages need a trained checkpoint (see TRAINING.md); the closed-form and
+# blockchain stages do not. Stages that require one stop with instructions.
 reproduce:
-	python scripts/download_checkpoint.py
 	python data/scripts/generate_synthetic.py
 	bash experiments/run_all.sh
 

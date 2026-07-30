@@ -17,7 +17,7 @@ import sys as _sys; _sys.path.insert(0, "src"); _sys.path.insert(0, ".")
 VIIRS_PATH = Path("data/processed/viirs_grid_mediterranean_2021.npz")
 
 
-def main(config_path: str, smoke: bool = False) -> None:
+def main(config_path: str, smoke: bool = False, allow_untrained: bool = False) -> None:
     # Import shared VIIRS runner from the experiments package
     from experiments._viirs_runner import run_viirs_region  # type: ignore[import]
 
@@ -28,6 +28,7 @@ def main(config_path: str, smoke: bool = False) -> None:
         output_stem="table6_mediterranean",
         config_path=config_path,
         smoke=smoke,
+        allow_untrained=allow_untrained,
     )
 
 
@@ -35,5 +36,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default="configs/experiments/realworld_viirs.yaml")
     parser.add_argument("--smoke", action="store_true")
+    parser.add_argument(
+        "--allow-untrained",
+        "--allow_untrained",
+        dest="allow_untrained",
+        action="store_true",
+        help="Run with random init when no usable checkpoint exists. "
+             "Metrics will NOT match the paper.",
+    )
     args = parser.parse_args()
-    main(args.config, args.smoke)
+    main(args.config, args.smoke, args.allow_untrained)

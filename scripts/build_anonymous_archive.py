@@ -31,17 +31,40 @@ EXCLUDE_DIRS = {
     # Build artefacts embed absolute paths, which on Windows contain the
     # author's username.
     ".next", ".turbo", "build", ".egg-info",
+    # CI config carries a repository slug and is of no use to a reviewer.
+    ".github",
 }
 
 # This script necessarily contains the names it scrubs, so it excludes itself.
-EXCLUDE_FILES = {"build_anonymous_archive.py"}
+# The rebuttal report is working material, not supplementary material.
+EXCLUDE_FILES = {"build_anonymous_archive.py", "Reviewer_Response_Report.md"}
+
+# Files lifted into the archive from otherwise-excluded trees: (source, dest).
+# The appendix is the one part of Paper/ a reviewer must have, and it belongs at
+# the archive root where it is the first thing seen.
+EXTRA_FILES: list[tuple[str, str]] = [
+    ("Paper/AAAI/supplementary.pdf", "supplementary.pdf"),
+]
+
+# Submission limit is 100 MB; fail well before it so the ceiling is discovered
+# here rather than at the upload form.
+MAX_ARCHIVE_MB = 95.0
 
 EXCLUDE_PATH_PARTS = {
     # Byte-identical copies of the frozen targets: misleading to a reviewer.
     ("results", "reproduced"),
 }
 
-EXCLUDE_SUFFIXES = {".pyc", ".pyo", ".log", ".aux", ".synctex", ".blg"}
+EXCLUDE_SUFFIXES = {
+    ".pyc", ".pyo", ".log", ".aux", ".synctex", ".blg",
+    # Trained weights are not shipped: ppo_gomdp_best.pt alone is 63 MB, and a
+    # torch checkpoint is an internal zip so it barely compresses. Nothing on
+    # the headline verification path needs it -- the 354-cell alignment gate,
+    # the test suite, and the whole dashboard all run without one. TRAINING.md
+    # documents how to reproduce it. The checkpoints/ directory itself is kept
+    # (README + .gitkeep) so the training output path exists.
+    ".pt", ".ckpt", ".pth",
+}
 
 # Identifying strings -> anonymous replacements. Order matters: longest first.
 SCRUB: list[tuple[str, str]] = [
@@ -111,6 +134,20 @@ def scrub_text(text: str) -> str:
     return text
 
 
+def scan_bytes(path: Path) -> list[str]:
+    """Return FORBIDDEN patterns found in a file's raw bytes.
+
+    Text files are scrubbed and then checked, but binaries (PDF, .npz, images)
+    are copied verbatim and would otherwise never be checked at all. A PDF in
+    particular can carry an author name in its metadata or an embedded stream.
+    """
+    try:
+        data = path.read_bytes()
+    except OSError:
+        return []
+    return [p for p in FORBIDDEN if re.search(p.encode(), data, re.IGNORECASE)]
+
+
 def collect_files() -> list[Path]:
     return [
         p for p in REPO.rglob("*")
@@ -153,12 +190,30 @@ def build(check_only: bool = False) -> int:
                 dst.parent.mkdir(parents=True, exist_ok=True)
                 dst.write_text(cleaned, encoding="utf-8")
         else:
+            for pattern in scan_bytes(src):
+                violations.append(f"{rel}: binary matches /{pattern}/")
             if not check_only:
                 dst.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(src, dst)
 
+    # Files lifted out of otherwise-excluded trees.
+    n_extra = 0
+    for rel_src, rel_dst in EXTRA_FILES:
+        src = REPO / rel_src
+        if not src.is_file():
+            violations.append(f"{rel_src}: required file is missing")
+            continue
+        for pattern in scan_bytes(src):
+            violations.append(f"{rel_src}: binary matches /{pattern}/")
+        n_extra += 1
+        if not check_only:
+            dst = OUT_DIR / rel_dst
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, dst)
+
     print(f"files considered : {len(files)}")
     print(f"files scrubbed   : {n_scrubbed}")
+    print(f"extra files      : {n_extra} ({', '.join(d for _, d in EXTRA_FILES)})")
 
     if violations:
         print(f"\nFAIL — {len(violations)} identifying string(s) survived:")
@@ -172,6 +227,14 @@ def build(check_only: bool = False) -> int:
         archive = shutil.make_archive(str(OUT_DIR), "zip", root_dir=OUT_DIR)
         size_mb = Path(archive).stat().st_size / 1e6
         print(f"\nwrote {archive} ({size_mb:.1f} MB)")
+
+        if size_mb > MAX_ARCHIVE_MB:
+            print(
+                f"\nFAIL - archive is {size_mb:.1f} MB, over the "
+                f"{MAX_ARCHIVE_MB:.0f} MB build limit (submission cap is 100 MB)."
+            )
+            return 1
+        print(f"size check       : PASS ({size_mb:.1f} / {MAX_ARCHIVE_MB:.0f} MB)")
 
     return 0
 

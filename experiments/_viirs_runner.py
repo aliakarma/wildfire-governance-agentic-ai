@@ -17,6 +17,7 @@ def run_viirs_region(
     output_stem: str,
     config_path: str,
     smoke: bool = False,
+    allow_untrained: bool = False,
 ) -> None:
     """Run PPO-GOMDP evaluation on a real VIIRS region dataset.
 
@@ -27,6 +28,8 @@ def run_viirs_region(
         output_stem: Output CSV filename stem.
         config_path: Path to YAML config file.
         smoke: If True, use reduced episode count.
+        allow_untrained: Proceed with random init when no usable checkpoint
+            exists, instead of stopping. Metrics will not match the paper.
     """
     from wildfire_governance.utils.config import load_config
     from wildfire_governance.utils.logging import get_structured_logger
@@ -57,12 +60,19 @@ def run_viirs_region(
     from wildfire_governance.simulation.grid_environment import EnvironmentConfig
     from wildfire_governance.rl.gomdp_env import GOMMDPGymEnv
     from wildfire_governance.rl.ppo_agent import PPOGOMDPAgent
-    from wildfire_governance.rl.evaluator import CHECKPOINT_DIR
+    from wildfire_governance.rl.evaluator import require_checkpoint
     from wildfire_governance.gomdp.invariant_checker import GovernanceInvariantChecker
 
     n_seeds = 3 if smoke else 10
     n_uavs = 5 if smoke else 20
     n_timesteps = 50 if smoke else 500
+
+    if smoke:
+        # Smoke flies a 5-UAV fleet while the packaged checkpoint is 20-UAV, so
+        # the shape mismatch is structural rather than a broken checkpoint.
+        # Smoke output never feeds the manuscript, so it opts in to untrained
+        # weights; require_checkpoint still prints the banner.
+        allow_untrained = True
 
     adapter = RealWorldAdapter(grid_size=100)
     viirs_grids = adapter.load_viirs_grid(viirs_path)
@@ -74,12 +84,7 @@ def run_viirs_region(
         env_cfg = EnvironmentConfig(grid_size=100, n_timesteps=n_timesteps)
         env = GOMMDPGymEnv(config=env_cfg, n_uavs=n_uavs, enable_governance=True)
         agent = PPOGOMDPAgent(grid_size=100, n_uavs=n_uavs)
-        ckpt = CHECKPOINT_DIR / "ppo_gomdp_best.pt"
-        if ckpt.exists():
-            try:
-                agent.load_checkpoint(ckpt)
-            except Exception:
-                pass
+        require_checkpoint(agent, allow_untrained=allow_untrained)
 
         obs, _ = env.reset(seed=seed)
         if viirs_grids.ndim == 3 and len(viirs_grids) > 0:

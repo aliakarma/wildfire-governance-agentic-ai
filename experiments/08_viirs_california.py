@@ -33,7 +33,7 @@ VIIRS_PATH = Path("data/processed/viirs_grid_california_2020.npz")
 NIFC_PATH = Path("data/processed/nifc_masks_2020_CA.npz")
 
 
-def main(config_path: str, smoke: bool = False) -> None:
+def main(config_path: str, smoke: bool = False, allow_untrained: bool = False) -> None:
     cfg = load_config(config_path)
     run_hash = generate_run_hash(cfg)
     out_dir = RESULTS_BASE / run_hash
@@ -64,7 +64,7 @@ def main(config_path: str, smoke: bool = False) -> None:
     from wildfire_governance.simulation.real_world_adapter import RealWorldAdapter
     from wildfire_governance.rl.gomdp_env import GOMMDPGymEnv
     from wildfire_governance.rl.ppo_agent import PPOGOMDPAgent
-    from wildfire_governance.rl.evaluator import CHECKPOINT_DIR
+    from wildfire_governance.rl.evaluator import require_checkpoint
     from wildfire_governance.gomdp.invariant_checker import GovernanceInvariantChecker
     from wildfire_governance.simulation.grid_environment import EnvironmentConfig
 
@@ -76,6 +76,13 @@ def main(config_path: str, smoke: bool = False) -> None:
     n_uavs = 5 if smoke else 20
     n_timesteps = 50 if smoke else 500
 
+    if smoke:
+        # Smoke flies a 5-UAV fleet while the packaged checkpoint is 20-UAV, so
+        # the shape mismatch is structural rather than a broken checkpoint.
+        # Smoke output never feeds the manuscript, so it opts in to untrained
+        # weights; require_checkpoint still prints the banner.
+        allow_untrained = True
+
     checker = GovernanceInvariantChecker()
     lds, fps, compliances = [], [], []
 
@@ -84,12 +91,7 @@ def main(config_path: str, smoke: bool = False) -> None:
         env_cfg = EnvironmentConfig(grid_size=100, n_timesteps=n_timesteps)
         env = GOMMDPGymEnv(config=env_cfg, n_uavs=n_uavs, enable_governance=True)
         agent = PPOGOMDPAgent(grid_size=100, n_uavs=n_uavs)
-        ckpt = CHECKPOINT_DIR / "ppo_gomdp_best.pt"
-        if ckpt.exists():
-            try:
-                agent.load_checkpoint(ckpt)
-            except Exception:
-                pass
+        require_checkpoint(agent, allow_untrained=allow_untrained)
 
         # Inject real VIIRS heat map into env at reset
         obs, _ = env.reset(seed=seed)
@@ -141,5 +143,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default="configs/experiments/realworld_viirs.yaml")
     parser.add_argument("--smoke", action="store_true")
+    parser.add_argument(
+        "--allow-untrained",
+        "--allow_untrained",
+        dest="allow_untrained",
+        action="store_true",
+        help="Run with random init when no usable checkpoint exists. "
+             "Metrics will NOT match the paper.",
+    )
     args = parser.parse_args()
-    main(args.config, args.smoke)
+    main(args.config, args.smoke, args.allow_untrained)

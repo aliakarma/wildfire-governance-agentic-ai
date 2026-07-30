@@ -1,12 +1,91 @@
 # Governance-Invariant MDPs: A Framework and Formal Safety Case for Agentic Wildfire Monitoring
 
-**Anonymous Submission — AAAI 2027 Reviewer & Auditor Artifact Package**  
-*Anonymous Affiliation*
+**Anonymous Submission — AAAI 2027 Supplementary Material**
 
-[![Paper](https://img.shields.io/badge/Paper-AAAI--2027%20submission-blue)](Paper/AAAI/Wildfire.pdf)
-[![Results](https://img.shields.io/badge/results-354%20cells%20verified-brightgreen)](scripts/verify_paper_alignment.py)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)](https://python.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+Implementation, experiment suite, committed results, interactive dashboard, and
+the appendix ([`supplementary.pdf`](supplementary.pdf)) for the submitted
+manuscript.
+
+---
+
+## Start here — 3 commands, ~4 minutes
+
+No GPU. No training. No Node.js. No API keys.
+
+```bash
+pip install -e ".[dev]"
+
+python scripts/verify_paper_alignment.py    # 354/354 manuscript cells   (~30 s)
+python dashboard/run_dashboard.py           # → http://127.0.0.1:8123/
+```
+
+The first command checks every number in every table and figure of the
+manuscript against the committed result files, cell by cell. The second opens an
+interactive dashboard where you can run live simulation episodes, inspect the
+governance predicate and on-chain transactions, mount adversarial attacks, and
+compare governed against ungoverned policies on identical seeds.
+
+### No trained checkpoint is included
+
+The PPO checkpoint is 63 MB and does not compress, so it is omitted to stay
+within the 100 MB submission limit. **This does not affect verification of the
+paper.**
+
+| | |
+| :--- | :--- |
+| **Works immediately** | The 354-cell alignment gate · all 87 tests · the entire dashboard · Tables 8, 9, 11 (closed-form) · every committed CSV and per-seed bundle |
+| **Needs ~4 h training** | Re-deriving Table 1, Table 5, and the Table 7 VIIRS rows from a freshly learned policy |
+
+Scripts that need a checkpoint **stop with instructions** rather than silently
+running an untrained policy and emitting numbers that do not match the paper.
+[TRAINING.md](TRAINING.md) covers training, expected metrics, and tolerances.
+
+### Anonymity
+
+Author names, affiliations, institutional email addresses, and repository URLs
+have been removed; PDF metadata carries no author fields; version-control
+history is not included. Verify with:
+
+```bash
+python scripts/build_anonymous_archive.py --check
+```
+
+---
+
+## What's in this archive
+
+```
+supplementary.pdf             Appendix: proofs of Theorems 1–2, Tables 5–11
+README.md                     This file
+TRAINING.md                   How to train the PPO-GOMDP policy
+PROVENANCE.md                 Manuscript ↔ code ↔ CSV provenance map
+
+results/paper/                Every committed result behind the manuscript
+  ├── *.csv, *.json           The 354 verified cells
+  ├── per_seed/               Raw per-seed bundles (seeds 0–19)
+  ├── MANIFEST.yaml           Machine-readable artifact map
+  └── CALIBRATION.md          Environment parameterisation
+
+src/wildfire_governance/
+  ├── gomdp/                  GOMDP framework (Definition 1, Theorems 1–2)
+  ├── simulation/             Wildfire grid environment & fire propagation
+  ├── agents/                 UAV agents & coordination engine
+  ├── decision/               Belief state & risk-weighted greedy policy
+  ├── verification/           Two-stage Bayesian fusion pipeline
+  ├── blockchain/             Smart contract & Ed25519 cryptographic gate
+  ├── governance/             HITL authorization interface & oracle model
+  ├── rl/                     PPO-GOMDP environment, training, evaluation
+  ├── adversarial/            Sensor spoofer, alert injector, Byzantine sim
+  └── metrics/                Statistical tests & evaluation metrics
+
+experiments/                  One script per table/figure (01–16)
+dashboard/                    Full-stack dashboard; UI ships pre-built
+configs/                      YAML experiment configurations
+data/                         VIIRS fire events + synthetic fallbacks
+tests/                        87 tests: smoke, unit, integration
+notebooks/                    Walkthrough, results analysis, Colab training
+scripts/                      Verification and build automation
+```
 
 ---
 
@@ -42,6 +121,23 @@ python dashboard/run_dashboard.py --port 8123
 ```
 
 Open your browser at: **`http://127.0.0.1:8123/`**
+
+Expected output:
+
+```
+[ok] Using existing frontend build (dashboard/frontend/out/).
+-> Open http://127.0.0.1:8123/
+INFO:     Application startup complete.
+```
+
+**Node.js is not required.** The UI ships pre-built in
+`dashboard/frontend/out/`, so the launcher serves it directly. Node is needed
+only if you want to modify the frontend and rebuild it (`--force-build`).
+
+**No checkpoint is required.** The dashboard's search policy is analytic, so
+every screen works without training.
+
+If port 8123 is busy, pass `--port <n>`.
 
 ---
 
@@ -84,7 +180,6 @@ Open your browser at: **`http://127.0.0.1:8123/`**
 conda env create -f environment.yml
 conda activate wildfire-gov
 pip install -e ".[dev]"
-python scripts/download_checkpoint.py
 python data/scripts/generate_synthetic.py
 make test-smoke
 ```
@@ -94,7 +189,6 @@ make test-smoke
 conda env create -f environment.yml
 conda activate wildfire-gov
 pip install -e ".[dev]"
-python scripts/download_checkpoint.py
 python data/scripts/generate_synthetic.py
 python -m pytest tests/smoke/ -v --no-cov --timeout=60
 ```
@@ -109,7 +203,6 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements-dev.txt
 pip install -e ".[dev]"
-python scripts/download_checkpoint.py
 python data/scripts/generate_synthetic.py
 make test-smoke
 ```
@@ -120,7 +213,6 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements-dev.txt
 pip install -e ".[dev]"
-python scripts/download_checkpoint.py
 python data/scripts/generate_synthetic.py
 python -m pytest tests/smoke/ -v --no-cov --timeout=60
 ```
@@ -178,6 +270,10 @@ make reproduce
 bash experiments/run_all.sh --skip_training
 ```
 
+The closed-form and blockchain stages run unconditionally. The three RL stages
+(Tables 1, 5, and 7) need a trained checkpoint and will stop with instructions
+if none is present — see [TRAINING.md](TRAINING.md).
+
 ---
 
 ### Step 4: Check Reproducibility Diff Against Manuscript
@@ -202,51 +298,26 @@ make figures
 
 ## Manuscript-to-Code Mapping & Provenance
 
-The table below maps each table and figure in the manuscript to its committed data, script, and code implementation:
+Each table and figure in the manuscript, mapped to its committed data, the
+script that produces it, and its implementation. The **Training** column marks
+the three items that need a trained checkpoint; every other row is verifiable
+immediately from the committed CSVs.
 
-| Manuscript Item | Canonical ID | CSV Path | Experiment Script | Key Implementation File |
-| :--- | :--- | :--- | :--- | :--- |
-| **Table 1** (Policy Comparison) | `table1_rl_comparison` | `results/paper/table1_rl_comparison.csv` | `experiments/11b_rl_comparison.py` | `src/wildfire_governance/rl/gomdp_env.py` |
-| **Table 2** (Ablation Study) | `table2_ablation` | `results/paper/table2_ablation.csv` | `experiments/02_ablation_study.py` | `src/wildfire_governance/gomdp/invariant_checker.py` |
-| **Table 4** (Config Parameters) | `table_config_parameters` | `results/paper/table_config_parameters.csv` | Specification | `src/wildfire_governance/simulation/grid_environment.py` |
-| **Table 5** (Full Metric Summary) | `table1_rl_comparison_main` | `results/paper/table1_rl_comparison_main.csv` | `experiments/01_main_comparison.py` | `src/wildfire_governance/metrics/evaluator.py` |
-| **Table 6** (Adversarial Robustness) | `table3_adversarial` | `results/paper/table3_adversarial.csv` | `experiments/09_adversarial_robustness.py` | `src/wildfire_governance/adversarial/spoofer.py` |
-| **Table 7** (VIIRS Real-World Data) | `table4_realworld_viirs` | `results/paper/table4_realworld_viirs.csv` | `experiments/08_viirs_california.py` | `experiments/_viirs_runner.py` |
-| **Table 8** (Validator Compromise) | `table5_byzantine` | `results/paper/table5_byzantine_empirical.csv` | `experiments/13_byzantine_compromise.py` | `src/wildfire_governance/blockchain/consensus.py` |
-| **Table 9** (Validator Sweep) | `table6_ksweep` | `results/paper/table6_ksweep.csv` | `experiments/14_ksweep.py` | `src/wildfire_governance/blockchain/consensus.py` |
-| **Table 10** (HITL Sensitivity) | `table7_hitl_sensitivity` | `results/paper/table7_hitl_sensitivity.csv` | `experiments/06b_hitl_sensitivity.py` | `src/wildfire_governance/governance/hitl_interface.py` |
-| **Table 11** (Multisig Ablation) | `table9_multisig` | `results/paper/table9_multisig.csv` | `experiments/16_multisig.py` | `src/wildfire_governance/blockchain/crypto_utils.py` |
-| **Sec. 6.2** (Statistical Tests) | `statistical_tests` | `results/paper/statistical_tests.csv` | `scripts/generate_all_paper_results.py` | `src/wildfire_governance/metrics/statistical_tests.py` |
-| **Figure 2** ($F_p$ vs $N$) | `fig2_false_alerts` | `results/paper/fig2_false_alerts.csv` | `experiments/04b_false_alert_scaling.py` | `src/wildfire_governance/decision/greedy_policy.py` |
-| **Figure 3** ($L_d$ vs $N$) | `fig3_latency` | `results/paper/fig3_latency_data.csv` | `experiments/03_scalability.py` | `src/wildfire_governance/agents/coordination_engine.py` |
-
----
-
-## Repository Code Architecture
-
-```
-wildfire-governance-agentic-ai/
-├── configs/                     YAML experiment configurations
-├── data/                        Dataset scripts & synthetic fallbacks
-├── experiments/                 Reproducible experiment scripts (01–16)
-├── Paper/                       AAAI manuscript source & styles
-│   └── AAAI/                    Wildfire.tex, aaai2027.sty, references.bib
-├── results/                     Committed CSVs, JSONs, and seed bundles
-│   └── paper/                   354 verified cells matching manuscript
-├── scripts/                     Verification and build automation scripts
-├── src/wildfire_governance/
-│   ├── gomdp/                   GOMDP framework (Definition 1, Theorems 1–2)
-│   ├── simulation/              Wildfire grid environment & fire propagation
-│   ├── agents/                  UAV agents & coordination engine
-│   ├── decision/                Belief state & greedy policy
-│   ├── verification/            Two-stage Bayesian fusion pipeline
-│   ├── blockchain/              Smart contract & Ed25519 cryptographic gate
-│   ├── governance/              HITL authorization interface & oracle model
-│   ├── rl/                      PPO-GOMDP environment & training logic
-│   ├── adversarial/             Sensor spoofer, alert injector, Byzantine sim
-│   └── metrics/                 Statistical tests & evaluation metrics
-└── tests/                       Smoke, unit, and integration tests
-```
+| Manuscript Item | Canonical ID | CSV Path | Experiment Script | Key Implementation File | Training |
+| :--- | :--- | :--- | :--- | :--- | :---: |
+| **Table 1** (Policy Comparison) | `table1_rl_comparison` | `results/paper/table1_rl_comparison.csv` | `experiments/11b_rl_comparison.py` | `src/wildfire_governance/rl/gomdp_env.py` | **yes** |
+| **Table 2** (Ablation Study) | `table2_ablation` | `results/paper/table2_ablation.csv` | `experiments/02_ablation_study.py` | `src/wildfire_governance/gomdp/invariant_checker.py` | no |
+| **Table 4** (Config Parameters) | `table_config_parameters` | `results/paper/table_config_parameters.csv` | Specification | `src/wildfire_governance/simulation/grid_environment.py` | no |
+| **Table 5** (Full Metric Summary) | `table1_rl_comparison_main` | `results/paper/table1_rl_comparison_main.csv` | `experiments/01_main_comparison.py` | `src/wildfire_governance/metrics/evaluator.py` | **yes** |
+| **Table 6** (Adversarial Robustness) | `table3_adversarial` | `results/paper/table3_adversarial.csv` | `experiments/09_adversarial_robustness.py` | `src/wildfire_governance/adversarial/spoofer.py` | no |
+| **Table 7** (VIIRS Real-World Data) | `table4_realworld_viirs` | `results/paper/table4_realworld_viirs.csv` | `experiments/08_viirs_california.py` | `experiments/_viirs_runner.py` | **yes** |
+| **Table 8** (Validator Compromise) | `table5_byzantine` | `results/paper/table5_byzantine_empirical.csv` | `experiments/13_byzantine_compromise.py` | `src/wildfire_governance/blockchain/consensus.py` | no |
+| **Table 9** (Validator Sweep) | `table6_ksweep` | `results/paper/table6_ksweep.csv` | `experiments/14_ksweep.py` | `src/wildfire_governance/blockchain/consensus.py` | no |
+| **Table 10** (HITL Sensitivity) | `table7_hitl_sensitivity` | `results/paper/table7_hitl_sensitivity.csv` | `experiments/06b_hitl_sensitivity.py` | `src/wildfire_governance/governance/hitl_interface.py` | no |
+| **Table 11** (Multisig Ablation) | `table9_multisig` | `results/paper/table9_multisig.csv` | `experiments/16_multisig.py` | `src/wildfire_governance/blockchain/crypto_utils.py` | no |
+| **Sec. 6.2** (Statistical Tests) | `statistical_tests` | `results/paper/statistical_tests.csv` | `scripts/generate_all_paper_results.py` | `src/wildfire_governance/metrics/statistical_tests.py` | no |
+| **Figure 2** ($F_p$ vs $N$) | `fig2_false_alerts` | `results/paper/fig2_false_alerts.csv` | `experiments/04b_false_alert_scaling.py` | `src/wildfire_governance/decision/greedy_policy.py` | no |
+| **Figure 3** ($L_d$ vs $N$) | `fig3_latency` | `results/paper/fig3_latency_data.csv` | `experiments/03_scalability.py` | `src/wildfire_governance/agents/coordination_engine.py` | no |
 
 ---
 

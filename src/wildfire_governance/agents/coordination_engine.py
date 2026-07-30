@@ -51,6 +51,9 @@ class HierarchicalCoordinationEngine:
         grid_size: Environment grid side length.
         n_sectors: Number of patrol sectors for the greedy policy.
         policy_backend: ``"greedy"`` (default) or ``"ppo"`` (loads PPO-GOMDP checkpoint).
+        allow_untrained: With ``policy_backend="ppo"``, proceed on random weights
+            when no usable checkpoint exists instead of raising. Metrics will not
+            match the paper.
     """
 
     def __init__(
@@ -59,6 +62,7 @@ class HierarchicalCoordinationEngine:
         grid_size: int = 100,
         n_sectors: int = 25,
         policy_backend: str = "greedy",
+        allow_untrained: bool = False,
     ) -> None:
         self._fleet = uav_fleet
         self._grid_size = grid_size
@@ -67,27 +71,45 @@ class HierarchicalCoordinationEngine:
         self._scorer = TwoStageConfidenceScorer()
         self._threshold_adapter = OnlineThresholdAdapter()
         self._policy_backend = policy_backend
+        self._allow_untrained = allow_untrained
         self._ppo_agent: Any = None
         if policy_backend == "ppo":
             self._load_ppo_agent()
 
     def _load_ppo_agent(self) -> None:
-        """Lazily load the PPO-GOMDP agent from the pre-trained checkpoint."""
-        try:
-            from wildfire_governance.rl.ppo_agent import PPOGOMDPAgent  # type: ignore[import]
-            from pathlib import Path
-            ckpt = Path(__file__).parent.parent / "rl" / "checkpoints" / "ppo_gomdp_best.pt"
-            agent = PPOGOMDPAgent(grid_size=self._grid_size, n_uavs=len(self._fleet))
-            if ckpt.exists():
-                agent.load_checkpoint(ckpt)
-            self._ppo_agent = agent
-        except Exception as exc:  # noqa: BLE001
+        """Load the PPO-GOMDP policy requested via ``policy_backend="ppo"``.
+
+        Raises rather than falling back. The caller asked for PPO explicitly, so
+        a silent downgrade -- to greedy, or worse, to untrained random weights --
+        would attribute metrics to a policy that never ran.
+
+        Raises:
+            FileNotFoundError: No usable checkpoint and ``allow_untrained`` unset.
+        """
+        from pathlib import Path
+
+        from wildfire_governance.rl.evaluator import (  # type: ignore[import]
+            CHECKPOINT_NAME,
+            checkpoint_guidance,
+            try_load_checkpoint,
+        )
+        from wildfire_governance.rl.ppo_agent import PPOGOMDPAgent  # type: ignore[import]
+
+        ckpt = Path(__file__).parent.parent / "rl" / "checkpoints" / CHECKPOINT_NAME
+        agent = PPOGOMDPAgent(grid_size=self._grid_size, n_uavs=len(self._fleet))
+        loaded, reason = try_load_checkpoint(agent, ckpt)
+
+        if not loaded:
+            if not self._allow_untrained:
+                raise FileNotFoundError(checkpoint_guidance(ckpt, reason))
             import warnings
             warnings.warn(
-                f"Could not load PPO-GOMDP checkpoint: {exc}. Falling back to greedy.",
+                f"PPO-GOMDP running UNTRAINED ({reason}): {ckpt}. "
+                "Metrics will not match the paper.",
                 stacklevel=2,
             )
-            self._policy_backend = "greedy"
+
+        self._ppo_agent = agent
 
     def step(
         self,

@@ -61,27 +61,14 @@ def _evaluate_ppo_seedwise(
     use_pretrained: bool,
     enable_governance: bool,
     smoke: bool,
+    allow_untrained: bool = False,
 ) -> dict:
     grid_size = 10 if smoke else 100
     env_config = EnvironmentConfig(grid_size=grid_size, n_timesteps=n_timesteps)
 
     agent = PPOGOMDPAgent(grid_size=grid_size, n_uavs=n_uavs)
     if use_pretrained:
-        ckpt = ppo_eval_module.CHECKPOINT_DIR / "ppo_gomdp_best.pt"
-        try:
-            loaded = ppo_eval_module._load_checkpoint_if_compatible(agent, ckpt)
-            if not loaded:
-                logger.warning(
-                    "checkpoint_compatibility_fallback",
-                    path=str(ckpt),
-                    reason="shape mismatch or load failure; using random init",
-                )
-        except FileNotFoundError:
-            logger.warning(
-                "checkpoint_not_found",
-                path=str(ckpt),
-                reason="using random init",
-            )
+        ppo_eval_module.require_checkpoint(agent, allow_untrained=allow_untrained)
 
     checker = GOMDPInvariantChecker(tau=0.80)
     lds, fps, comps = [], [], []
@@ -108,7 +95,12 @@ def _evaluate_ppo_seedwise(
     return {"ld": lds, "fp": fps, "comp": comps}
 
 
-def main(config_path: str, smoke: bool = False, use_pretrained: bool = True) -> None:
+def main(
+    config_path: str,
+    smoke: bool = False,
+    use_pretrained: bool = True,
+    allow_untrained: bool = False,
+) -> None:
     if smoke:
         use_pretrained = False
 
@@ -141,6 +133,7 @@ def main(config_path: str, smoke: bool = False, use_pretrained: bool = True) -> 
         use_pretrained=use_pretrained,
         enable_governance=True,
         smoke=smoke,
+        allow_untrained=allow_untrained,
     )
     ppo_ld_mean, ppo_ld_std, ppo_ld_ci = _mean_std_ci(ppo_seedwise["ld"])
     ppo_fp_mean, ppo_fp_std, ppo_fp_ci = _mean_std_ci(ppo_seedwise["fp"])
@@ -199,6 +192,7 @@ def main(config_path: str, smoke: bool = False, use_pretrained: bool = True) -> 
         use_pretrained=use_pretrained,
         enable_governance=False,
         smoke=smoke,
+        allow_untrained=allow_untrained,
     )
     checker = GovernanceInvariantChecker(tau=0.80)
     cmdp_compliances = []
@@ -336,5 +330,13 @@ if __name__ == "__main__":
     parser.add_argument("--config", default="configs/experiments/paper_main_results.yaml")
     parser.add_argument("--smoke", action="store_true")
     parser.add_argument("--use_pretrained", action="store_true", default=True)
+    parser.add_argument(
+        "--allow-untrained",
+        "--allow_untrained",
+        dest="allow_untrained",
+        action="store_true",
+        help="Run with random init when no usable checkpoint exists. "
+             "Metrics will NOT match the paper.",
+    )
     args = parser.parse_args()
-    main(args.config, args.smoke, args.use_pretrained)
+    main(args.config, args.smoke, args.use_pretrained, args.allow_untrained)

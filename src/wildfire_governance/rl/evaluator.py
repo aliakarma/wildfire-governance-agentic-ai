@@ -17,6 +17,7 @@ from wildfire_governance.utils.reproducibility import set_global_seed
 
 logger = get_structured_logger(__name__)
 CHECKPOINT_DIR = Path(__file__).parent / "checkpoints"
+CHECKPOINT_NAME = "ppo_gomdp_best.pt"
 
 
 def _load_checkpoint_if_compatible(
@@ -52,7 +53,13 @@ def _load_checkpoint_if_compatible(
 
     current_policy_state = agent.policy.state_dict()
     current_value_state = agent.value_net.state_dict()
-    loaded_policy_state = checkpoint["policy_state_dict"]
+    # Compare against the MIGRATED keys. Pre-fusion checkpoints store one head
+    # per UAV (``heads.<i>.*``); agent.load_state_dict() fuses those into
+    # ``head.*`` on load, so validating the raw payload would reject a
+    # checkpoint that loads perfectly well.
+    loaded_policy_state = PPOGOMDPAgent._migrate_legacy_heads(
+        checkpoint["policy_state_dict"]
+    )
     loaded_value_state = checkpoint.get("value_state_dict", {})
 
     for key, current_tensor in current_policy_state.items():
@@ -95,6 +102,91 @@ def _load_checkpoint_if_compatible(
     return True
 
 
+def checkpoint_guidance(ckpt: Path, reason: str) -> str:
+    """Build the actionable message shown when a checkpoint cannot be used."""
+    return (
+        f"\nPPO checkpoint unusable: {ckpt}\n"
+        f"  reason: {reason}\n\n"
+        "This archive ships without the trained checkpoint (file-size limits).\n"
+        "A randomly-initialised policy does NOT reproduce the manuscript's\n"
+        "numbers, so this run stopped rather than emit misleading results.\n\n"
+        "Choose one:\n"
+        "  (a) Verify the published numbers without training (~30 s):\n"
+        "        python scripts/verify_paper_alignment.py\n"
+        "  (b) Train a checkpoint (~4 h on 8 CPU cores):\n"
+        "        python experiments/11_ppo_training.py \\\n"
+        "          --config configs/experiments/ppo_training.yaml\n"
+        "      Check the training loop first (~2 min): add --smoke\n"
+        "  (c) Point at your own checkpoint: --checkpoint_path <path>\n"
+        "  (d) Run deliberately untrained -- a Theorem 1 control, NOT a\n"
+        "      reproduction of the paper's numbers: --allow-untrained\n\n"
+        "See TRAINING.md.\n"
+    )
+
+
+def try_load_checkpoint(agent: PPOGOMDPAgent, ckpt: Path) -> tuple[bool, str]:
+    """Attempt to load ``ckpt`` into ``agent``, reporting why if it failed.
+
+    Returns:
+        ``(True, "")`` on success, else ``(False, reason)``.
+    """
+    if not ckpt.exists():
+        return False, "file not found"
+    try:
+        loaded = _load_checkpoint_if_compatible(agent, ckpt)
+    except FileNotFoundError:
+        return False, "file not found"
+    if loaded:
+        return True, ""
+    return False, "shape mismatch or load failure (see warnings above)"
+
+
+def require_checkpoint(
+    agent: PPOGOMDPAgent,
+    checkpoint_path: str | Path | None = None,
+    *,
+    allow_untrained: bool = False,
+) -> bool:
+    """Load the pre-trained policy into ``agent``, or stop the run.
+
+    Guards the failure mode that matters most here: continuing with random
+    weights produces a run that exits 0 and emits plausible-looking metrics
+    which do not match the manuscript. A reviewer seeing those would
+    reasonably conclude the paper does not reproduce.
+
+    Args:
+        agent: Agent to load weights into.
+        checkpoint_path: Explicit checkpoint; defaults to the packaged path.
+        allow_untrained: Opt in to random init instead of stopping.
+
+    Returns:
+        True when the checkpoint was loaded, False only when
+        ``allow_untrained`` is set and loading was not possible.
+
+    Raises:
+        SystemExit: Checkpoint missing or incompatible, with no explicit opt-in.
+    """
+    ckpt = (
+        Path(checkpoint_path)
+        if checkpoint_path is not None
+        else CHECKPOINT_DIR / CHECKPOINT_NAME
+    )
+
+    loaded, reason = try_load_checkpoint(agent, ckpt)
+    if loaded:
+        return True
+
+    if allow_untrained:
+        logger.warning("checkpoint_untrained_opt_in", path=str(ckpt), reason=reason)
+        print(
+            f"\n!! UNTRAINED POLICY -- {reason}: {ckpt}\n"
+            "!! --allow-untrained was set. Metrics will NOT match the paper.\n"
+        )
+        return False
+
+    raise SystemExit(checkpoint_guidance(ckpt, reason))
+
+
 def evaluate(
     n_seeds: int = 20,
     n_uavs: int = 20,
@@ -103,6 +195,7 @@ def evaluate(
     checkpoint_path: str | Path | None = None,
     enable_governance: bool = True,
     smoke: bool = False,
+    allow_untrained: bool = False,
 ) -> Dict[str, Any]:
     """Evaluate PPO-GOMDP over n_seeds episodes and report aggregated metrics.
 
@@ -113,6 +206,8 @@ def evaluate(
         use_pretrained: If True, load the pre-trained checkpoint.
         enable_governance: If False, runs without GOMDP (CMDP comparison).
         smoke: If True, use 2 seeds × 100 steps.
+        allow_untrained: Proceed with random init when no usable checkpoint
+            exists, instead of stopping. Metrics will not match the paper.
 
     Returns:
         Dict with ld_mean, ld_std, fp_mean, fp_std, governance_compliance_pct.
@@ -120,6 +215,12 @@ def evaluate(
     if smoke:
         n_seeds = 2
         grid_size = 10
+        # Smoke builds a 10x10 agent while the packaged checkpoint is 100x100,
+        # so the shape mismatch is structural, not a broken checkpoint. Smoke is
+        # a plumbing check that is never compared against the manuscript, so it
+        # opts in to untrained weights rather than stopping on them. The banner
+        # from require_checkpoint still prints, so it is never silent.
+        allow_untrained = True
 
     from wildfire_governance.simulation.grid_environment import EnvironmentConfig
     env_config = EnvironmentConfig(
@@ -129,19 +230,7 @@ def evaluate(
 
     agent = PPOGOMDPAgent(grid_size=grid_size, n_uavs=n_uavs)
     if use_pretrained:
-        ckpt = Path(checkpoint_path) if checkpoint_path is not None else (CHECKPOINT_DIR / "ppo_gomdp_best.pt")
-        try:
-            if not _load_checkpoint_if_compatible(agent, ckpt):
-                logger.warning(
-                    "checkpoint_compatibility_fallback",
-                    path=str(ckpt),
-                    reason="shape mismatch or load failure; using random init",
-                )
-        except FileNotFoundError as exc:
-            raise FileNotFoundError(
-                f"PPO checkpoint not found at {ckpt}. "
-                "Download or provide checkpoint before evaluation."
-            ) from exc
+        require_checkpoint(agent, checkpoint_path, allow_untrained=allow_untrained)
 
     checker = GovernanceInvariantChecker(tau=0.80)
     episode_metrics_list: List[EpisodeMetrics] = []
@@ -200,6 +289,14 @@ def main() -> None:
     )
     parser.add_argument("--no_governance", action="store_true")
     parser.add_argument("--smoke", action="store_true")
+    parser.add_argument(
+        "--allow-untrained",
+        "--allow_untrained",
+        dest="allow_untrained",
+        action="store_true",
+        help="Run with random init when no usable checkpoint exists. "
+             "Metrics will NOT match the paper.",
+    )
     args = parser.parse_args()
 
     results = evaluate(
@@ -208,6 +305,7 @@ def main() -> None:
         checkpoint_path=args.checkpoint_path,
         enable_governance=not args.no_governance,
         smoke=args.smoke,
+        allow_untrained=args.allow_untrained,
     )
     print(json.dumps(results, indent=2))
 

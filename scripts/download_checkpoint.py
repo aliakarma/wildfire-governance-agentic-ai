@@ -35,19 +35,20 @@ def validate_checksum(path: Path) -> None:
 DEST.parent.mkdir(parents=True, exist_ok=True)
 
 if DEST.exists():
-    # The trained checkpoint ships with the archive; no download is required.
     print(f"Checkpoint present: {DEST} ({DEST.stat().st_size / 1e6:.1f} MB)")
     validate_checksum(DEST)
     raise SystemExit(0)
 
 if URL == "REPLACE_WITH_ACTUAL_LINK":
     raise SystemExit(
-        f"No checkpoint at {DEST} and no download URL configured.\n"
-        "The checkpoint normally ships with this archive. To train one from "
-        "scratch instead, run:\n"
-        "    python experiments/11_ppo_training.py\n"
-        "Or set WILDFIRE_PPO_CHECKPOINT_URL (and optionally "
-        "WILDFIRE_PPO_CHECKPOINT_SHA256) to fetch it from a mirror."
+        f"No checkpoint at {DEST} and no download URL configured.\n\n"
+        "This archive ships without a trained checkpoint (file-size limits).\n"
+        "No paper-verification step needs one -- see TRAINING.md.\n\n"
+        "To train one (~4 h on 8 CPU cores):\n"
+        "    python experiments/11_ppo_training.py \\\n"
+        "      --config configs/experiments/ppo_training.yaml\n\n"
+        "Or set WILDFIRE_PPO_CHECKPOINT_URL (and optionally\n"
+        "WILDFIRE_PPO_CHECKPOINT_SHA256) to fetch one from a mirror."
     )
 
 print("Downloading PPO checkpoint...")
