@@ -13,19 +13,18 @@ venv/
 env/
 pip-wheel-metadata/
 
-# Data — never commit raw or processed datasets
+# Data: never commit raw or processed datasets
 data/raw/*
 data/processed/*
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 
-# Results — only paper/ is committed; runs/ and reproduced/ are gitignored
+# Results: only paper/ is committed; runs/ and reproduced/ are gitignored
 results/runs/*
 !results/runs/.gitkeep
-# Aggregation preview from generate_all_paper_results.py (never the frozen paper CSVs)
 results/reproduced/
 
-# Credentials and secrets — NEVER commit
+# Credentials and secrets: NEVER commit
 .env
 *.pem
 *.key
@@ -55,9 +54,13 @@ coverage.xml
 .ipynb_checkpoints/
 *.ipynb_checkpoints
 
-# IDEs
+# IDEs, AI assistants, and editor caches
 .vscode/
 .idea/
+.cursor/
+.claude/
+.agents/
+.gemini/
 *.swp
 *.swo
 .DS_Store
@@ -67,13 +70,30 @@ Thumbs.db
 site/
 docs/api/
 
-# Node (for any JS tooling)
+# Node and frontend build artifacts
 node_modules/
+.next/
+out/
+dashboard/frontend/.next/
+dashboard/frontend/out/
+dashboard/frontend/node_modules/
+*.tsbuildinfo
+next-env.d.ts
 
-# Logs
+# Logs and runtime traces
 logs/
+*.log
+.gstack/
 
-# LaTeX build artefacts — the manuscript source itself IS tracked (see Paper/)
+# Archives and presentation source decks
+*.zip
+*.tar.gz
+*.tgz
+*.pptx
+
+# Paper manuscript and LaTeX artefacts
+Paper/
+paper/
 *.aux
 *.bbl
 *.blg
@@ -82,6 +102,7 @@ logs/
 *.toc
 *.fls
 *.fdb_latexmk
-*.log
-.gstack/
-/Paper
+*.nav
+*.snm
+*.vrb
+

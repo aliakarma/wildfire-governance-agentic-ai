@@ -4,7 +4,7 @@ Interactive dashboard for the GOMDP wildfire-monitoring project. It drives the
 **real** `wildfire_governance` simulation (not the pre-committed result CSVs) and
 streams every step to an animated, bilingual, themeable UI.
 
-Built per [`../Dashboard_Guide.md`](../Dashboard_Guide.md). This covers **Phase 0–3**
+Built per [`../docs/dashboard_guide.md`](../docs/dashboard_guide.md). This covers **Phase 0–3**
 plus part of Phase 4 (Live Simulation, Governance Explorer, Adversarial Lab,
 Benchmarks/Reproducibility, **A/B Compare**, and **shareable permalinks**). See
 [Status](#status) for what's implemented vs. planned.
@@ -197,7 +197,7 @@ FastAPI (dashboard/backend) ── imports src/wildfire_governance
 
 ## Scientific integrity
 
-Per `Dashboard_Guide.md` §19, this dashboard computes results **live** from the
+Per `docs/dashboard_guide.md` §19, this dashboard computes results **live** from the
 real simulation. It never presents the pre-committed `results/paper/*.csv` as a
 live run. `/api/paper-results/{table}` exists only to show manuscript reference
 values and always labels them as such. The compliance = 100% figure is enforced

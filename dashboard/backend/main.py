@@ -205,7 +205,7 @@ _ARTIFACT_BY_ID = {a["id"]: a for a in _ARTIFACT_CATALOG}
 def paper_results(table: str) -> Dict[str, Any]:
     """Serve a committed manuscript CSV, EXPLICITLY labeled as a paper value.
 
-    Never blend this with live results (see Dashboard_Guide.md §19).
+    Never blend this with live results (see docs/dashboard_guide.md §19).
     """
     import csv
     safe = table.replace("/", "").replace("..", "")

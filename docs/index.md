@@ -24,11 +24,9 @@ This repository implements the **Governance-Invariant MDP (GOMDP)** framework, w
 ## Quick Navigation
 
 - [Installation](installation.md) — Set up the environment
-- [Quick Start](quickstart.md) — Run in 5 minutes
-- [Architecture](architecture.md) — System design
-- [Datasets](datasets.md) — Real-world VIIRS data setup
 - [Reproducibility](reproducibility.md) — Reproduce all paper results
 - [Blockchain Setup](blockchain_setup.md) — Hyperledger Fabric details
+- [Dashboard Guide](dashboard_guide.md) — Interactive web dashboard guide
 
 ---
 

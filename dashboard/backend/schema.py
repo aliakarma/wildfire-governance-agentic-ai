@@ -96,7 +96,7 @@ METHOD_PRESETS: Dict[str, Dict[str, Any]] = {
     mid: _preset_from_registry(mid) for mid in table1_method_ids()
 }
 
-# UI colour token per method (kept in sync with Dashboard_Guide.md §9.1).
+# UI colour token per method (kept in sync with docs/dashboard_guide.md §9.1).
 METHOD_COLORS: Dict[str, Dict[str, str]] = {
     "ppo_gomdp":    {"light": "#E4572E", "dark": "#FF6B3D"},
     "greedy_gomdp": {"light": "#C77D0A", "dark": "#F2B455"},
