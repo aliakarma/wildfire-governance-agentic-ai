@@ -91,9 +91,7 @@ logs/
 *.tgz
 *.pptx
 
-# Paper manuscript and LaTeX artefacts
-Paper/
-paper/
+# LaTeX build artefacts (the manuscript source itself IS tracked in Paper/)
 *.aux
 *.bbl
 *.blg
@@ -105,4 +103,4 @@ paper/
 *.nav
 *.snm
 *.vrb
-
+/Paper/AAAI
